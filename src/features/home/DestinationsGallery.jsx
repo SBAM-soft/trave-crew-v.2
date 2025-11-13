@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Card from '../shared/Card';
+import Card from '../../shared/Card';
 import styles from './DestinationsGallery.module.css';
 
 function DestinationsGallery() {

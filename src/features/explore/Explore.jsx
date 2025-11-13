@@ -1,6 +1,6 @@
 // src/components/explore/Explore.jsx
 import { useState, useEffect } from 'react';
-import { loadCSV } from '../../utils/dataLoader';
+import { loadCSV } from '../../core/utils/dataLoader';
 import SearchBar from './SearchBar';
 import Filters from './Filters';
 import TripGrid from './TripGrid';
