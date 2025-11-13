@@ -1,0 +1,166 @@
+/* Container */
+.container {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Question */
+.question {
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Buttons Grid */
+.buttonsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Button Base */
+.button {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+/* Icon */
+.icon {
+  font-size: 2.5rem;
+  transition: transform 0.3s ease;
+}
+
+.button:hover .icon {
+  transform: scale(1.2);
+}
+
+/* Text */
+.text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4b5563;
+  transition: color 0.3s ease;
+}
+
+/* Dislike Button */
+.dislikeButton {
+  border-color: #fca5a5;
+}
+
+.dislikeButton:hover {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.dislikeButton:hover .text {
+  color: #dc2626;
+}
+
+.dislikeButton.selected {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.dislikeButton.selected .icon {
+  animation: shake 0.5s ease;
+}
+
+/* Like Button */
+.likeButton {
+  border-color: #86efac;
+}
+
+.likeButton:hover {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.likeButton:hover .text {
+  color: #16a34a;
+}
+
+.likeButton.selected {
+  border-color: #22c55e;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.likeButton.selected .icon {
+  animation: bounce 0.5s ease;
+}
+
+/* Hint */
+.hint {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  min-height: 1.5rem;
+  font-weight: 500;
+}
+
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .buttonsGrid {
+    gap: 1.5rem;
+  }
+
+  .button {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .icon {
+    font-size: 3rem;
+  }
+
+  .text {
+    font-size: 1.125rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .container {
+    padding: 2rem;
+  }
+
+  .question {
+    font-size: 1.25rem;
+  }
+}

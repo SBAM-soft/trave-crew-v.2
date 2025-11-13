@@ -1,0 +1,98 @@
+import styles from './DayBlocksGrid.module.css';
+
+function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
+  // Crea array di blocchi (1 giorno = 1 blocco)
+  const blocks = Array.from({ length: totalDays }, (_, i) => i + 1);
+  
+  // Giorno 1 è sempre "Arrivo" e non cliccabile
+  const isArrivalDay = (day) => day === 1;
+  
+  // Controlla se un blocco è pieno
+  const isFilled = (day) => filledBlocks.includes(day);
+
+  return (
+    <div className={styles.container}>
+      {/* Header */}
+      <div className={styles.header}>
+        <h3 className={styles.title}>📅 I tuoi giorni</h3>
+        <p className={styles.subtitle}>
+          {filledBlocks.length} di {totalDays - 1} giorni pianificati
+        </p>
+        <div className={styles.progressBar}>
+          <div 
+            className={styles.progress}
+            style={{ width: `${((filledBlocks.length) / (totalDays - 1)) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Griglia blocchi */}
+      <div className={styles.grid}>
+        {blocks.map(day => {
+          const filled = isFilled(day);
+          const arrival = isArrivalDay(day);
+          
+          return (
+            <div
+              key={day}
+              className={`${styles.block} ${
+                arrival ? styles.arrival : 
+                filled ? styles.filled : styles.empty
+              }`}
+              onClick={() => !arrival && filled && onBlockClick && onBlockClick(day)}
+              style={{ cursor: !arrival && filled ? 'pointer' : 'default' }}
+            >
+              {/* Numero giorno */}
+              <span className={styles.dayNumber}>
+                {arrival ? '✈️' : `Giorno ${day}`}
+              </span>
+
+              {/* Label arrivo */}
+              {arrival && (
+                <span className={styles.arrivalLabel}>Arrivo</span>
+              )}
+
+              {/* Checkmark per blocchi pieni */}
+              {filled && !arrival && (
+                <div className={styles.checkmark}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+              )}
+
+              {/* Placeholder per blocchi vuoti */}
+              {!filled && !arrival && (
+                <div className={styles.placeholder}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                  </svg>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Legenda */}
+      <div className={styles.legend}>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendBlock} ${styles.arrival}`} />
+          <span>Arrivo (no esperienze)</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendBlock} ${styles.filled}`} />
+          <span>Giorno pianificato</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendBlock} ${styles.empty}`} />
+          <span>Da pianificare</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default DayBlocksGrid;

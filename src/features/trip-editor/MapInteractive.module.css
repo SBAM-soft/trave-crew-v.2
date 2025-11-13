@@ -1,0 +1,317 @@
+.mapContainer {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+/* Header mappa */
+.mapHeader {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.mapTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.mapSubtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Immagine mappa */
+.mapImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.mapImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.3;
+}
+
+.mapOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.mapLabel {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  color: #667eea;
+  backdrop-filter: blur(10px);
+}
+
+/* Sezione zone */
+.zonesSection {
+  margin-top: 1.5rem;
+}
+
+.zonesTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+}
+
+.zonesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Card zona */
+.zoneCard {
+  position: relative;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zoneCard:hover,
+.zoneCard.hovered {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.zoneCard.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+/* Badge tipo area */
+.zoneBadge {
+  display: inline-block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+}
+
+.zoneBadge[data-type="città"] {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.zoneBadge[data-type="mare"] {
+  background: rgba(14, 165, 233, 0.1);
+}
+
+.zoneBadge[data-type="montagna"] {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.zoneBadge[data-type="natura"] {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.zoneBadge[data-type="deserto"] {
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.zoneBadge[data-type="città-cultura"],
+.zoneBadge[data-type="città-mare"] {
+  background: rgba(168, 85, 247, 0.1);
+}
+
+/* Nome zona */
+.zoneName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+/* Descrizione */
+.zoneDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+}
+
+/* Info zona */
+.zoneInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.infoItem {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+/* Indicatore selezione */
+.selectedIndicator {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Info zona selezionata */
+.selectedInfo {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 0.75rem;
+  border-left: 4px solid #667eea;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.selectedInfo h4 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #667eea;
+  margin: 0 0 0.5rem 0;
+}
+
+.selectedInfo p {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Caratteristiche */
+.caratteristiche {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.caratteristiche strong {
+  font-size: 0.875rem;
+  color: #1f2937;
+  margin-right: 0.25rem;
+}
+
+.caratteristica {
+  display: inline-block;
+  background: white;
+  color: #667eea;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #667eea;
+}
+
+/* Messaggio nessuna zona */
+.noZones {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.noZones p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .mapContainer {
+    padding: 2rem;
+  }
+
+  .mapImageWrapper {
+    height: 400px;
+  }
+
+  .zonesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mapTitle {
+    font-size: 1.75rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .mapImageWrapper {
+    height: 500px;
+  }
+
+  .zonesGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  .mapTitle {
+    font-size: 2rem;
+  }
+
+  .zoneCard {
+    padding: 1.25rem;
+  }
+}

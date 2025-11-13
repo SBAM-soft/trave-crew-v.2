@@ -1,0 +1,162 @@
+.step {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.selectedCount {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.countBadge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.countPlaceholder {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+
+.interessiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.interesseCard {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.interesseCard:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+}
+
+.interesseCard.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.interesseIcon {
+  font-size: 2.5rem;
+  transition: transform 0.3s ease;
+}
+
+.interesseCard:hover .interesseIcon {
+  transform: scale(1.1);
+}
+
+.interesseCard.selected .interesseIcon {
+  transform: scale(1.15);
+}
+
+.interesseLabel {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.hint {
+  background: #e0e7ff;
+  border: 1px solid #818cf8;
+  color: #3730a3;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+.interessiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 colonne desktop */
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+  .interessiGrid {
+    grid-template-columns: repeat(4, 1fr); /* 4 colonne laptop */
+  }
+}
+
+@media (max-width: 900px) {
+  .interessiGrid {
+    grid-template-columns: repeat(3, 1fr); /* 3 colonne tablet */
+  }
+}
+
+@media (max-width: 600px) {
+  .interessiGrid {
+    grid-template-columns: repeat(2, 1fr); /* 2 colonne mobile */
+  }
+}
+}
