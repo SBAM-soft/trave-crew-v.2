@@ -4,6 +4,7 @@ import { loadCSV } from '../../core/utils/dataLoader';
 import SearchBar from './SearchBar';
 import Filters from './Filters';
 import TripGrid from './TripGrid';
+import SkeletonCard from './SkeletonCard';
 import styles from './Explore.module.css';
 
 function Explore() {
@@ -116,9 +117,17 @@ function Explore() {
     return (
       <div className={styles.explore}>
         <div className={styles.container}>
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>Caricamento viaggi...</p>
+          <div className={styles.pageHeader}>
+            <h1>Esplora Viaggi</h1>
+            <p className={styles.subtitle}>
+              Caricamento viaggi in corso...
+            </p>
+          </div>
+
+          <div className={styles.skeletonGrid}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         </div>
       </div>
