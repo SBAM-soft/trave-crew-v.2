@@ -1,8 +1,18 @@
 import Papa from 'papaparse';
 
+// Helper per ottenere il path corretto con base URL
+const getDataPath = (filename) => {
+  const base = import.meta.env.BASE_URL || '/';
+  return `${base}data/${filename}`;
+};
+
 export const loadCSV = (filePath) => {
+  // Se il path inizia con /data/, rimuovilo e usa getDataPath
+  const cleanPath = filePath.replace(/^\/data\//, '');
+  const fullPath = cleanPath.includes('/') ? filePath : getDataPath(cleanPath);
+
   return new Promise((resolve, reject) => {
-    Papa.parse(filePath, {
+    Papa.parse(fullPath, {
       download: true,
       header: true,
       dynamicTyping: true,
@@ -14,11 +24,11 @@ export const loadCSV = (filePath) => {
         if (results.errors.length > 0) {
           console.warn('Warning parsing CSV:', results.errors);
         }
-        console.log('CSV caricato:', filePath, '→', results.data.length, 'righe');
+        console.log('CSV caricato:', fullPath, '→', results.data.length, 'righe');
         resolve(results.data);
       },
       error: (error) => {
-        console.error('Errore caricamento CSV:', filePath, error);
+        console.error('Errore caricamento CSV:', fullPath, error);
         reject(error);
       }
     });
@@ -28,15 +38,15 @@ export const loadCSV = (filePath) => {
 export const loadAllData = async () => {
   try {
     const [destinazioni, zone, esperienze, pacchetti, hotel, voli, plus, costi_accessori, viaggi] = await Promise.all([
-      loadCSV('/data/destinazioni.csv'),
-      loadCSV('/data/zone.csv'),
-      loadCSV('/data/esperienze.csv'),
-      loadCSV('/data/pacchetti.csv'),
-      loadCSV('/data/hotel.csv'),
-      loadCSV('/data/voli.csv'),
-      loadCSV('/data/plus.csv'),
-      loadCSV('/data/costi_accessori.csv'),
-      loadCSV('/data/viaggi.csv')
+      loadCSV('destinazioni.csv'),
+      loadCSV('zone.csv'),
+      loadCSV('esperienze.csv'),
+      loadCSV('pacchetti.csv'),
+      loadCSV('hotel.csv'),
+      loadCSV('voli.csv'),
+      loadCSV('plus.csv'),
+      loadCSV('costi_accessori.csv'),
+      loadCSV('viaggi.csv')
     ]);
 
     return {
