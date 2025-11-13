@@ -32,6 +32,14 @@
   margin: 0 auto;
   padding: 0 1rem;
   text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.content.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .title {

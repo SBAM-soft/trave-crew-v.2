@@ -12,6 +12,7 @@ function Explore() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
   const [filters, setFilters] = useState({
     destinazione: 'all',
     budget: 'all',
@@ -83,8 +84,25 @@ function Explore() {
       risultati = risultati.filter(v => v.STATO === 'aperto');
     }
 
+    // Sorting
+    switch (sortBy) {
+      case 'price-low':
+        risultati.sort((a, b) => (a.COSTO_TOTALE_PP || 0) - (b.COSTO_TOTALE_PP || 0));
+        break;
+      case 'price-high':
+        risultati.sort((a, b) => (b.COSTO_TOTALE_PP || 0) - (a.COSTO_TOTALE_PP || 0));
+        break;
+      case 'duration':
+        risultati.sort((a, b) => (b.DURATA_GIORNI || 0) - (a.DURATA_GIORNI || 0));
+        break;
+      case 'recent':
+      default:
+        // Ordine originale
+        break;
+    }
+
     setViaggiFiltrati(risultati);
-  }, [searchText, filters, viaggi]);
+  }, [searchText, filters, viaggi, sortBy]);
 
   const handleSearch = (text) => {
     setSearchText(text);
@@ -136,9 +154,25 @@ function Explore() {
 
         {/* Risultati */}
         <div className={styles.results}>
-          <p className={styles.resultsCount}>
-            {viaggiFiltrati.length} {viaggiFiltrati.length === 1 ? 'viaggio trovato' : 'viaggi trovati'}
-          </p>
+          <div className={styles.resultsHeader}>
+            <p className={styles.resultsCount}>
+              {viaggiFiltrati.length} {viaggiFiltrati.length === 1 ? 'viaggio trovato' : 'viaggi trovati'}
+            </p>
+            <div className={styles.sortWrapper}>
+              <label htmlFor="sort">Ordina per:</label>
+              <select
+                id="sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className={styles.sortSelect}
+              >
+                <option value="recent">Più recenti</option>
+                <option value="price-low">Prezzo: basso → alto</option>
+                <option value="price-high">Prezzo: alto → basso</option>
+                <option value="duration">Durata</option>
+              </select>
+            </div>
+          </div>
           <TripGrid viaggi={viaggiFiltrati} />
         </div>
       </div>
