@@ -3,6 +3,27 @@ import Card from '../../shared/Card';
 import styles from './PEXPCard.module.css';
 
 function PEXPCard({ pexp, onClick, isSelected = false }) {
+  // Compatibilità CSV: estrai valori da struttura CSV o mock
+  const notti = pexp.MIN_NOTTI || pexp.notti || 2;
+  const giorniTotali = notti + 1;
+  const nome = pexp.NOME || pexp.nome || 'Pacchetto esperienza';
+  const descrizione = pexp.DESCRIZIONE || pexp.storytelling?.intro || 'Scopri questo fantastico pacchetto di esperienze';
+  const zona = pexp.ZONA || pexp.zona_nome || 'Zona non specificata';
+  const prezzo = pexp.PRX_PAX || pexp.prezzo_base || 0;
+
+  // Conta esperienze dal CSV (campi ATTIVITA_G*_ORD*)
+  const countExperiences = () => {
+    const slots = ['ATTIVITA_G2_ORD1', 'ATTIVITA_G2_ORD2', 'ATTIVITA_G3_ORD1', 'ATTIVITA_G3_ORD2',
+                   'ATTIVITA_G4_ORD1', 'ATTIVITA_G4_ORD2', 'ATTIVITA_G5_ORD1'];
+    let count = 0;
+    slots.forEach(slot => {
+      if (pexp[slot]) count++;
+    });
+    return count || (pexp.esperienze_ids?.length || 0);
+  };
+
+  const experiencesCount = countExperiences();
+
   // Calcola score like/dislike
   const totalVotes = (pexp.likes || 0) + (pexp.dislikes || 0);
   const likePercentage = totalVotes > 0 ? Math.round(((pexp.likes || 0) / totalVotes) * 100) : 0;
@@ -12,7 +33,7 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
       {/* Badge durata */}
       <div className={styles.badges}>
         <span className={styles.badge}>
-          📅 {pexp.giorni_totali} giorni • {pexp.notti} notti
+          📅 {giorniTotali} giorni • {notti} notti
         </span>
         {isSelected && (
           <span className={styles.selectedBadge}>
@@ -22,22 +43,22 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
       </div>
 
       {/* Titolo pacchetto */}
-      <h3 className={styles.title}>{pexp.nome}</h3>
+      <h3 className={styles.title}>{nome}</h3>
 
       {/* Intro storytelling (troncata) */}
       <p className={styles.intro}>
-        {pexp.storytelling?.intro 
-          ? `${pexp.storytelling.intro.substring(0, 120)}...`
-          : 'Scopri questo fantastico pacchetto di esperienze'}
+        {descrizione.length > 120
+          ? `${descrizione.substring(0, 120)}...`
+          : descrizione}
       </p>
 
       {/* Informazioni zona */}
       <div className={styles.meta}>
         <div className={styles.metaItem}>
           <span className={styles.icon}>🗺️</span>
-          <span>{pexp.zona_nome || 'Zona non specificata'}</span>
+          <span>{zona}</span>
         </div>
-        
+
         {pexp.citta_arrivo && (
           <div className={styles.metaItem}>
             <span className={styles.icon}>✈️</span>
@@ -47,10 +68,10 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
       </div>
 
       {/* Numero esperienze incluse */}
-      {pexp.esperienze_ids && pexp.esperienze_ids.length > 0 && (
+      {experiencesCount > 0 && (
         <div className={styles.experiences}>
           <span className={styles.experiencesLabel}>
-            ⭐ {pexp.esperienze_ids.length} esperienze incluse
+            ⭐ {experiencesCount} esperienze incluse
           </span>
         </div>
       )}
@@ -60,7 +81,7 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
         {/* Prezzo */}
         <div className={styles.price}>
           <span className={styles.priceLabel}>A partire da</span>
-          <span className={styles.priceValue}>€{pexp.prezzo_base || 0}</span>
+          <span className={styles.priceValue}>€{prezzo}</span>
         </div>
 
         {/* Voti */}
@@ -68,7 +89,7 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
           {totalVotes > 0 ? (
             <>
               <span className={styles.voteBar}>
-                <span 
+                <span
                   className={styles.voteBarFill}
                   style={{ width: `${likePercentage}%` }}
                 />

@@ -1,21 +1,65 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '../../shared/Button';
 import EXPCard from './EXPCard';
 import DETEXP from './DETEXP';
+import { loadCSV } from '../../core/utils/dataLoader';
 import styles from './PEXPPanel.module.css';
 
 function PEXPPanel({ pexp, onConfirm, onClose }) {
   // Stati per le esperienze
-  const [experiences, setExperiences] = useState(pexp.esperienze_ids || []);
+  const [experiences, setExperiences] = useState([]);
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
-  
+  const [loading, setLoading] = useState(true);
+
   // Stati per DETEXP (Livello 3)
   const [showDETEXP, setShowDETEXP] = useState(false);
-  const [selectedExpId, setSelectedExpId] = useState(null);
+  const [selectedExp, setSelectedExp] = useState(null);
+
+  // Carica esperienze reali dal CSV
+  useEffect(() => {
+    const loadExperiences = async () => {
+      try {
+        setLoading(true);
+        const experiencesData = await loadCSV('esperienze.csv');
+
+        // Filtra esperienze del pacchetto
+        const pexpExperiences = [];
+
+        // Prendi le esperienze dagli slot del pacchetto
+        ['ATTIVITA_G2_ORD1', 'ATTIVITA_G2_ORD2', 'ATTIVITA_G3_ORD1', 'ATTIVITA_G3_ORD2',
+         'ATTIVITA_G4_ORD1', 'ATTIVITA_G4_ORD2', 'ATTIVITA_G5_ORD1'].forEach(slot => {
+          if (pexp[slot]) {
+            const exp = experiencesData.find(e => e.CODICE === pexp[slot]);
+            if (exp) {
+              pexpExperiences.push({
+                id: exp.CODICE,
+                nome: exp.ESPERIENZA,
+                descrizione: exp.DESCRIZIONE || '',
+                durata: `${exp.DURATA_ORE || 8} ore`,
+                prezzo: exp.PRX_PAX || 0,
+                tags: exp.TAG ? exp.TAG.split(';') : [],
+                difficolta: exp.DIFFICOLTA || 1,
+                include: exp.INCLUDE || '',
+                nonInclude: exp.NON_INCLUDE || ''
+              });
+            }
+          }
+        });
+
+        setExperiences(pexpExperiences);
+        setLoading(false);
+      } catch (err) {
+        console.error('Errore caricamento esperienze:', err);
+        setLoading(false);
+      }
+    };
+
+    loadExperiences();
+  }, [pexp]);
 
   // Handler click su esperienza → Apre DETEXP (Livello 3)
-  const handleExpClick = (expId) => {
-    setSelectedExpId(expId);
+  const handleExpClick = (exp) => {
+    setSelectedExp(exp);
     setShowDETEXP(true);
   };
 
@@ -23,36 +67,36 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
   const handleExpDislike = (expId) => {
     setDislikedExperiences([...dislikedExperiences, expId]);
     setShowDETEXP(false);
-    // Nota: slot diventa vuoto/tratteggiato
+    setSelectedExp(null);
   };
 
   // Handler like da DETEXP
   const handleExpLike = () => {
     setShowDETEXP(false);
+    setSelectedExp(null);
     // Esperienza confermata!
   };
 
+  if (loading) {
+    return (
+      <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.loadingContent}>
+            <div className={styles.spinner}></div>
+            <p>Caricamento esperienze...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Handler sostituzione esperienza (se slot vuoto)
-  const handleReplaceExp = (oldExpId, newExpId) => {
-    setExperiences(experiences.map(id => id === oldExpId ? newExpId : id));
-    setDislikedExperiences(dislikedExperiences.filter(id => id !== oldExpId));
+  const handleReplaceExp = (oldExpId) => {
+    // Per ora alert, poi si può implementare modale con alternative
+    alert('Funzionalità sostituzione esperienza in arrivo!\nPer ora puoi lasciare vuoto o confermare il pacchetto.');
   };
 
-  // Mock data pacchetto (poi da CSV)
-  const mockPEXP = {
-    ...pexp,
-    nome: pexp.nome || 'Pacchetto Nord Thailandia',
-    descrizione: pexp.descrizione || 'Esplora la giungla, i templi e la cultura del nord',
-    durata_giorni: pexp.durata_giorni || 4,
-    durata_notti: pexp.durata_notti || 3,
-    zona: pexp.zona || 'Chiang Mai',
-    immagine: pexp.immagine || 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800',
-    esperienze: [
-      { id: 'exp1', nome: 'Trekking Giungla', descrizione: 'Avventura nella foresta', durata: 'Giorno intero' },
-      { id: 'exp2', nome: 'Villaggi Tribù', descrizione: 'Cultura locale autentica', durata: 'Giorno intero' },
-      { id: 'exp3', nome: 'Elephant Sanctuary', descrizione: 'Giornata con gli elefanti', durata: 'Giorno intero' }
-    ]
-  };
+  const validExperiences = experiences.filter(exp => !dislikedExperiences.includes(exp.id));
 
   return (
     <>
@@ -63,13 +107,18 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
           {/* Header */}
           <div className={styles.header}>
             <div className={styles.headerContent}>
-              <h2 className={styles.title}>{mockPEXP.nome}</h2>
-              <p className={styles.subtitle}>{mockPEXP.descrizione}</p>
+              <h2 className={styles.title}>{pexp.NOME || pexp.nome}</h2>
+              <p className={styles.subtitle}>{pexp.DESCRIZIONE || 'Pacchetto esperienza completo'}</p>
               <div className={styles.meta}>
-                <span className={styles.metaBadge}>📍 {mockPEXP.zona}</span>
+                <span className={styles.metaBadge}>📍 {pexp.ZONA || pexp.zona}</span>
                 <span className={styles.metaBadge}>
-                  🗓️ {mockPEXP.durata_giorni} giorni / {mockPEXP.durata_notti} notti
+                  🗓️ {pexp.MIN_NOTTI + 1 || 3} giorni / {pexp.MIN_NOTTI || 2} notti
                 </span>
+                {pexp.PRX_PAX && (
+                  <span className={styles.metaBadge}>
+                    💰 €{pexp.PRX_PAX} p.p.
+                  </span>
+                )}
               </div>
             </div>
             <button className={styles.closeBtn} onClick={onClose}>✕</button>
@@ -77,9 +126,9 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
 
           {/* Immagine pacchetto */}
           <div className={styles.imageSection}>
-            <img 
-              src={mockPEXP.immagine} 
-              alt={mockPEXP.nome}
+            <img
+              src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800"
+              alt={pexp.NOME || pexp.nome}
               className={styles.image}
             />
           </div>
@@ -91,21 +140,18 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>🎯 Esperienze incluse</h3>
               <div className={styles.expGrid}>
-                {mockPEXP.esperienze.map((exp) => {
+                {experiences.map((exp) => {
                   const isDisliked = dislikedExperiences.includes(exp.id);
-                  
+
                   return (
                     <div key={exp.id} className={styles.expWrapper}>
                       {isDisliked ? (
                         // Slot vuoto/tratteggiato
                         <div className={styles.emptySlot}>
-                          <p className={styles.emptyText}>Slot disponibile</p>
-                          <button 
+                          <p className={styles.emptyText}>❌ Esperienza rifiutata</p>
+                          <button
                             className={styles.replaceBtn}
-                            onClick={() => {
-                              // Logica sostituzione (da implementare)
-                              alert('Scegli esperienza alternativa');
-                            }}
+                            onClick={() => handleReplaceExp(exp.id)}
                           >
                             🔄 Sostituisci
                           </button>
@@ -114,7 +160,7 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
                         // Card esperienza normale
                         <EXPCard
                           exp={exp}
-                          onClick={() => handleExpClick(exp.id)}
+                          onClick={() => handleExpClick(exp)}
                         />
                       )}
                     </div>
@@ -140,14 +186,15 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
             <Button variant="outline" onClick={onClose}>
               Indietro
             </Button>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={() => {
-                onConfirm(mockPEXP);
+                onConfirm(validExperiences);
                 onClose();
               }}
+              disabled={validExperiences.length === 0}
             >
-              ✓ Conferma Pacchetto
+              ✓ Conferma Pacchetto ({validExperiences.length} exp.)
             </Button>
           </div>
 
@@ -155,11 +202,11 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
       </div>
 
       {/* DETEXP Modal (Livello 3) */}
-      {showDETEXP && (
+      {showDETEXP && selectedExp && (
         <DETEXP
-          expId={selectedExpId}
+          exp={selectedExp}
           onLike={handleExpLike}
-          onDislike={() => handleExpDislike(selectedExpId)}
+          onDislike={() => handleExpDislike(selectedExp.id)}
           onClose={() => setShowDETEXP(false)}
         />
       )}
