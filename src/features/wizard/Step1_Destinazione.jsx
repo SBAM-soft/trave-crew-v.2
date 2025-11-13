@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { loadCSV } from '../../utils/dataLoader';
+import { loadCSV } from '../../core/utils/dataLoader';
 import styles from './Step1_Destinazione.module.css';
 
 function Step1_Destinazione({ value, destinazione, onChange, error }) {
