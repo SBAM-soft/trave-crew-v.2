@@ -114,23 +114,23 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.title}><� Scegli il tuo Hotel</h2>
+            <h2 className={styles.title}>🏨 Scegli il tuo Hotel</h2>
             <p className={styles.subtitle}>
               Trova l'alloggio perfetto per il tuo viaggio a {destinazione}
             </p>
             <div className={styles.meta}>
               <span className={styles.metaBadge}>
-                <� {filteredHotels.length} hotel disponibili
+                🏨 {filteredHotels.length} hotel disponibili
               </span>
               {selectedHotel && (
                 <span className={styles.metaBadge}>
-                   1 hotel selezionato
+                  ✓ 1 hotel selezionato
                 </span>
               )}
             </div>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>
-            
+            ✕
           </button>
         </div>
 
@@ -139,7 +139,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
 
           {/* Filtri */}
           <div className={styles.filtersSection}>
-            <h3 className={styles.filtersTitle}>= Filtra Hotel</h3>
+            <h3 className={styles.filtersTitle}>🔍 Filtra Hotel</h3>
 
             <div className={styles.filtersGrid}>
               {/* Budget */}
@@ -151,9 +151,9 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
                   className={styles.filterSelect}
                 >
                   <option value="ALL">Tutti</option>
-                  <option value="LOW">� Budget</option>
-                  <option value="MEDIUM">�� Medio</option>
-                  <option value="HIGH">��� Lusso</option>
+                  <option value="LOW">💰 Budget</option>
+                  <option value="MEDIUM">💰💰 Medio</option>
+                  <option value="HIGH">💰💰💰 Lusso</option>
                 </select>
               </div>
 
@@ -166,10 +166,10 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
                   className={styles.filterSelect}
                 >
                   <option value="ALL">Tutte</option>
-                  <option value="2">PP 2 stelle</option>
-                  <option value="3">PPP 3 stelle</option>
-                  <option value="4">PPPP 4 stelle</option>
-                  <option value="5">PPPPP 5 stelle</option>
+                  <option value="2">⭐⭐ 2 stelle</option>
+                  <option value="3">⭐⭐⭐ 3 stelle</option>
+                  <option value="4">⭐⭐⭐⭐ 4 stelle</option>
+                  <option value="5">⭐⭐⭐⭐⭐ 5 stelle</option>
                 </select>
               </div>
 
@@ -199,7 +199,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
                   checked={serviziFiltri.colazione}
                   onChange={() => toggleServizio('colazione')}
                 />
-                <s Colazione inclusa
+                🍳 Colazione inclusa
               </label>
               <label className={styles.checkboxLabel}>
                 <input
@@ -207,7 +207,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
                   checked={serviziFiltri.wifi}
                   onChange={() => toggleServizio('wifi')}
                 />
-                =� WiFi gratuito
+                📶 WiFi gratuito
               </label>
               <label className={styles.checkboxLabel}>
                 <input
@@ -215,7 +215,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
                   checked={serviziFiltri.piscina}
                   onChange={() => toggleServizio('piscina')}
                 />
-                <� Piscina
+                🏊 Piscina
               </label>
             </div>
           </div>
