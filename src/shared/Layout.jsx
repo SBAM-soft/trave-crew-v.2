@@ -4,9 +4,13 @@ import styles from './Layout.module.css';
 function Layout({ children }) {
   const location = useLocation();
 
-  // Nascondi navbar su wizard e trip-editor per UX pulita
+  // Nascondi navbar su wizard, trip-editor e timeline-editor per UX pulita
   const hideNavbar = location.pathname.includes('/create') ||
-                     location.pathname.includes('/trip-editor');
+                     location.pathname.includes('/trip-editor') ||
+                     location.pathname.includes('/timeline-editor');
+
+  // Mock user state (in futuro da context)
+  const isLoggedIn = true; // Cambia a false per testare login
 
   return (
     <div className={styles.layout}>
@@ -30,12 +34,39 @@ function Layout({ children }) {
               >
                 Esplora
               </Link>
+              {isLoggedIn && (
+                <Link
+                  to="/my-trips"
+                  className={location.pathname === '/my-trips' ? styles.active : ''}
+                >
+                  I miei viaggi
+                </Link>
+              )}
               <Link
                 to="/create"
                 className={`${styles.btnCreate} ${location.pathname === '/create' ? styles.active : ''}`}
               >
                 + Crea Viaggio
               </Link>
+            </div>
+
+            <div className={styles.navUser}>
+              {isLoggedIn ? (
+                <Link
+                  to="/profile"
+                  className={styles.profileLink}
+                >
+                  <img
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mario"
+                    alt="Profilo"
+                    className={styles.avatar}
+                  />
+                </Link>
+              ) : (
+                <Link to="/login" className={styles.loginBtn}>
+                  Accedi
+                </Link>
+              )}
             </div>
           </div>
         </nav>
