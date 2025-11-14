@@ -134,14 +134,7 @@
   font-size: 0.875rem;
 }
 
-@media (max-width: 768px) {
-.interessiGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 colonne desktop */
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
+/* Responsive breakpoints - properly flattened */
 @media (max-width: 1200px) {
   .interessiGrid {
     grid-template-columns: repeat(4, 1fr); /* 4 colonne laptop */
@@ -154,9 +147,14 @@
   }
 }
 
+@media (max-width: 768px) {
+  .interessiGrid {
+    grid-template-columns: repeat(2, 1fr); /* 2 colonne tablet piccolo */
+  }
+}
+
 @media (max-width: 600px) {
   .interessiGrid {
     grid-template-columns: repeat(2, 1fr); /* 2 colonne mobile */
   }
-}
 }

@@ -102,66 +102,66 @@ function Step2_NumeroPersone({ numeroPersone, tipoViaggio, etaRange, genere, onC
         </button>
       </div>
 
-     {tipoViaggio === 'pubblico' && (
-  <div className={styles.publicOptions}>
-    <div className={styles.ageRange}>
-      <label>Fascia d'età partecipanti</label>
-      <p className={styles.selectHint}>Seleziona una o più fasce</p>
-      <div className={styles.ageButtons}>
-        {['18-25', '25-35', '35-45', 'over 50'].map(fascia => (
-          <button
-            key={fascia}
-            className={`${styles.ageBtn} ${
-              etaRange.includes(fascia) ? styles.selected : ''
-            }`}
-            onClick={() => {
-              if (etaRange.includes(fascia)) {
-                // Rimuovi
-                onChange('etaRange', etaRange.filter(f => f !== fascia));
-              } else {
-                // Aggiungi
-                onChange('etaRange', [...etaRange, fascia]);
-              }
-            }}
-          >
-            {fascia === 'over 50' ? '50+ anni' : `${fascia} anni`}
-          </button>
-        ))}
-      </div>
-      {errors.etaRange && (
-        <div className={styles.errorInline}>⚠️ {errors.etaRange}</div>
+      {tipoViaggio === 'pubblico' && (
+        <div className={styles.publicOptions}>
+          <div className={styles.ageRange}>
+            <label>Fascia d'età partecipanti</label>
+            <p className={styles.selectHint}>Seleziona una o più fasce</p>
+            <div className={styles.ageButtons}>
+              {['18-25', '25-35', '35-45', 'over 50'].map(fascia => (
+                <button
+                  key={fascia}
+                  className={`${styles.ageBtn} ${
+                    etaRange.includes(fascia) ? styles.selected : ''
+                  }`}
+                  onClick={() => {
+                    if (etaRange.includes(fascia)) {
+                      // Rimuovi
+                      onChange('etaRange', etaRange.filter(f => f !== fascia));
+                    } else {
+                      // Aggiungi
+                      onChange('etaRange', [...etaRange, fascia]);
+                    }
+                  }}
+                >
+                  {fascia === 'over 50' ? '50+ anni' : `${fascia} anni`}
+                </button>
+              ))}
+            </div>
+            {errors.etaRange && (
+              <div className={styles.errorInline}>⚠️ {errors.etaRange}</div>
+            )}
+          </div>
+
+          <div className={styles.genderSelect}>
+            <label>Composizione gruppo</label>
+            <div className={styles.genderButtons}>
+              <button
+                className={`${styles.genderBtn} ${genere === 'misto' ? styles.selected : ''}`}
+                onClick={() => onChange('genere', 'misto')}
+              >
+                Misto
+              </button>
+              <button
+                className={`${styles.genderBtn} ${genere === 'uomini' ? styles.selected : ''}`}
+                onClick={() => onChange('genere', 'uomini')}
+              >
+                Solo uomini
+              </button>
+              <button
+                className={`${styles.genderBtn} ${genere === 'donne' ? styles.selected : ''}`}
+                onClick={() => onChange('genere', 'donne')}
+              >
+                Solo donne
+              </button>
+            </div>
+          </div>
+
+          {errors.genere && (
+            <div className={styles.error}>⚠️ {errors.genere}</div>
+          )}
+        </div>
       )}
-    </div>
-
-    <div className={styles.genderSelect}>
-      <label>Composizione gruppo</label>
-      <div className={styles.genderButtons}>
-        <button
-          className={`${styles.genderBtn} ${genere === 'misto' ? styles.selected : ''}`}
-          onClick={() => onChange('genere', 'misto')}
-        >
-          Misto
-        </button>
-        <button
-          className={`${styles.genderBtn} ${genere === 'uomini' ? styles.selected : ''}`}
-          onClick={() => onChange('genere', 'uomini')}
-        >
-          Solo uomini
-        </button>
-        <button
-          className={`${styles.genderBtn} ${genere === 'donne' ? styles.selected : ''}`}
-          onClick={() => onChange('genere', 'donne')}
-        >
-          Solo donne
-        </button>
-      </div>
-    </div>
-
-    {errors.genere && (
-      <div className={styles.error}>⚠️ {errors.genere}</div>
-    )}
-  </div>
-)}
     </div>
   );
 }
