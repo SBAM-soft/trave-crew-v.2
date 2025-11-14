@@ -145,9 +145,15 @@ function TripEditor() {
       alert('Completa tutti i giorni prima di creare l\'itinerario!');
       return;
     }
-    
-    alert('Creazione Timeline Itinerario...\n(Da implementare nella Fase 2 - Timeline Trip Editor)');
-    // navigate('/timeline-editor');
+
+    // Naviga alla timeline con tutti i dati necessari
+    navigate('/timeline-editor', {
+      state: {
+        wizardData,
+        filledBlocks,
+        totalDays
+      }
+    });
   };
 
   // Rendering
