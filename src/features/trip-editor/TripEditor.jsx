@@ -277,11 +277,57 @@ function TripEditor() {
               </p>
             </div>
             <div className={styles.packagesGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
-              <HotelCard
-                hotel={selectedHotel}
-                onClick={handleHotelCardClick}
-                isSelected={!!selectedHotel}
-              />
+              {selectedHotel ? (
+                <HotelCard
+                  hotel={selectedHotel}
+                  onClick={handleHotelCardClick}
+                  isSelected={true}
+                />
+              ) : (
+                <div
+                  className={styles.hotelPlaceholder}
+                  onClick={handleHotelCardClick}
+                  style={{
+                    border: '2px dashed #d1d5db',
+                    borderRadius: '12px',
+                    padding: '3rem 2rem',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: '#f9fafb'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = '#667eea';
+                    e.currentTarget.style.backgroundColor = '#f3f4f6';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                    e.currentTarget.style.backgroundColor = '#f9fafb';
+                  }}
+                >
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏨</div>
+                  <h4 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                    Nessun hotel selezionato
+                  </h4>
+                  <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+                    Clicca per scegliere dove alloggiare
+                  </p>
+                  <button
+                    style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Seleziona Hotel
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         )}

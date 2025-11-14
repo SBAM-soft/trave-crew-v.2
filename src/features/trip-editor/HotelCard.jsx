@@ -4,6 +4,15 @@ import styles from './HotelCard.module.css';
 function HotelCard({ hotel, onSelect, isSelected = false }) {
   const [showDetails, setShowDetails] = useState(false);
 
+  // Null check - prevent crash if hotel is null
+  if (!hotel) {
+    return (
+      <div className={styles.hotelCard} style={{ padding: '2rem', textAlign: 'center' }}>
+        <p style={{ color: '#6b7280' }}>Hotel non disponibile</p>
+      </div>
+    );
+  }
+
   // Calcola prezzo medio per notte
   const getPrezzoMedioNotte = () => {
     const mesi = [
