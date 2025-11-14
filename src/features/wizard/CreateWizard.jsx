@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useNavigationGuard from '../../hooks/useNavigationGuard';
+// import useNavigationGuard from '../../hooks/useNavigationGuard'; // Temporarily disabled - causing crashes
 import WizardProgress from './WizardProgress';
 import Step1_Destinazione from './Step1_Destinazione';
 import Step2_NumeroPersone from './Step2_NumeroPersone';
@@ -42,12 +42,12 @@ function CreateWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
 
-  // Protezione navigazione - avvisa se l'utente ha iniziato a compilare il wizard
-  const hasStartedWizard = currentStep > 1 || wizardData.stato_id !== null;
-  useNavigationGuard(
-    hasStartedWizard,
-    'Sei sicuro di voler uscire? I dati inseriti nel wizard andranno persi.'
-  );
+  // Protezione navigazione - TEMPORARILY DISABLED due to useBlocker issues
+  // const hasStartedWizard = currentStep > 1 || wizardData.stato_id !== null;
+  // useNavigationGuard(
+  //   hasStartedWizard,
+  //   'Sei sicuro di voler uscire? I dati inseriti nel wizard andranno persi.'
+  // );
 
   // Scroll to top quando cambia step
   useEffect(() => {
