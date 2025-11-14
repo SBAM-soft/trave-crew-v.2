@@ -47,27 +47,30 @@ function TripEditor() {
   const loadData = async () => {
     try {
       setLoading(true);
-      
-      // Carica destinazioni e zone
-      const destinazioniData = await loadCSV('/data/destinazioni.csv');
-      const zoneData = await loadCSV('/data/zone.csv');
-      
+
+      // Carica destinazioni, zone e pacchetti dal CSV
+      const destinazioniData = await loadCSV('destinazioni.csv');
+      const zoneData = await loadCSV('zone.csv');
+      const pacchettiData = await loadCSV('pacchetti.csv');
+
       // Trova destinazione selezionata (case-insensitive)
-      const dest = destinazioniData.find(d => 
+      const dest = destinazioniData.find(d =>
         d.STATO?.toLowerCase() === wizardData.destinazione?.toLowerCase()
       );
       setDestinazioneData(dest);
-      
+
       // Filtra zone per destinazione (case-insensitive)
-      const destZone = zoneData.filter(z => 
+      const destZone = zoneData.filter(z =>
         z.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
       );
       setZone(destZone);
-      
-      // Per ora usa pacchetti mock (poi si caricheranno da CSV)
-      const mockPacchetti = generateMockPacchetti(destZone);
-      setPacchetti(mockPacchetti);
-      
+
+      // Carica pacchetti reali dal CSV
+      const destPacchetti = pacchettiData.filter(p =>
+        p.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
+      );
+      setPacchetti(destPacchetti);
+
       setLoading(false);
     } catch (err) {
       console.error('Errore caricamento dati:', err);
@@ -76,36 +79,13 @@ function TripEditor() {
     }
   };
 
-  // Genera pacchetti mock per test
-  const generateMockPacchetti = (zoneData) => {
-    if (!zoneData || zoneData.length === 0) return [];
-    
-    return zoneData.slice(0, 3).map((zona, index) => ({
-      id: index + 1,
-      nome: `Avventura ${zona.ZONA}`,
-      zona_nome: zona.ZONA,
-      zona_id: zona.CODICE,
-      giorni_totali: zona.GIORNI_CONSIGLIATI || 3,
-      notti: (zona.GIORNI_CONSIGLIATI || 3) - 1,
-      esperienze_ids: Array.from({ length: (zona.GIORNI_CONSIGLIATI || 3) - 1 }, (_, i) => i + 1 + (index * 10)),
-      storytelling: {
-        intro: zona.DESCRIZIONE || 'Un\'esperienza indimenticabile',
-        titolo: `Scopri ${zona.ZONA}`,
-        descrizione_dettagliata: zona.DESCRIZIONE
-      },
-      citta_arrivo: zona.CITTA_PRINCIPALE,
-      prezzo_base: 350 + (index * 100),
-      likes: 80 + (index * 20),
-      dislikes: 10 + (index * 5),
-      caratteristiche: zona.CARATTERISTICHE
-    }));
-  };
-
   // Handler selezione zona
   const handleZoneClick = (zona) => {
-    setSelectedZone(zona.CODICE);
-    // Filtra pacchetti per zona (mock)
-    const zonePacchetti = pacchetti.filter(p => p.zona_id === zona.CODICE);
+    setSelectedZone(zona.ZONA);
+    // Filtra pacchetti per zona
+    const zonePacchetti = pacchetti.filter(p =>
+      p.ZONA?.toLowerCase() === zona.ZONA?.toLowerCase()
+    );
     if (zonePacchetti.length > 0) {
       setSelectedPacchetto(zonePacchetti[0]);
     }
@@ -119,22 +99,33 @@ function TripEditor() {
 
   // Handler conferma pacchetto dal Panel
   const handleConfirmPackage = (validExperiences) => {
-    if (!currentPexp) return;
-    
-    // Simula riempimento giorni
-    const newFilledBlocks = [];
-    for (let i = 2; i <= currentPexp.giorni_totali; i++) {
-      if (!filledBlocks.includes(i)) {
-        newFilledBlocks.push(i);
+    if (!currentPexp || !validExperiences || validExperiences.length === 0) return;
+
+    // Calcola giorni necessari (1 esperienza = 1 giorno)
+    const experienceDays = validExperiences.length;
+
+    // Riempi blocchi giorni con le esperienze
+    const newBlocks = [];
+    const startDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2; // Inizia dal giorno 2 (1 è arrivo)
+
+    for (let i = 0; i < experienceDays; i++) {
+      const dayNum = startDay + i;
+      if (dayNum <= totalDays) {
+        newBlocks.push({
+          day: dayNum,
+          experience: validExperiences[i],
+          packageName: currentPexp.NOME || currentPexp.nome
+        });
       }
     }
-    
-    setFilledBlocks([...filledBlocks, ...newFilledBlocks]);
+
+    // Aggiungi i nuovi blocchi
+    setFilledBlocks([...filledBlocks, ...newBlocks]);
     setIsPanelOpen(false);
     setCurrentPexp(null);
-    
+
     // Feedback utente
-    alert(`Pacchetto "${currentPexp.nome}" confermato!\n${newFilledBlocks.length} giorni aggiunti al viaggio.`);
+    alert(`✓ Pacchetto "${currentPexp.NOME || currentPexp.nome}" confermato!\n${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1}).`);
   };
 
   // Handler chiusura panel

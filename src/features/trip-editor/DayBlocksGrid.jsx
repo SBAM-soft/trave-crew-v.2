@@ -3,12 +3,24 @@ import styles from './DayBlocksGrid.module.css';
 function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
   // Crea array di blocchi (1 giorno = 1 blocco)
   const blocks = Array.from({ length: totalDays }, (_, i) => i + 1);
-  
+
   // Giorno 1 è sempre "Arrivo" e non cliccabile
   const isArrivalDay = (day) => day === 1;
-  
-  // Controlla se un blocco è pieno
-  const isFilled = (day) => filledBlocks.includes(day);
+
+  // Controlla se un blocco è pieno (supporta sia array di numeri che array di oggetti)
+  const isFilled = (day) => {
+    return filledBlocks.some(block =>
+      typeof block === 'number' ? block === day : block.day === day
+    );
+  };
+
+  // Ottieni l'esperienza per un giorno specifico
+  const getExperience = (day) => {
+    const block = filledBlocks.find(b =>
+      typeof b === 'number' ? b === day : b.day === day
+    );
+    return typeof block === 'object' ? block.experience : null;
+  };
 
   return (
     <div className={styles.container}>
@@ -31,12 +43,13 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
         {blocks.map(day => {
           const filled = isFilled(day);
           const arrival = isArrivalDay(day);
-          
+          const experience = getExperience(day);
+
           return (
             <div
               key={day}
               className={`${styles.block} ${
-                arrival ? styles.arrival : 
+                arrival ? styles.arrival :
                 filled ? styles.filled : styles.empty
               }`}
               onClick={() => !arrival && filled && onBlockClick && onBlockClick(day)}
@@ -52,8 +65,20 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
                 <span className={styles.arrivalLabel}>Arrivo</span>
               )}
 
-              {/* Checkmark per blocchi pieni */}
-              {filled && !arrival && (
+              {/* Info esperienza per blocchi pieni */}
+              {filled && !arrival && experience && (
+                <div className={styles.experienceInfo}>
+                  <span className={styles.experienceName}>{experience.nome}</span>
+                  <div className={styles.checkmark}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              {/* Checkmark per blocchi pieni senza esperienza */}
+              {filled && !arrival && !experience && (
                 <div className={styles.checkmark}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                     <polyline points="20 6 9 17 4 12" />
