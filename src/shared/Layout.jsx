@@ -4,18 +4,12 @@ import styles from './Layout.module.css';
 function Layout({ children }) {
   const location = useLocation();
 
-  // Nascondi navbar su wizard, trip-editor e timeline-editor per UX pulita
-  const hideNavbar = location.pathname.includes('/create') ||
-                     location.pathname.includes('/trip-editor') ||
-                     location.pathname.includes('/timeline-editor');
-
   // Mock user state (in futuro da context)
   const isLoggedIn = true; // Cambia a false per testare login
 
   return (
     <div className={styles.layout}>
-      {!hideNavbar && (
-        <nav className={styles.navbar}>
+      <nav className={styles.navbar}>
           <div className={styles.navContainer}>
             <Link to="/" className={styles.logo}>
               🌍 Travel Crew
@@ -70,14 +64,12 @@ function Layout({ children }) {
             </div>
           </div>
         </nav>
-      )}
 
       <main className={styles.main}>
         {children}
       </main>
 
-      {!hideNavbar && (
-        <footer className={styles.footer}>
+      <footer className={styles.footer}>
           <div className={styles.footerContainer}>
             <p>© 2025 Travel Crew v2.0 - Sistema PEXP</p>
             <div className={styles.footerLinks}>
@@ -87,7 +79,6 @@ function Layout({ children }) {
             </div>
           </div>
         </footer>
-      )}
     </div>
   );
 }

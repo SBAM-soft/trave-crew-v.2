@@ -9,6 +9,7 @@ function MyTrips() {
 
   // Mock data viaggi (in futuro da backend/context)
   const [activeTab, setActiveTab] = useState('upcoming'); // upcoming, past, saved
+  const [expandedTripId, setExpandedTripId] = useState(null);
 
   const trips = {
     upcoming: [
@@ -74,6 +75,62 @@ function MyTrips() {
       saved: { text: '💾 Salvato', color: '#6b7280' }
     };
     return badges[status] || badges.saved;
+  };
+
+  // Funzioni helper per timeline
+  const generateTimeline = (trip) => {
+    const giorni = [];
+    for (let i = 1; i <= trip.giorni; i++) {
+      if (i === 1) {
+        giorni.push({
+          day: i,
+          type: 'arrival',
+          title: `Giorno ${i} - Arrivo`,
+          description: `Arrivo a ${trip.destinazione} e sistemazione in hotel`
+        });
+      } else if (i === trip.giorni) {
+        giorni.push({
+          day: i,
+          type: 'departure',
+          title: `Giorno ${i} - Partenza`,
+          description: `Check-out e partenza da ${trip.destinazione}`
+        });
+      } else {
+        giorni.push({
+          day: i,
+          type: 'experience',
+          title: `Giorno ${i} - Esplorazione`,
+          description: `Giornata di esperienze e attività a ${trip.destinazione}`
+        });
+      }
+    }
+    return giorni;
+  };
+
+  const getDayTypeIcon = (type) => {
+    switch (type) {
+      case 'arrival':
+        return '✈️';
+      case 'departure':
+        return '🏠';
+      case 'experience':
+        return '⭐';
+      default:
+        return '📍';
+    }
+  };
+
+  const getDayTypeColor = (type) => {
+    switch (type) {
+      case 'arrival':
+        return '#fbbf24';
+      case 'departure':
+        return '#ef4444';
+      case 'experience':
+        return '#667eea';
+      default:
+        return '#6b7280';
+    }
   };
 
   const formatDate = (dateString) => {
@@ -178,6 +235,43 @@ function MyTrips() {
                         💰 €{trip.costoTotale}
                       </div>
                     </div>
+
+                    {/* Expand button */}
+                    <div className={styles.tripExpand}>
+                      <button
+                        className={styles.expandButton}
+                        onClick={() => setExpandedTripId(expandedTripId === trip.id ? null : trip.id)}
+                      >
+                        {expandedTripId === trip.id ? '▲ Chiudi itinerario' : '▼ Vedi itinerario'}
+                      </button>
+                    </div>
+
+                    {/* Timeline espandibile */}
+                    {expandedTripId === trip.id && (
+                      <div className={styles.timelineSection}>
+                        <h4 className={styles.timelineTitle}>📅 Itinerario del viaggio</h4>
+                        <div className={styles.timeline}>
+                          {generateTimeline(trip).map((giorno, index, array) => (
+                            <div
+                              key={giorno.day}
+                              className={`${styles.timelineDay} ${index === array.length - 1 ? styles.last : ''}`}
+                            >
+                              {index < array.length - 1 && <div className={styles.timelineLine} />}
+                              <div
+                                className={styles.dayMarker}
+                                style={{ backgroundColor: getDayTypeColor(giorno.type) }}
+                              >
+                                <span className={styles.dayIcon}>{getDayTypeIcon(giorno.type)}</span>
+                              </div>
+                              <div className={styles.dayContent}>
+                                <h5 className={styles.dayTitle}>{giorno.title}</h5>
+                                <p className={styles.dayDescription}>{giorno.description}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Actions */}
                     <div className={styles.tripActions}>

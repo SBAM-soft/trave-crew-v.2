@@ -1,30 +1,30 @@
 /* src/components/explore/Explore.module.css */
 .explore {
   min-height: 100vh;
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   background: linear-gradient(to bottom, #f9fafb, #ffffff);
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
 
 /* Header Pagina */
 .pageHeader {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .pageHeader h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
   color: #1f2937;
 }
 
 .subtitle {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: #6b7280;
   margin: 0;
 }
@@ -58,8 +58,8 @@
 .skeletonGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -71,6 +71,18 @@
 @media (min-width: 1024px) {
   .skeletonGrid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1400px) {
+  .skeletonGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1800px) {
+  .skeletonGrid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
@@ -87,14 +99,14 @@
 
 /* Risultati */
 .results {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 
 .resultsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
