@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import useNavigationGuard from '../../hooks/useNavigationGuard';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayBlocksGrid from './DayBlocksGrid';
 import PEXPCard from './PEXPCard';
 import PEXPPanel from './PEXPPanel';
-import HotelSelector from './HotelSelector';
+import HotelCard from './HotelCard';
+import HotelPanel from './HotelPanel';
 import Button from '../../shared/Button';
 import { loadCSV } from '../../core/utils/dataLoader';
 import styles from './TripEditor.module.css';
@@ -40,9 +42,16 @@ function TripEditor() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPexp, setCurrentPexp] = useState(null);
 
-  // State per Hotel Selector
-  const [isHotelSelectorOpen, setIsHotelSelectorOpen] = useState(false);
+  // State per Hotel Panel
+  const [isHotelPanelOpen, setIsHotelPanelOpen] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
+
+  // Protezione navigazione - avvisa se ci sono modifiche non salvate
+  const hasUnsavedChanges = filledBlocks.length > 0 || selectedHotel !== null;
+  useNavigationGuard(
+    hasUnsavedChanges,
+    'Sei sicuro di voler uscire dal Trip Editor? Il viaggio non è stato completato e le modifiche andranno perse.'
+  );
 
   // Carica dati iniziali
   useEffect(() => {
@@ -144,21 +153,20 @@ function TripEditor() {
     alert(`Modifica giorno ${day}\n(Da implementare - riaprire PEXP Panel per modifiche)`);
   };
 
-  // Handler apertura hotel selector
-  const handleOpenHotelSelector = () => {
-    setIsHotelSelectorOpen(true);
+  // Handler click card hotel → Apre Hotel Panel
+  const handleHotelCardClick = () => {
+    setIsHotelPanelOpen(true);
   };
 
-  // Handler conferma hotel
+  // Handler conferma hotel dal panel
   const handleConfirmHotel = (hotel) => {
     setSelectedHotel(hotel);
-    setIsHotelSelectorOpen(false);
-    alert(`✓ Hotel "${hotel.NOME}" selezionato!\n${hotel.STELLE} stelle • ${hotel.QUARTIERE || hotel.ZONA}`);
+    setIsHotelPanelOpen(false);
   };
 
-  // Handler chiusura hotel selector
-  const handleCloseHotelSelector = () => {
-    setIsHotelSelectorOpen(false);
+  // Handler chiusura hotel panel
+  const handleCloseHotelPanel = () => {
+    setIsHotelPanelOpen(false);
   };
 
   // Handler crea itinerario
@@ -228,49 +236,6 @@ function TripEditor() {
           />
         </section>
 
-        {/* Sezione Hotel */}
-        <section className={styles.section}>
-          <div className={styles.hotelSection}>
-            <h3 className={styles.sectionTitle}>🏨 Scegli il tuo Hotel</h3>
-            <p className={styles.sectionSubtitle}>
-              Seleziona dove alloggiare durante il tuo viaggio
-            </p>
-
-            {selectedHotel ? (
-              <div className={styles.selectedHotelCard}>
-                <div className={styles.selectedHotelImage}>
-                  <img
-                    src={selectedHotel.IMMAGINE_URL || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'}
-                    alt={selectedHotel.NOME}
-                  />
-                </div>
-                <div className={styles.selectedHotelInfo}>
-                  <h4 className={styles.selectedHotelName}>{selectedHotel.NOME}</h4>
-                  <p className={styles.selectedHotelType}>{selectedHotel.TIPO_STRUTTURA}</p>
-                  <div className={styles.selectedHotelMeta}>
-                    <span>{'⭐'.repeat(selectedHotel.STELLE || 3)}</span>
-                    <span>📍 {selectedHotel.QUARTIERE || selectedHotel.ZONA}</span>
-                    {selectedHotel.COLAZIONE_INCLUSA === 'si' && <span>🍳 Colazione inclusa</span>}
-                  </div>
-                  <Button variant="outline" size="sm" onClick={handleOpenHotelSelector}>
-                    🔄 Cambia Hotel
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.noHotelCard}>
-                <div className={styles.noHotelIcon}>🏨</div>
-                <p className={styles.noHotelText}>
-                  Nessun hotel selezionato. Scegli dove alloggiare per completare il tuo viaggio.
-                </p>
-                <Button variant="primary" onClick={handleOpenHotelSelector}>
-                  🏨 Seleziona Hotel
-                </Button>
-              </div>
-            )}
-          </div>
-        </section>
-
         {/* Pacchetti disponibili */}
         <section className={styles.section}>
           <div className={styles.packagesHeader}>
@@ -278,8 +243,8 @@ function TripEditor() {
               📦 Pacchetti Esperienza Disponibili
             </h3>
             <p className={styles.sectionSubtitle}>
-              {selectedZone 
-                ? `Pacchetti per ${zone.find(z => z.CODICE === selectedZone)?.ZONA}` 
+              {selectedZone
+                ? `Pacchetti per ${zone.find(z => z.ZONA === selectedZone)?.ZONA}`
                 : 'Seleziona una zona per vedere i pacchetti'}
             </p>
           </div>
@@ -301,6 +266,25 @@ function TripEditor() {
             )}
           </div>
         </section>
+
+        {/* Sezione Hotel - FASE 2: Mostrata solo dopo aver riempito almeno metà dei giorni */}
+        {filledBlocks.length >= Math.floor((totalDays - 1) / 2) && (
+          <section className={styles.section}>
+            <div className={styles.packagesHeader}>
+              <h3 className={styles.sectionTitle}>🏨 Scegli il tuo Hotel</h3>
+              <p className={styles.sectionSubtitle}>
+                Seleziona dove alloggiare durante il tuo viaggio
+              </p>
+            </div>
+            <div className={styles.packagesGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
+              <HotelCard
+                hotel={selectedHotel}
+                onClick={handleHotelCardClick}
+                isSelected={!!selectedHotel}
+              />
+            </div>
+          </section>
+        )}
 
         {/* Pulsante crea itinerario */}
         <section className={styles.finalSection}>
@@ -332,13 +316,13 @@ function TripEditor() {
         />
       )}
 
-      {/* Hotel Selector - Modal */}
-      {isHotelSelectorOpen && (
-        <HotelSelector
+      {/* Hotel Panel - Modal */}
+      {isHotelPanelOpen && (
+        <HotelPanel
           destinazione={wizardData.destinazione}
           zone={zone}
           onConfirm={handleConfirmHotel}
-          onClose={handleCloseHotelSelector}
+          onClose={handleCloseHotelPanel}
         />
       )}
     </div>

@@ -240,6 +240,106 @@
   }
 }
 
+/* Expand Button */
+.tripExpand {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.expandButton {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.expandButton:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* Timeline Section (same as TripCard) */
+.timelineSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.timelineTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.25rem 0;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.timelineDay {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.timelineDay.last {
+  padding-bottom: 0;
+}
+
+.timelineLine {
+  position: absolute;
+  left: 1.125rem;
+  top: 2.5rem;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(102, 126, 234, 0.3), rgba(102, 126, 234, 0.1));
+}
+
+.dayMarker {
+  position: relative;
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dayIcon {
+  font-size: 1.125rem;
+}
+
+.dayContent {
+  flex: 1;
+  padding-top: 0.25rem;
+}
+
+.dayTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.dayDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
 /* Desktop */
 @media (min-width: 1024px) {
   .title {

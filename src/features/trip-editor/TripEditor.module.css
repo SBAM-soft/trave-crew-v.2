@@ -1,43 +1,43 @@
 .tripEditor {
   min-height: 100vh;
   background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
-  padding-bottom: 2rem;
+  padding-bottom: 1.5rem;
 }
 
 .content {
-  max-width: 1400px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 /* Sezioni */
 .section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .sectionTitle {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #1f2937;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.35rem 0;
 }
 
 .sectionSubtitle {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #6b7280;
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
 }
 
 /* Header pacchetti */
 .packagesHeader {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 /* Griglia pacchetti */
 .packagesGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 /* Nessun pacchetto */
@@ -65,13 +65,13 @@
 
 /* Sezione finale */
 .finalSection {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .finalCard {
   background: white;
-  border-radius: 1rem;
-  padding: 2rem;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 2px solid transparent;
@@ -154,8 +154,8 @@
 /* Hotel Section */
 .hotelSection {
   background: white;
-  border-radius: 1rem;
-  padding: 2rem;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -246,23 +246,24 @@
 /* Tablet */
 @media (min-width: 768px) {
   .content {
-    padding: 0 2rem;
+    padding: 0 1.5rem;
   }
 
   .packagesGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
   }
 
   .sectionTitle {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .finalCard {
-    padding: 2.5rem;
+    padding: 1.75rem;
   }
 
   .finalCard h3 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .quickActions {
@@ -273,30 +274,37 @@
 /* Desktop */
 @media (min-width: 1024px) {
   .content {
-    padding: 0 3rem;
+    padding: 0 2rem;
   }
 
   .packagesGrid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
   .sectionTitle {
-    font-size: 2rem;
+    font-size: 1.65rem;
   }
 
   .finalCard {
-    padding: 3rem;
+    padding: 2rem;
   }
 
   .finalCard h3 {
-    font-size: 2rem;
+    font-size: 1.65rem;
   }
 }
 
 /* Extra large */
 @media (min-width: 1400px) {
   .packagesGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Ultra wide */
+@media (min-width: 1800px) {
+  .packagesGrid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
