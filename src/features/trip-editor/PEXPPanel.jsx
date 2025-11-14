@@ -124,15 +124,6 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
             <button className={styles.closeBtn} onClick={onClose}>✕</button>
           </div>
 
-          {/* Immagine pacchetto */}
-          <div className={styles.imageSection}>
-            <img
-              src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800"
-              alt={pexp.NOME || pexp.nome}
-              className={styles.image}
-            />
-          </div>
-
           {/* Content scrollabile */}
           <div className={styles.content}>
             
