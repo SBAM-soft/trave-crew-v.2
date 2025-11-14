@@ -14,8 +14,19 @@ function CreateWizard() {
   const containerRef = useRef(null);
   
   const [wizardData, setWizardData] = useState(() => {
-    const saved = localStorage.getItem('wizardData');
-    return saved ? JSON.parse(saved) : {
+    try {
+      const saved = localStorage.getItem('wizardData');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log('✅ Wizard data loaded from localStorage:', parsed);
+        return parsed;
+      }
+    } catch (error) {
+      console.error('⚠️ Error loading wizard data from localStorage:', error);
+      localStorage.removeItem('wizardData');
+    }
+
+    return {
       stato_id: null,
       destinazione: '',
       numeroPersone: 1,
