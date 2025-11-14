@@ -1,0 +1,392 @@
+/* Day Timeline Item */
+.dayTimeline {
+  position: relative;
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.dayTimeline.last {
+  margin-bottom: 0;
+}
+
+/* Timeline Line */
+.timelineLine {
+  position: absolute;
+  left: 1.5rem;
+  top: 3rem;
+  bottom: -3rem;
+  width: 3px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  opacity: 0.3;
+}
+
+/* Day Marker */
+.dayMarker {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.dayTimeline:hover .dayMarker {
+  transform: scale(1.1);
+}
+
+.dayIcon {
+  font-size: 1.5rem;
+}
+
+/* Day Content */
+.dayContent {
+  flex: 1;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.dayContent:hover {
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Day Header */
+.dayHeader {
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.dayHeader:hover {
+  background-color: #f9fafb;
+}
+
+.dayHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dayTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.packageBadge {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  color: #667eea;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.expandBtn {
+  background: #f3f4f6;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.expandBtn:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* Day Body */
+.dayBody {
+  padding: 1.5rem;
+}
+
+.dayDescription {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Experiences */
+.experiences {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.experienceCard {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 50%);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  border-left: 4px solid #667eea;
+}
+
+.expHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.expTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+}
+
+.expPrice {
+  background: #667eea;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.expDescription {
+  font-size: 0.9375rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+}
+
+.expMeta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.expMetaItem {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.expTags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.expTag {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  color: #667eea;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(102, 126, 234, 0.25);
+}
+
+.expDetails {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.expDetailSection strong {
+  display: block;
+  font-size: 0.875rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.expDetailList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.expDetailList li {
+  font-size: 0.875rem;
+  color: #6b7280;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.expDetailList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: 700;
+}
+
+/* Notes Section */
+.notesSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.addNoteBtn {
+  background: transparent;
+  border: 2px dashed #d1d5db;
+  color: #6b7280;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.addNoteBtn:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.noteInput {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.noteTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.noteTextarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.noteActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.noteSaveBtn,
+.noteCancelBtn {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.noteSaveBtn {
+  background: #667eea;
+  color: white;
+}
+
+.noteSaveBtn:hover {
+  background: #764ba2;
+}
+
+.noteCancelBtn {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.noteCancelBtn:hover {
+  background: #e5e7eb;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dayTimeline {
+    gap: 1rem;
+  }
+
+  .timelineLine {
+    left: 1rem;
+  }
+
+  .dayMarker {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .dayIcon {
+    font-size: 1rem;
+  }
+
+  .dayHeader,
+  .dayBody {
+    padding: 1rem;
+  }
+
+  .dayTitle {
+    font-size: 1.125rem;
+  }
+
+  .packageBadge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .expHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .expPrice {
+    align-self: flex-start;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .dayTimeline {
+    gap: 2.5rem;
+  }
+
+  .dayMarker {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .dayIcon {
+    font-size: 1.75rem;
+  }
+}
