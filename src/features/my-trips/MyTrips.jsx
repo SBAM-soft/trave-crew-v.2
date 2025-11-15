@@ -1,70 +1,94 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../shared/Button';
 import Card from '../../shared/Card';
+import {
+  getAllTrips,
+  deleteTrip,
+  moveTripToCategory,
+  exportTripAsJSON,
+  populateTestData
+} from '../../core/utils/tripStorage';
 import styles from './MyTrips.module.css';
 
 function MyTrips() {
   const navigate = useNavigate();
 
-  // Mock data viaggi (in futuro da backend/context)
-  const [activeTab, setActiveTab] = useState('upcoming'); // upcoming, past, saved
+  const [activeTab, setActiveTab] = useState('upcoming');
   const [expandedTripId, setExpandedTripId] = useState(null);
+  const [trips, setTrips] = useState({ upcoming: [], past: [], saved: [] });
 
-  const trips = {
-    upcoming: [
-      {
-        id: 1,
-        destinazione: 'Thailandia',
-        zona: 'Bangkok e dintorni',
-        dataPartenza: '2024-07-15',
-        dataRitorno: '2024-07-22',
-        giorni: 7,
-        persone: 2,
-        immagine: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800',
-        status: 'confirmed',
-        costoTotale: 1850
-      },
-      {
-        id: 2,
-        destinazione: 'Giappone',
-        zona: 'Tokyo e Kyoto',
-        dataPartenza: '2024-09-10',
-        dataRitorno: '2024-09-20',
-        giorni: 10,
-        persone: 1,
-        immagine: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
-        status: 'pending',
-        costoTotale: 2400
+  // Carica viaggi da localStorage
+  useEffect(() => {
+    loadTrips();
+  }, []);
+
+  const loadTrips = () => {
+    const storedTrips = getAllTrips();
+    setTrips(storedTrips);
+  };
+
+  // Handler cancella viaggio
+  const handleDeleteTrip = (tripId) => {
+    if (window.confirm('Sei sicuro di voler cancellare questo viaggio?')) {
+      const success = deleteTrip(tripId);
+      if (success) {
+        loadTrips();
+        alert('✓ Viaggio cancellato con successo');
+      } else {
+        alert('⚠️ Errore durante la cancellazione');
       }
-    ],
-    past: [
-      {
-        id: 3,
-        destinazione: 'Portogallo',
-        zona: 'Lisbona e Algarve',
-        dataPartenza: '2024-05-01',
-        dataRitorno: '2024-05-08',
-        giorni: 7,
-        persone: 2,
-        immagine: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
-        status: 'completed',
-        costoTotale: 1200,
-        recensione: true
+    }
+  };
+
+  // Handler modifica viaggio
+  const handleEditTrip = (trip) => {
+    if (trip.wizardData && trip.filledBlocks) {
+      navigate('/trip-editor', {
+        state: {
+          wizardData: trip.wizardData,
+          filledBlocks: trip.filledBlocks,
+          totalDays: trip.giorni,
+          editMode: true,
+          tripId: trip.id
+        }
+      });
+    } else {
+      alert('⚠️ Questo viaggio non può essere modificato (dati incompleti)');
+    }
+  };
+
+  // Handler pubblica viaggio
+  const handlePublishTrip = (tripId) => {
+    if (window.confirm('Vuoi pubblicare questo viaggio tra i prossimi viaggi?')) {
+      const success = moveTripToCategory(tripId, 'upcoming');
+      if (success) {
+        loadTrips();
+        alert('✓ Viaggio pubblicato!');
+        setActiveTab('upcoming');
+      } else {
+        alert('⚠️ Errore durante la pubblicazione');
       }
-    ],
-    saved: [
-      {
-        id: 4,
-        destinazione: 'Islanda',
-        zona: 'Ring Road',
-        giorni: 8,
-        persone: 2,
-        immagine: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800',
-        status: 'saved',
-        costoTotale: 2800
-      }
-    ]
+    }
+  };
+
+  // Handler esporta viaggio
+  const handleExportTrip = (tripId) => {
+    const success = exportTripAsJSON(tripId);
+    if (success) {
+      alert('✓ Viaggio esportato!');
+    } else {
+      alert('⚠️ Errore durante l\'esportazione');
+    }
+  };
+
+  // Handler popola dati di test
+  const handlePopulateTestData = () => {
+    if (window.confirm('Vuoi popolare lo storage con dati di test?')) {
+      populateTestData();
+      loadTrips();
+      alert('✓ Dati di test caricati!');
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -147,9 +171,14 @@ function MyTrips() {
           <h1 className={styles.title}>I miei viaggi</h1>
           <p className={styles.subtitle}>Gestisci i tuoi viaggi passati, prossimi e salvati</p>
         </div>
-        <Button variant="primary" onClick={() => navigate('/create')}>
-          ➕ Crea nuovo viaggio
-        </Button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Button variant="outline" onClick={handlePopulateTestData} size="sm">
+            🧪 Dati Test
+          </Button>
+          <Button variant="primary" onClick={() => navigate('/create')}>
+            ➕ Crea nuovo viaggio
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -280,16 +309,23 @@ function MyTrips() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => alert('Visualizzazione dettagli viaggio...')}
+                            onClick={() => handleExportTrip(trip.id)}
                           >
-                            👁️ Dettagli
+                            📤 Esporta
                           </Button>
                           <Button
                             variant="primary"
                             size="sm"
-                            onClick={() => alert('Modifica viaggio...')}
+                            onClick={() => handleEditTrip(trip)}
                           >
                             ✏️ Modifica
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteTrip(trip.id)}
+                          >
+                            🗑️ Cancella
                           </Button>
                         </>
                       )}
@@ -298,27 +334,17 @@ function MyTrips() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => alert('Visualizzazione dettagli viaggio...')}
+                            onClick={() => handleExportTrip(trip.id)}
                           >
-                            👁️ Dettagli
+                            📤 Esporta
                           </Button>
-                          {trip.recensione ? (
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              onClick={() => alert('Vedi recensione...')}
-                            >
-                              ⭐ Vedi recensione
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              onClick={() => alert('Lascia recensione...')}
-                            >
-                              ⭐ Lascia recensione
-                            </Button>
-                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteTrip(trip.id)}
+                          >
+                            🗑️ Cancella
+                          </Button>
                         </>
                       )}
                       {activeTab === 'saved' && (
@@ -326,16 +352,23 @@ function MyTrips() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => alert('Rimuovi dai salvati...')}
+                            onClick={() => handleDeleteTrip(trip.id)}
                           >
-                            🗑️ Rimuovi
+                            🗑️ Cancella
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditTrip(trip)}
+                          >
+                            ✏️ Modifica
                           </Button>
                           <Button
                             variant="primary"
                             size="sm"
-                            onClick={() => alert('Prenota viaggio...')}
+                            onClick={() => handlePublishTrip(trip.id)}
                           >
-                            ✓ Prenota
+                            ✓ Pubblica
                           </Button>
                         </>
                       )}
