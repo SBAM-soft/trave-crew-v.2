@@ -23,7 +23,7 @@ export const loadCSV = (filePath) => {
       header: true,
       dynamicTyping: false, // Disabled to prevent parsing issues with values like "si"
       skipEmptyLines: true,
-      delimiter: ',',
+      delimiter: '', // Auto-detect delimiter (supports both comma and semicolon)
       quoteChar: '"',
       escapeChar: '"',
       complete: (results) => {
