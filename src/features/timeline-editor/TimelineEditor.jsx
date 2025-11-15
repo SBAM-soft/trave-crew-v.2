@@ -180,18 +180,22 @@ function TimelineEditor() {
       <div className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerInfo}>
-            <h3>🎉 Itinerario completato!</h3>
+            <h3>✅ Itinerario Completato - Fase 1/2</h3>
             <p>
-              Il tuo viaggio a {wizardData.destinazione} è pronto. Puoi esportarlo,
-              condividerlo con il gruppo o salvarlo per dopo.
+              Le esperienze del tuo viaggio a {wizardData.destinazione} sono pronte!<br/>
+              Procedi ora alla Fase 2 per scegliere il tuo hotel e completare la prenotazione.
             </p>
           </div>
           <div className={styles.footerActions}>
             <Button variant="outline" onClick={handleBack}>
-              ← Modifica Itinerario
+              ← Modifica Esperienze
             </Button>
-            <Button variant="primary" onClick={handleExport} size="lg">
-              📤 Esporta e Condividi
+            <Button
+              variant="primary"
+              onClick={() => navigate('/hotel-selector', { state: tripData })}
+              size="lg"
+            >
+              🏨 Fase 2: Scegli Hotel →
             </Button>
           </div>
         </div>
