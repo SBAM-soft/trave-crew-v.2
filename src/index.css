@@ -9,7 +9,7 @@
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  font-size: 75%; /* Riduce tutto il sito al 75% della dimensione standard */
+  font-size: 90%; /* 75% + 20% = 90% della dimensione standard */
 
   color-scheme: light;
   color: #1f2937;
