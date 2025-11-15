@@ -121,16 +121,28 @@ function TripEditor() {
     }
   };
 
+  // State per pacchetti filtrati
+  const [filteredPacchetti, setFilteredPacchetti] = useState([]);
+
   // Handler selezione zona
   const handleZoneClick = (zona) => {
     setSelectedZone(zona.CODICE);
-    // Filtra pacchetti per zona
+
+    // Filtra pacchetti per zona usando ZONA_COLLEGATA
     const zonePacchetti = pacchetti.filter(p =>
-      p.ZONA?.toLowerCase() === zona.ZONA?.toLowerCase()
+      p.ZONA_COLLEGATA === zona.CODICE
     );
+
+    setFilteredPacchetti(zonePacchetti);
+
     if (zonePacchetti.length > 0) {
       setSelectedPacchetto(zonePacchetti[0]);
+    } else {
+      setSelectedPacchetto(null);
     }
+
+    console.log(`🗺️ Zona selezionata: ${zona.ZONA} (${zona.CODICE})`);
+    console.log(`📦 Pacchetti trovati: ${zonePacchetti.length}`);
   };
 
   // Handler click pacchetto → Apre PEXP Panel
@@ -328,18 +340,24 @@ function TripEditor() {
           </div>
 
           <div className={styles.packagesGrid}>
-            {pacchetti.length > 0 ? (
-              pacchetti.map((pexp) => (
-                <PEXPCard
-                  key={pexp.id}
-                  pexp={pexp}
-                  onClick={handlePacchettoClick}
-                  isSelected={selectedPacchetto?.id === pexp.id}
-                />
-              ))
+            {selectedZone ? (
+              filteredPacchetti.length > 0 ? (
+                filteredPacchetti.map((pexp, idx) => (
+                  <PEXPCard
+                    key={pexp.CODICE || idx}
+                    pexp={pexp}
+                    onClick={handlePacchettoClick}
+                    isSelected={selectedPacchetto?.CODICE === pexp.CODICE}
+                  />
+                ))
+              ) : (
+                <div className={styles.noPacchetti}>
+                  <p>Nessun pacchetto disponibile per questa zona.</p>
+                </div>
+              )
             ) : (
               <div className={styles.noPacchetti}>
-                <p>Nessun pacchetto disponibile. Seleziona una zona sulla mappa.</p>
+                <p>Seleziona una zona sulla mappa per vedere i pacchetti disponibili.</p>
               </div>
             )}
           </div>

@@ -1,32 +1,152 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import styles from './MapInteractive.module.css';
+
+// Fix per icone di default di Leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Componente per centrare la mappa quando cambia la destinazione
+function MapCenterController({ center, zones }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (zones && zones.length > 0) {
+      // Crea bounds per includere tutti i marker
+      const bounds = L.latLngBounds(
+        zones.map(z => [parseFloat(z.COORDINATE_LAT), parseFloat(z.COORDINATE_LNG)])
+      );
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8 });
+    } else if (center) {
+      map.setView(center, 6);
+    }
+  }, [map, center, zones]);
+
+  return null;
+}
 
 function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
   const [hoveredZone, setHoveredZone] = useState(null);
+  const [mapCenter, setMapCenter] = useState([13.7563, 100.5018]); // Default Bangkok
+  const [mapZoom, setMapZoom] = useState(6);
 
-  // Placeholder immagine mappa
-  const destinazioneName = (destinazione?.NOME || destinazione?.STATO || 'Destinazione')
-    .replace(/\s+/g, '+'); // Sostituisce spazi con +
-  const mapPlaceholder = `https://via.placeholder.com/800x500/667eea/ffffff?text=${destinazioneName}`;
+  // Aggiorna centro mappa quando cambia destinazione
+  useEffect(() => {
+    if (zone && zone.length > 0) {
+      // Prendi coordinate della prima zona come centro iniziale
+      const firstZone = zone[0];
+      if (firstZone.COORDINATE_LAT && firstZone.COORDINATE_LNG) {
+        setMapCenter([
+          parseFloat(firstZone.COORDINATE_LAT),
+          parseFloat(firstZone.COORDINATE_LNG)
+        ]);
+      }
+    }
+  }, [zone]);
+
+  // Crea icone personalizzate per le zone
+  const createZoneIcon = (zona, isSelected, isHovered) => {
+    const iconMap = {
+      'città': '🏙️',
+      'mare': '🏖️',
+      'montagna': '⛰️',
+      'natura': '🌿',
+      'deserto': '🏜️',
+      'città-cultura': '🏛️',
+      'città-mare': '🌊'
+    };
+
+    const emoji = iconMap[zona.TIPO_AREA] || '📍';
+    const size = isSelected || isHovered ? 40 : 32;
+    const color = isSelected ? '#667eea' : isHovered ? '#764ba2' : '#f97316';
+
+    return L.divIcon({
+      html: `
+        <div style="
+          font-size: ${size}px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+          transition: all 0.2s ease;
+          cursor: pointer;
+        ">
+          ${emoji}
+        </div>
+      `,
+      className: 'custom-marker',
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2]
+    });
+  };
 
   return (
     <div className={styles.mapContainer}>
       {/* Header mappa */}
       <div className={styles.mapHeader}>
         <h3 className={styles.mapTitle}>🗺️ {destinazione?.NOME || 'Destinazione'}</h3>
-        <p className={styles.mapSubtitle}>Seleziona una zona per vedere i pacchetti disponibili</p>
+        <p className={styles.mapSubtitle}>Clicca su una zona per vedere i pacchetti disponibili</p>
       </div>
 
-      {/* Immagine mappa placeholder */}
-      <div className={styles.mapImageWrapper}>
-        <img
-          src={destinazione?.IMMAGINE_URL || mapPlaceholder}
-          alt={`Mappa di ${destinazione?.NOME}`}
-          className={styles.mapImage}
-        />
-        <div className={styles.mapOverlay}>
-          <span className={styles.mapLabel}>Vista mappa interattiva</span>
-        </div>
+      {/* Mappa interattiva reale */}
+      <div className={styles.mapWrapper}>
+        <MapContainer
+          center={mapCenter}
+          zoom={mapZoom}
+          className={styles.leafletMap}
+          scrollWheelZoom={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          <MapCenterController center={mapCenter} zones={zone} />
+
+          {/* Marker per ogni zona */}
+          {zone && zone.map((zona) => {
+            if (!zona.COORDINATE_LAT || !zona.COORDINATE_LNG) return null;
+
+            const isSelected = selectedZone === zona.CODICE;
+            const isHovered = hoveredZone === zona.CODICE;
+
+            return (
+              <Marker
+                key={zona.CODICE}
+                position={[parseFloat(zona.COORDINATE_LAT), parseFloat(zona.COORDINATE_LNG)]}
+                icon={createZoneIcon(zona, isSelected, isHovered)}
+                eventHandlers={{
+                  click: () => onZoneClick(zona),
+                  mouseover: () => setHoveredZone(zona.CODICE),
+                  mouseout: () => setHoveredZone(null)
+                }}
+              >
+                <Popup>
+                  <div className={styles.popupContent}>
+                    <h4>{zona.ZONA}</h4>
+                    {zona.CITTA_PRINCIPALE && <p>📍 {zona.CITTA_PRINCIPALE}</p>}
+                    {zona.GIORNI_CONSIGLIATI && <p>📅 {zona.GIORNI_CONSIGLIATI} giorni consigliati</p>}
+                    {zona.DESCRIZIONE && <p className={styles.popupDesc}>{zona.DESCRIZIONE.substring(0, 100)}...</p>}
+                    <button
+                      onClick={() => onZoneClick(zona)}
+                      className={styles.popupButton}
+                    >
+                      Seleziona questa zona
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
       </div>
 
       {/* Zone disponibili */}
