@@ -11,8 +11,14 @@ export const loadCSV = (filePath) => {
   const cleanPath = filePath.replace(/^\/data\//, '');
   const fullPath = cleanPath.includes('/') ? filePath : getDataPath(cleanPath);
 
+  // Add cache buster to force fresh load
+  const cacheBuster = `?v=${Date.now()}`;
+  const urlWithCacheBuster = fullPath + cacheBuster;
+
+  console.log('🔄 Loading CSV from:', urlWithCacheBuster);
+
   return new Promise((resolve, reject) => {
-    Papa.parse(fullPath, {
+    Papa.parse(urlWithCacheBuster, {
       download: true,
       header: true,
       dynamicTyping: false, // Disabled to prevent parsing issues with values like "si"
@@ -21,17 +27,27 @@ export const loadCSV = (filePath) => {
       quoteChar: '"',
       escapeChar: '"',
       complete: (results) => {
+        console.log('✅ CSV parse complete');
+        console.log('   File:', fullPath);
+        console.log('   Rows:', results.data.length);
+        console.log('   Errors:', results.errors.length);
+
         if (results.errors.length > 0) {
-          console.warn('Warning parsing CSV:', results.errors);
+          console.warn('⚠️  CSV parsing warnings:');
           results.errors.slice(0, 5).forEach(err => {
-            console.warn(`  Row ${err.row}: ${err.message}`);
+            console.warn(`   Row ${err.row}: ${err.type} - ${err.message}`);
           });
         }
-        console.log('CSV caricato:', fullPath, '→', results.data.length, 'righe');
+
+        // Log first row for debugging
+        if (results.data.length > 0) {
+          console.log('   First row:', JSON.stringify(results.data[0], null, 2));
+        }
+
         resolve(results.data);
       },
       error: (error) => {
-        console.error('Errore caricamento CSV:', fullPath, error);
+        console.error('❌ CSV loading error:', fullPath, error);
         reject(error);
       }
     });
