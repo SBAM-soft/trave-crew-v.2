@@ -88,17 +88,19 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
         </div>
 
         {/* Description (collapsible) */}
-        <p className={styles.description}>
-          {showDetails ? hotel.DESCRIZIONE : `${hotel.DESCRIZIONE.substring(0, 100)}...`}
-          {hotel.DESCRIZIONE.length > 100 && (
-            <button
-              className={styles.toggleBtn}
-              onClick={() => setShowDetails(!showDetails)}
-            >
-              {showDetails ? 'Mostra meno' : 'Leggi tutto'}
-            </button>
-          )}
-        </p>
+        {hotel.DESCRIZIONE && (
+          <p className={styles.description}>
+            {showDetails ? hotel.DESCRIZIONE : `${hotel.DESCRIZIONE.substring(0, 100)}...`}
+            {hotel.DESCRIZIONE.length > 100 && (
+              <button
+                className={styles.toggleBtn}
+                onClick={() => setShowDetails(!showDetails)}
+              >
+                {showDetails ? 'Mostra meno' : 'Leggi tutto'}
+              </button>
+            )}
+          </p>
+        )}
 
         {/* Features */}
         <div className={styles.features}>
