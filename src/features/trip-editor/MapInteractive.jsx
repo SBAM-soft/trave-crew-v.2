@@ -13,15 +13,15 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
     <div className={styles.mapContainer}>
       {/* Header mappa */}
       <div className={styles.mapHeader}>
-        <h3 className={styles.mapTitle}>🗺️ {destinazione?.STATO || 'Destinazione'}</h3>
+        <h3 className={styles.mapTitle}>🗺️ {destinazione?.NOME || 'Destinazione'}</h3>
         <p className={styles.mapSubtitle}>Seleziona una zona per vedere i pacchetti disponibili</p>
       </div>
 
       {/* Immagine mappa placeholder */}
       <div className={styles.mapImageWrapper}>
-        <img 
+        <img
           src={destinazione?.IMMAGINE_URL || mapPlaceholder}
-          alt={`Mappa di ${destinazione?.STATO}`}
+          alt={`Mappa di ${destinazione?.NOME}`}
           className={styles.mapImage}
         />
         <div className={styles.mapOverlay}>
