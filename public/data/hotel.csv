@@ -1,73 +1,13 @@
 CODICE,TIPO,DESTINAZIONE,ZONA,QUARTIERE,BUDGET,SERVIZI_MINIMI,PRZ_PAX_NIGHT_15_01_2026,PRZ_PAX_NIGHT_23_01_2026,PRZ_PAX_NIGHT_12_02_2026,PRZ_PAX_NIGHT_26_02_2026,PRZ_PAX_NIGHT_05_03_2026,PRZ_PAX_NIGHT_20_03_2026,PRZ_PAX_NIGHT_02_04_2026,PRZ_PAX_NIGHT_16_04_2026,PRZ_PAX_NIGHT_07_05_2026,PRZ_PAX_NIGHT_13_05_2026,PRZ_PAX_NIGHT_04_06_2026,PRZ_PAX_NIGHT_18_06_2026,PRZ_PAX_NIGHT_02_07_2026,PRZ_PAX_NIGHT_16_07_2026,PRZ_PAX_NIGHT_06_08_2026,PRZ_PAX_NIGHT_20_08_2026,PRZ_PAX_NIGHT_10_09_2026,PRZ_PAX_NIGHT_17_09_2026,PRZ_PAX_NIGHT_09_10_2026,PRZ_PAX_NIGHT_16_10_2026,PRZ_PAX_NIGHT_11_11_2026,PRZ_PAX_NIGHT_18_11_2026,PRZ_PAX_NIGHT_08_12_2026,PRZ_PAX_NIGHT_15_12_2026,EXTRA_1,EXTRA_2,EXTRA_3,EXTRA_4,EXTRA_5,EXTRA_6,EXTRA_7
-HTHBALO,H,THAILANDIA,BANGKOK,"OLD TOWN
-SUKHUMVIT
-CITY CENTER",LOW,"Max 2 stelle
-Posto letto/Doppia/Tripla
-Bagno in comune o privato
-Aria condizionata e Wi Fi",16,17,18,17,15,17,19,20,20,20,18,0,0,0,0,0,0,0,0,0,0,0,0,0,ETHBA15,,,,,,
-HTHBAME,H,THAILANDIA,BANGKOK,"OLD TOWN
-SUKHUMVIT
-CITY CENTER",MEDIUM,"3 o 4 stelle
-Mono/Doppia/Tripla
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",45,44,44,42,46,46,44,44,41,39,41,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHBAHI,H,THAILANDIA,BANGKOK,"OLD TOWN
-SUKHUMVIT
-CITY CENTER",HIGH,"5 stelle
-Mono/Doppia
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",116,121,108,121,115,115,121,120,117,117,115,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHCHLO,H,THAILANDIA,CHIANG MAI,"OLD TOWN
-NIMMANHAEMIN
-RIVERSIDE",LOW,"Max 2 stelle
-Posto letto/Doppia/Tripla
-Bagno in comune o privato
-Aria condizionata e Wi Fi",17,16,17,16,15,14,16,17,14,14,14,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHCHME,H,THAILANDIA,CHIANG MAI,"OLD TOWN
-NIMMANHAEMIN
-RIVERSIDE",MEDIUM,"3 o 4 stelle
-Mono/Doppia/Tripla
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",47,46,44,46,46,41,40,39,38,41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHCHHI,H,THAILANDIA,CHIANG MAI,"OLD TOWN
-NIMMANHAEMIN
-RIVERSIDE",HIGH,"5 stelle
-Mono/Doppia
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",119,101,96,97,97,77,86,102,96,96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHPHLO,H,THAILANDIA,PHUKET,"PHUKET TOWN
-PATONG
-KATA E KARON BEACH",LOW,"Max 2 stelle
-Posto letto/Doppia/Tripla
-Bagno in comune o privato
-Aria condizionata e Wi Fi",25,17,15,15,14,15,13,13,13,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHPHME,H,THAILANDIA,PHUKET,"PHUKET TOWN
-PATONG
-KATA E KARON BEACH",MEDIUM,"3 o 4 stelle
-Mono/Doppia/Tripla
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",59,51,45,49,41,44,32,35,34,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHPHHI,H,THAILANDIA,PHUKET,"PHUKET TOWN
-PATONG
-KATA E KARON BEACH",HIGH,"5 stelle
-Mono/Doppia
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",109,103,95,86,77,76,85,81,76,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHKOLO,H,THAILANDIA,KOH SAMUI,"BOPHUT
-CHAWENG
-LAMAI",LOW,"Max 2 stelle
-Posto letto/Doppia/Tripla
-Bagno in comune o privato
-Aria condizionata e Wi Fi",19,19,20,20,17,18,17,19,20,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHKOME,H,THAILANDIA,KOH SAMUI,"BOPHUT
-CHAWENG
-LAMAI",MEDIUM,"3 o 4 stelle
-Mono/Doppia/Tripla
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",71,61,65,62,67,57,53,53,42,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
-HTHKOHI,H,THAILANDIA,KOH SAMUI,"BOPHUT
-CHAWENG
-LAMAI",HIGH,"5 stelle
-Mono/Doppia
-Bagno privato, Aria Cond. e Wi Fi
-Colazione inclusa",182,173,164,156,152,139,202,134,112,114,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHBALO,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi,16,17,18,17,15,17,19,20,20,20,18,0,0,0,0,0,0,0,0,0,0,0,0,0,ETHBA15,,,,,,
+HTHBAME,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,45,44,44,42,46,46,44,44,41,39,41,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHBAHI,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,116,121,108,121,115,115,121,120,117,117,115,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHCHLO,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi,17,16,17,16,15,14,16,17,14,14,14,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHCHME,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,47,46,44,46,46,41,40,39,38,41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHCHHI,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,119,101,96,97,97,77,86,102,96,96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHPHLO,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi,25,17,15,15,14,15,13,13,13,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHPHME,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,59,51,45,49,41,44,32,35,34,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHPHHI,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,109,103,95,86,77,76,85,81,76,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHKOLO,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi,19,19,20,20,17,18,17,19,20,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHKOME,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,71,61,65,62,67,57,53,53,42,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
+HTHKOHI,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa,182,173,164,156,152,139,202,134,112,114,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,
