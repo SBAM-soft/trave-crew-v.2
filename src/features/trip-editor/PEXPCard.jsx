@@ -6,15 +6,16 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
   // Compatibilità CSV: estrai valori da struttura CSV o mock
   const notti = pexp.MIN_NOTTI || pexp.notti || 2;
   const giorniTotali = notti + 1;
-  const nome = pexp.NOME || pexp.nome || 'Pacchetto esperienza';
+  const nome = pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome || 'Pacchetto esperienza';
   const descrizione = pexp.DESCRIZIONE || pexp.storytelling?.intro || 'Scopri questo fantastico pacchetto di esperienze';
   const zona = pexp.ZONA || pexp.zona_nome || 'Zona non specificata';
   const prezzo = pexp.PRX_PAX || pexp.prezzo_base || 0;
 
-  // Conta esperienze dal CSV (campi ATTIVITA_G*_ORD*)
+  // Conta esperienze dal CSV (campi DAY*_ESPERIENZA_STD)
   const countExperiences = () => {
-    const slots = ['ATTIVITA_G2_ORD1', 'ATTIVITA_G2_ORD2', 'ATTIVITA_G3_ORD1', 'ATTIVITA_G3_ORD2',
-                   'ATTIVITA_G4_ORD1', 'ATTIVITA_G4_ORD2', 'ATTIVITA_G5_ORD1'];
+    const slots = ['DAY2_ESPERIENZA_STD', 'DAY3_ESPERIENZA_STD', 'DAY4_ESPERIENZA_STD',
+                   'DAY5_ESPERIENZA_STD', 'DAY6_ESPERIENZA_STD', 'DAY7_ESPERIENZA_STD',
+                   'DAY8_ESPERIENZA_STD', 'DAY9_ESPERIENZA_STD', 'DAY10_ESPERIENZA_STD'];
     let count = 0;
     slots.forEach(slot => {
       if (pexp[slot]) count++;

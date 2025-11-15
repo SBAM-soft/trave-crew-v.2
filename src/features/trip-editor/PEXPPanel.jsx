@@ -26,21 +26,22 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
         const pexpExperiences = [];
 
         // Prendi le esperienze dagli slot del pacchetto
-        ['ATTIVITA_G2_ORD1', 'ATTIVITA_G2_ORD2', 'ATTIVITA_G3_ORD1', 'ATTIVITA_G3_ORD2',
-         'ATTIVITA_G4_ORD1', 'ATTIVITA_G4_ORD2', 'ATTIVITA_G5_ORD1'].forEach(slot => {
+        ['DAY2_ESPERIENZA_STD', 'DAY3_ESPERIENZA_STD', 'DAY4_ESPERIENZA_STD',
+         'DAY5_ESPERIENZA_STD', 'DAY6_ESPERIENZA_STD', 'DAY7_ESPERIENZA_STD',
+         'DAY8_ESPERIENZA_STD', 'DAY9_ESPERIENZA_STD', 'DAY10_ESPERIENZA_STD'].forEach(slot => {
           if (pexp[slot]) {
             const exp = experiencesData.find(e => e.CODICE === pexp[slot]);
             if (exp) {
               pexpExperiences.push({
                 id: exp.CODICE,
-                nome: exp.ESPERIENZA,
+                nome: exp.ESPERIENZE || exp.ESPERIENZA,
                 descrizione: exp.DESCRIZIONE || '',
-                durata: `${exp.DURATA_ORE || 8} ore`,
+                durata: `${exp.SLOT || 1} giorni`,
                 prezzo: exp.PRX_PAX || 0,
-                tags: exp.TAG ? exp.TAG.split(';') : [],
+                tags: [],
                 difficolta: exp.DIFFICOLTA || 1,
-                include: exp.INCLUDE || '',
-                nonInclude: exp.NON_INCLUDE || ''
+                include: '',
+                nonInclude: ''
               });
             }
           }

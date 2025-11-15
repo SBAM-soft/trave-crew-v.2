@@ -92,7 +92,7 @@ function TripEditor() {
 
       // Trova destinazione selezionata (case-insensitive)
       const dest = destinazioniData.find(d =>
-        d.STATO?.toLowerCase() === wizardData.destinazione?.toLowerCase()
+        d.NOME?.toLowerCase() === wizardData.destinazione?.toLowerCase()
       );
       setDestinazioneData(dest);
 
@@ -123,7 +123,7 @@ function TripEditor() {
 
   // Handler selezione zona
   const handleZoneClick = (zona) => {
-    setSelectedZone(zona.ZONA);
+    setSelectedZone(zona.CODICE);
     // Filtra pacchetti per zona
     const zonePacchetti = pacchetti.filter(p =>
       p.ZONA?.toLowerCase() === zona.ZONA?.toLowerCase()
@@ -322,7 +322,7 @@ function TripEditor() {
             </h3>
             <p className={styles.sectionSubtitle}>
               {selectedZone
-                ? `Pacchetti per ${zone.find(z => z.ZONA === selectedZone)?.ZONA}`
+                ? `Pacchetti per ${zone.find(z => z.CODICE === selectedZone)?.ZONA}`
                 : 'Seleziona una zona per vedere i pacchetti'}
             </p>
           </div>
