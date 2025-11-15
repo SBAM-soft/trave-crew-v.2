@@ -25,43 +25,71 @@
   margin: 0;
 }
 
-/* Immagine mappa */
-.mapImageWrapper {
+/* Mappa Leaflet */
+.mapWrapper {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 400px;
   border-radius: 0.75rem;
   overflow: hidden;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.mapImage {
+.leafletMap {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  opacity: 0.3;
+  z-index: 1;
 }
 
-.mapOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.1);
+/* Popup personalizzato */
+.popupContent {
+  padding: 0.5rem;
+  min-width: 200px;
 }
 
-.mapLabel {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.75rem 1.5rem;
-  border-radius: 2rem;
+.popupContent h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.popupContent p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0;
+}
+
+.popupDesc {
+  line-height: 1.5;
+  margin-top: 0.5rem !important;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.popupButton {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
   font-weight: 600;
-  color: #667eea;
-  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popupButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Custom marker */
+:global(.custom-marker) {
+  background: none;
+  border: none;
 }
 
 /* Sezione zone */
@@ -283,8 +311,8 @@
     padding: 2rem;
   }
 
-  .mapImageWrapper {
-    height: 400px;
+  .mapWrapper {
+    height: 500px;
   }
 
   .zonesGrid {
@@ -298,8 +326,8 @@
 
 /* Desktop */
 @media (min-width: 1024px) {
-  .mapImageWrapper {
-    height: 500px;
+  .mapWrapper {
+    height: 600px;
   }
 
   .zonesGrid {
