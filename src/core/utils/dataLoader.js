@@ -37,11 +37,12 @@ export const loadCSV = (filePath) => {
 
 export const loadAllData = async () => {
   try {
-    const [destinazioni, zone, esperienze, pacchetti, hotel, voli, plus, costi_accessori, viaggi] = await Promise.all([
+    const [destinazioni, zone, esperienze, pacchetti, itinerario, hotel, voli, plus, costi_accessori, viaggi] = await Promise.all([
       loadCSV('destinazioni.csv'),
       loadCSV('zone.csv'),
       loadCSV('esperienze.csv'),
       loadCSV('pacchetti.csv'),
+      loadCSV('itinerario.csv'),
       loadCSV('hotel.csv'),
       loadCSV('voli.csv'),
       loadCSV('plus.csv'),
@@ -54,6 +55,7 @@ export const loadAllData = async () => {
       zone,
       esperienze,
       pacchetti,
+      itinerario,
       hotel,
       voli,
       plus,

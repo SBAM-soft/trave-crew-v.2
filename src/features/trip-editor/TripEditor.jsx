@@ -10,6 +10,12 @@ import HotelCard from './HotelCard';
 import HotelPanel from './HotelPanel';
 import Button from '../../shared/Button';
 import { loadCSV } from '../../core/utils/dataLoader';
+import {
+  findItinerarioByZone,
+  getCostiAccessoriItinerario,
+  getExtraSuggeriti,
+  getZoneItinerario
+} from '../../core/utils/itinerarioHelpers';
 import styles from './TripEditor.module.css';
 
 function TripEditor() {
@@ -37,7 +43,7 @@ function TripEditor() {
   const [selectedPacchetto, setSelectedPacchetto] = useState(null);
   const [filledBlocks, setFilledBlocks] = useState([]);
   const [totalDays, setTotalDays] = useState(7); // Default 7 giorni
-  
+
   // State per PEXP Panel (Livello 2)
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [currentPexp, setCurrentPexp] = useState(null);
@@ -45,6 +51,11 @@ function TripEditor() {
   // State per Hotel Panel
   const [isHotelPanelOpen, setIsHotelPanelOpen] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
+
+  // State per database itinerari (🆕)
+  const [itinerari, setItinerari] = useState([]);
+  const [costiAccessori, setCostiAccessori] = useState([]);
+  const [plus, setPlus] = useState([]);
 
   // Protezione navigazione - TEMPORARILY DISABLED due to useBlocker issues
   // const hasUnsavedChanges = filledBlocks.length > 0 || selectedHotel !== null;
@@ -62,10 +73,22 @@ function TripEditor() {
     try {
       setLoading(true);
 
-      // Carica destinazioni, zone e pacchetti dal CSV
-      const destinazioniData = await loadCSV('destinazioni.csv');
-      const zoneData = await loadCSV('zone.csv');
-      const pacchettiData = await loadCSV('pacchetti.csv');
+      // Carica tutti i CSV necessari (🆕 aggiunti itinerario, plus, costi_accessori)
+      const [
+        destinazioniData,
+        zoneData,
+        pacchettiData,
+        itinerariData,
+        plusData,
+        costiAccessoriData
+      ] = await Promise.all([
+        loadCSV('destinazioni.csv'),
+        loadCSV('zone.csv'),
+        loadCSV('pacchetti.csv'),
+        loadCSV('itinerario.csv'),
+        loadCSV('plus.csv'),
+        loadCSV('costi_accessori.csv')
+      ]);
 
       // Trova destinazione selezionata (case-insensitive)
       const dest = destinazioniData.find(d =>
@@ -84,6 +107,11 @@ function TripEditor() {
         p.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
       );
       setPacchetti(destPacchetti);
+
+      // Salva database itinerari, plus e costi accessori (🆕)
+      setItinerari(itinerariData);
+      setPlus(plusData);
+      setCostiAccessori(costiAccessoriData);
 
       setLoading(false);
     } catch (err) {
@@ -115,6 +143,12 @@ function TripEditor() {
   const handleConfirmPackage = (validExperiences) => {
     if (!currentPexp || !validExperiences || validExperiences.length === 0) return;
 
+    // Trova codice zona corrispondente (🆕)
+    const zonaObj = zone.find(z =>
+      z.ZONA?.toLowerCase() === currentPexp.ZONA?.toLowerCase()
+    );
+    const codiceZona = zonaObj?.CODICE || null;
+
     // Calcola giorni necessari (1 esperienza = 1 giorno)
     const experienceDays = validExperiences.length;
 
@@ -128,7 +162,9 @@ function TripEditor() {
         newBlocks.push({
           day: dayNum,
           experience: validExperiences[i],
-          packageName: currentPexp.NOME || currentPexp.nome
+          packageName: currentPexp.NOME || currentPexp.nome,
+          zona: currentPexp.ZONA, // 🆕 Traccia zona del pacchetto
+          codiceZona: codiceZona // 🆕 Codice zona (es: ZTHBA01)
         });
       }
     }
@@ -169,11 +205,47 @@ function TripEditor() {
     setIsHotelPanelOpen(false);
   };
 
-  // Handler crea itinerario
+  // Handler crea itinerario (🆕 con logica itinerari pre-compilati)
   const handleCreateItinerary = () => {
     if (filledBlocks.length < totalDays - 1) {
       alert('Completa tutti i giorni prima di creare l\'itinerario!');
       return;
+    }
+
+    // 🆕 Estrai zone uniche dai pacchetti confermati
+    const zoneUsate = [...new Set(
+      filledBlocks
+        .map(block => block.codiceZona)
+        .filter(codice => codice !== null && codice !== undefined)
+    )];
+
+    console.log('🗺️ Zone utilizzate nei pacchetti:', zoneUsate);
+
+    // 🆕 Cerca itinerario pre-compilato che matcha le zone
+    let itinerarioMatch = null;
+    let costiAccessoriItinerario = [];
+    let extraSuggeriti = [];
+
+    if (zoneUsate.length > 0 && itinerari.length > 0) {
+      itinerarioMatch = findItinerarioByZone(zoneUsate, itinerari);
+
+      if (itinerarioMatch) {
+        console.log('✅ Itinerario pre-compilato trovato:', itinerarioMatch.CODICE);
+
+        // Carica costi accessori dell'itinerario
+        costiAccessoriItinerario = getCostiAccessoriItinerario(
+          itinerarioMatch,
+          costiAccessori
+        );
+
+        // Carica extra suggeriti
+        extraSuggeriti = getExtraSuggeriti(itinerarioMatch, plus);
+
+        console.log('💰 Costi accessori:', costiAccessoriItinerario.length);
+        console.log('✨ Extra suggeriti:', extraSuggeriti.length);
+      } else {
+        console.log('⚠️ Nessun itinerario pre-compilato per questa combinazione di zone');
+      }
     }
 
     // Naviga alla timeline con tutti i dati necessari
@@ -181,7 +253,13 @@ function TripEditor() {
       state: {
         wizardData,
         filledBlocks,
-        totalDays
+        totalDays,
+        selectedHotel,
+        // 🆕 Dati itinerario pre-compilato (se trovato)
+        itinerario: itinerarioMatch,
+        costiAccessori: costiAccessoriItinerario,
+        extraSuggeriti: extraSuggeriti,
+        zoneUsate: zoneUsate
       }
     });
   };
