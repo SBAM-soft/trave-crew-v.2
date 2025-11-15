@@ -15,7 +15,7 @@ export const loadCSV = (filePath) => {
     Papa.parse(fullPath, {
       download: true,
       header: true,
-      dynamicTyping: true,
+      dynamicTyping: false, // Disabled to prevent parsing issues with values like "si"
       skipEmptyLines: true,
       delimiter: ',',
       quoteChar: '"',
@@ -23,6 +23,9 @@ export const loadCSV = (filePath) => {
       complete: (results) => {
         if (results.errors.length > 0) {
           console.warn('Warning parsing CSV:', results.errors);
+          results.errors.slice(0, 5).forEach(err => {
+            console.warn(`  Row ${err.row}: ${err.message}`);
+          });
         }
         console.log('CSV caricato:', fullPath, '→', results.data.length, 'righe');
         resolve(results.data);
