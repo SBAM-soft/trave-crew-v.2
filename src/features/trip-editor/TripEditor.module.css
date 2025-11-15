@@ -2,6 +2,10 @@
   min-height: 100vh;
   background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
   padding-bottom: 1.5rem;
+  transform: scale(0.75);
+  transform-origin: top center;
+  width: 133.33%;
+  margin-left: -16.665%;
 }
 
 .content {
