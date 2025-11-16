@@ -39,7 +39,7 @@ function App() {
               <Route path="/create" element={<CreateWizard />} />
               <Route path="/trip-editor" element={<TripEditor />} />
               <Route path="/timeline-editor" element={<TimelineEditor />} />
-              <Route path="/hotel-selector" element={<HotelSelectionPage />} />
+              <Route path="/hotel-selection" element={<HotelSelectionPage />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/my-trips" element={<MyTrips />} />
               <Route path="/login" element={<Login />} />
