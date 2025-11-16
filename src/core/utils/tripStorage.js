@@ -258,11 +258,19 @@ const calculateHotelCost = (hotel, giorni) => {
 
 // Helper: calcola data ritorno
 const calculateDataRitorno = (dataPartenza, giorni) => {
-  if (!dataPartenza) return null;
+  // Valida che dataPartenza sia presente e non vuota
+  if (!dataPartenza || dataPartenza === '') return null;
 
   const partenza = new Date(dataPartenza);
+
+  // Valida che la data creata sia valida
+  if (isNaN(partenza.getTime())) return null;
+
   const ritorno = new Date(partenza);
   ritorno.setDate(partenza.getDate() + (giorni - 1));
+
+  // Doppia validazione sulla data di ritorno
+  if (isNaN(ritorno.getTime())) return null;
 
   return ritorno.toISOString().split('T')[0];
 };
