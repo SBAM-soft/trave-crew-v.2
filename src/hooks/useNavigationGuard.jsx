@@ -11,22 +11,28 @@ import { useNavigate, useLocation, useBlocker } from 'react-router-dom';
 function useNavigationGuard(isActive = false, message = 'Sei sicuro di voler uscire? Le modifiche non salvate andranno perse.') {
   // Blocca la navigazione react-router
   const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      isActive && currentLocation.pathname !== nextLocation.pathname
+    useCallback(
+      ({ currentLocation, nextLocation }) =>
+        isActive && currentLocation.pathname !== nextLocation.pathname,
+      [isActive]
+    )
   );
 
   // Gestisce la conferma dell'utente
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      const shouldProceed = window.confirm(message);
+      // Usa setTimeout per evitare problemi di rendering
+      setTimeout(() => {
+        const shouldProceed = window.confirm(message);
 
-      if (shouldProceed) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
+        if (shouldProceed) {
+          blocker.proceed?.();
+        } else {
+          blocker.reset?.();
+        }
+      }, 0);
     }
-  }, [blocker, message]);
+  }, [blocker.state, message]);
 
   // Blocca la chiusura della finestra/refresh del browser
   useEffect(() => {
