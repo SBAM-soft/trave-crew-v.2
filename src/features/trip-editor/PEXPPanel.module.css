@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   z-index: 900;
-  padding: 1rem;
+  padding: 0;
   animation: fadeIn 0.3s ease;
 }
 
@@ -53,13 +53,12 @@
   }
 }
 
-/* Panel principale - PIÙ COMPATTO */
+/* Panel principale - FULLSCREEN */
 .panel {
   background: white;
-  border-radius: 0.75rem;
-  width: 100%;
-  max-width: 1000px;
-  max-height: 90vh;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease;
@@ -256,7 +255,7 @@
   gap: 0.75rem;
   flex-shrink: 0;
   background: #f9fafb;
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0;
 }
 
 .footer button {
@@ -309,8 +308,8 @@
   }
 
   .panel {
-    border-radius: 0.75rem 0.75rem 0 0;
-    max-height: 95vh;
+    border-radius: 0;
+    height: 100vh;
   }
 
   .header {
