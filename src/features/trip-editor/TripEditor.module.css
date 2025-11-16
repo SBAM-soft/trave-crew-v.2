@@ -1,11 +1,7 @@
 .tripEditor {
   min-height: 100vh;
   background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
-  padding-bottom: 1.65rem; /* +10% from 1.5rem */
-  transform: scale(0.825); /* +10% from 0.75 (0.75 * 1.1 = 0.825) */
-  transform-origin: top center;
-  width: 121.21%; /* Updated: 100/0.825 */
-  margin-left: -10.605%; /* Updated: (121.21-100)/2 */
+  padding: 1rem 0;
 }
 
 .content {
@@ -41,7 +37,7 @@
 .packagesGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.1rem; /* +10% from 1rem */
+  gap: 1rem;
 }
 
 /* Container per PEXPCard + PEXPAccordion */
@@ -54,7 +50,7 @@
 /* Nessun pacchetto */
 .noPacchetti {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2rem 1rem;
   background: white;
   border-radius: 1rem;
   border: 2px dashed #e5e7eb;
@@ -76,7 +72,7 @@
 
 /* Sezione finale */
 .finalSection {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 
 .finalCard {
@@ -110,7 +106,7 @@
 
 .finalActions {
   display: flex;
-  gap: 1.1rem; /* +10% from 1rem */
+  gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
 }

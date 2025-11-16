@@ -2,7 +2,7 @@ import { memo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './DayBlocksGrid.module.css';
 
-function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
+function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = false }) {
   // Crea array di blocchi (1 giorno = 1 blocco)
   const blocks = Array.from({ length: totalDays }, (_, i) => i + 1);
 
@@ -25,7 +25,7 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${compact ? styles.compact : ''}`}>
       {/* Header */}
       <div className={styles.header}>
         <h3 className={styles.title}>📅 I tuoi giorni</h3>
@@ -136,6 +136,7 @@ DayBlocksGrid.propTypes = {
     ])
   ),
   onBlockClick: PropTypes.func,
+  compact: PropTypes.bool,
 };
 
 export default memo(DayBlocksGrid);

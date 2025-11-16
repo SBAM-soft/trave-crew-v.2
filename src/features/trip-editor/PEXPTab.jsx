@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import TabView from '../../shared/TabView';
 import Button from '../../shared/Button';
+import Breadcrumb from '../../shared/Breadcrumb';
+import DayBlocksGrid from './DayBlocksGrid';
 import EXPCard from './EXPCard';
 import { useExperiences } from '../../hooks/useExperiences';
 import styles from './PEXPTab.module.css';
@@ -10,7 +12,7 @@ import styles from './PEXPTab.module.css';
 /**
  * PEXP Tab - Fullscreen tab showing package experiences
  */
-function PEXPTab({ pexp, onClose, onConfirm, onExpClick }) {
+function PEXPTab({ pexp, onClose, onConfirm, onExpClick, totalDays = 7, filledBlocks = [] }) {
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
 
   // Extract experience IDs from package
@@ -87,6 +89,21 @@ function PEXPTab({ pexp, onClose, onConfirm, onExpClick }) {
         </div>
       ) : (
         <>
+          <Breadcrumb
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Crea Viaggio', href: '/create' },
+              { label: 'Trip Editor', href: '/trip-editor' },
+              { label: `Pacchetto: ${title}` }
+            ]}
+          />
+
+          <DayBlocksGrid
+            totalDays={totalDays}
+            filledBlocks={filledBlocks}
+            compact={true}
+          />
+
           <div className={styles.description}>
             <p>{pexp.DESCRIZIONE || 'Pacchetto esperienza completo'}</p>
           </div>
@@ -138,6 +155,8 @@ PEXPTab.propTypes = {
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onExpClick: PropTypes.func.isRequired,
+  totalDays: PropTypes.number,
+  filledBlocks: PropTypes.array,
 };
 
 export default PEXPTab;
