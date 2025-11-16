@@ -9,6 +9,7 @@ import CreateWizard from './features/wizard/CreateWizard';
 import TripEditor from './features/trip-editor/TripEditor';
 import TimelineEditor from './features/timeline-editor/TimelineEditor';
 import HotelSelectionPage from './features/hotel-selection/HotelSelectionPage';
+import TripSummary from './features/trip-summary/TripSummary';
 import Profile from './features/profile/Profile';
 import MyTrips from './features/my-trips/MyTrips';
 import Login from './features/auth/Login';
@@ -40,6 +41,7 @@ function App() {
               <Route path="/trip-editor" element={<TripEditor />} />
               <Route path="/timeline-editor" element={<TimelineEditor />} />
               <Route path="/hotel-selection" element={<HotelSelectionPage />} />
+              <Route path="/trip-summary" element={<TripSummary />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/my-trips" element={<MyTrips />} />
               <Route path="/login" element={<Login />} />

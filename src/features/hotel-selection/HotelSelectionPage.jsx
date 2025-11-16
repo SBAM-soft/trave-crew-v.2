@@ -144,8 +144,8 @@ function HotelSelectionPage() {
       }).filter(e => e !== undefined)
     }));
 
-    // Naviga alla timeline/salvataggio con tutti i dati
-    navigate('/timeline-editor', {
+    // Naviga al riepilogo finale con tutti i dati
+    navigate('/trip-summary', {
       state: {
         wizardData,
         filledBlocks,
@@ -154,11 +154,12 @@ function HotelSelectionPage() {
         selectedHotels,
         itinerario,
         costiAccessori,
-        extraSuggeriti
+        extraSuggeriti,
+        timeline: [] // Verrà ricostruita nella TripSummary se necessario
       }
     });
 
-    toast.success('Selezione completata!');
+    toast.success('🎉 Hotel selezionati! Vai al riepilogo finale');
   };
 
   // Handler salva come bozza
@@ -426,7 +427,7 @@ function HotelSelectionPage() {
               disabled={Object.values(selections).filter(s => s.hotel !== null).length !== zoneVisitate.length}
               size="lg"
             >
-              Conferma e Continua →
+              📋 Fase 3: Riepilogo Finale →
             </Button>
           </div>
         </div>
