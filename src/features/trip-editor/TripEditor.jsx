@@ -11,6 +11,7 @@ import DETEXPTab from './DETEXPTab';
 import HotelCard from './HotelCard';
 import HotelPanel from './HotelPanel';
 import Button from '../../shared/Button';
+import Breadcrumb from '../../shared/Breadcrumb';
 import { loadCSV } from '../../core/utils/dataLoader';
 import {
   findItinerarioByZone,
@@ -416,6 +417,17 @@ function TripEditor() {
 
   return (
     <div className={styles.tripEditor}>
+      {/* Breadcrumb */}
+      <div className={styles.content}>
+        <Breadcrumb
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Crea Viaggio', href: '/create' },
+            { label: 'Trip Editor' }
+          ]}
+        />
+      </div>
+
       {/* Header con riepilogo wizard */}
       <HeaderWizardSummary wizardData={wizardData} />
 
@@ -519,6 +531,8 @@ function TripEditor() {
           onClose={handleClosePexpTab}
           onConfirm={handleConfirmPackage}
           onExpClick={handleExpClick}
+          totalDays={totalDays}
+          filledBlocks={filledBlocks}
         />
       )}
 
@@ -527,6 +541,8 @@ function TripEditor() {
         <DETEXPTab
           exp={currentExp}
           onClose={handleCloseDetexpTab}
+          totalDays={totalDays}
+          filledBlocks={filledBlocks}
         />
       )}
     </div>

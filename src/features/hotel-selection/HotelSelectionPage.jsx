@@ -41,14 +41,19 @@ function HotelSelectionPage() {
           loadCSV('zone.csv')
         ]);
 
-        // Filtra per destinazione
-        const destHotels = hotelsData.filter(h =>
-          h.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
-        );
+        // Filtra per destinazione (cerca sia per NOME che per CODICE)
+        const destInput = (wizardData.destinazione || wizardData.destinazioneNome || '').toLowerCase().trim();
+        const destHotels = hotelsData.filter(h => {
+          const destNome = h.DESTINAZIONE?.toLowerCase().trim();
+          const destCodice = h.CODICE_DEST?.toLowerCase().trim();
+          return destNome === destInput || destCodice === destInput;
+        });
 
-        const destZone = zoneData.filter(z =>
-          z.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
-        );
+        const destZone = zoneData.filter(z => {
+          const destNome = z.DESTINAZIONE?.toLowerCase().trim();
+          const destCodice = z.CODICE_DEST?.toLowerCase().trim();
+          return destNome === destInput || destCodice === destInput;
+        });
 
         setHotels(destHotels);
         setFilteredHotels(destHotels);

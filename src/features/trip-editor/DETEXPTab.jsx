@@ -2,6 +2,8 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import TabView from '../../shared/TabView';
+import Breadcrumb from '../../shared/Breadcrumb';
+import DayBlocksGrid from './DayBlocksGrid';
 import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
@@ -11,7 +13,7 @@ import styles from './DETEXPTab.module.css';
 /**
  * DETEXP Tab - Fullscreen tab showing experience details
  */
-function DETEXPTab({ exp, onClose }) {
+function DETEXPTab({ exp, onClose, totalDays = 7, filledBlocks = [] }) {
   const [selectedPlus, setSelectedPlus] = useState([]);
 
   if (!exp || !exp.nome) {
@@ -84,6 +86,21 @@ function DETEXPTab({ exp, onClose }) {
       title={exp.nome}
       zIndex={1100}
     >
+      <Breadcrumb
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Crea Viaggio', href: '/create' },
+          { label: 'Trip Editor', href: '/trip-editor' },
+          { label: `Esperienza: ${exp.nome}` }
+        ]}
+      />
+
+      <DayBlocksGrid
+        totalDays={totalDays}
+        filledBlocks={filledBlocks}
+        compact={true}
+      />
+
       {/* Tags */}
       {exp.tags && exp.tags.length > 0 && (
         <div className={styles.tags}>
@@ -199,6 +216,8 @@ DETEXPTab.propTypes = {
     prezzo: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,
   onClose: PropTypes.func.isRequired,
+  totalDays: PropTypes.number,
+  filledBlocks: PropTypes.array,
 };
 
 export default DETEXPTab;
