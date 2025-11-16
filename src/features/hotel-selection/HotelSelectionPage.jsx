@@ -38,6 +38,8 @@ function HotelSelectionPage() {
 
   console.log('🏨 HotelSelectionPage - zoneVisitate:', zoneVisitate);
   console.log('🏨 HotelSelectionPage - wizardData:', wizardData);
+  console.log('🏨 HotelSelectionPage - filledBlocks:', filledBlocks);
+  console.log('🏨 HotelSelectionPage - totalDays:', totalDays);
 
   // Carica dati hotel
   useEffect(() => {
@@ -263,13 +265,21 @@ function HotelSelectionPage() {
 
       {/* Contenuto principale */}
       <div className={styles.content}>
+        {/* Debug info */}
+        {console.log('🔍 Rendering content - zoneVisitate.length:', zoneVisitate.length)}
+        {console.log('🔍 Rendering content - groupedHotels:', groupedHotels)}
+        {console.log('🔍 Rendering content - selections:', selections)}
+
         {/* Sezioni per zona */}
         {zoneVisitate.map((zona, index) => {
           const zonaKey = zona.nome.toUpperCase().trim(); // Usa UPPERCASE come chiave
+          console.log(`🔍 Rendering zona ${index}: ${zona.nome} -> key: ${zonaKey}`);
           const zoneHotels = groupedHotels[zonaKey] || {};
+          console.log(`🔍 Hotels per ${zonaKey}:`, zoneHotels);
           const hasLow = zoneHotels.LOW !== null;
           const hasMedium = zoneHotels.MEDIUM !== null;
           const hasHigh = zoneHotels.HIGH !== null;
+          console.log(`🔍 Has hotels: LOW=${hasLow}, MEDIUM=${hasMedium}, HIGH=${hasHigh}`);
           const selectedHotel = selections[zonaKey]?.hotel;
           const selectedExtras = selections[zonaKey]?.extras || [];
 
