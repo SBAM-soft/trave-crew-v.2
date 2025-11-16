@@ -17,7 +17,8 @@ import {
   findItinerarioByZone,
   getCostiAccessoriItinerario,
   getExtraSuggeriti,
-  getZoneItinerario
+  getZoneItinerario,
+  getZoneVisitate
 } from '../../core/utils/itinerarioHelpers';
 import styles from './TripEditor.module.css';
 
@@ -332,29 +333,33 @@ function TripEditor() {
     });
   };
 
-  // Handler crea itinerario (🆕 con logica itinerari pre-compilati)
+  // Handler crea itinerario (🆕 con logica zone visitate e selezione hotel)
   const handleCreateItinerary = () => {
     if (filledBlocks.length < totalDays - 1) {
-      toast.warning('Completa tutti i giorni prima di creare l\'itinerario!');
+      toast.warning('Completa tutti i giorni prima di continuare!');
       return;
     }
 
-    // 🆕 Estrai zone uniche dai pacchetti confermati
-    const zoneUsate = [...new Set(
-      filledBlocks
-        .map(block => block.codiceZona)
-        .filter(codice => codice !== null && codice !== undefined)
-    )];
+    // 🆕 Estrai zone visitate usando la nuova utility
+    const zoneVisitate = getZoneVisitate(filledBlocks);
 
-    console.log('🗺️ Zone utilizzate nei pacchetti:', zoneUsate);
+    console.log('🗺️ Zone visitate:', zoneVisitate);
+
+    if (zoneVisitate.length === 0) {
+      toast.error('Errore: nessuna zona trovata nei pacchetti confermati');
+      return;
+    }
+
+    // 🆕 Estrai codici zone per cercare itinerario pre-compilato
+    const codiciZone = zoneVisitate.map(z => z.codice);
 
     // 🆕 Cerca itinerario pre-compilato che matcha le zone
     let itinerarioMatch = null;
     let costiAccessoriItinerario = [];
     let extraSuggeriti = [];
 
-    if (zoneUsate.length > 0 && itinerari.length > 0) {
-      itinerarioMatch = findItinerarioByZone(zoneUsate, itinerari);
+    if (codiciZone.length > 0 && itinerari.length > 0) {
+      itinerarioMatch = findItinerarioByZone(codiciZone, itinerari);
 
       if (itinerarioMatch) {
         console.log('✅ Itinerario pre-compilato trovato:', itinerarioMatch.CODICE);
@@ -375,19 +380,23 @@ function TripEditor() {
       }
     }
 
-    // Naviga alla timeline con tutti i dati necessari
-    navigate('/timeline-editor', {
+    // 🆕 Naviga alla selezione hotel passando le zone visitate
+    navigate('/hotel-selection', {
       state: {
         wizardData,
         filledBlocks,
         totalDays,
-        selectedHotel,
-        // 🆕 Dati itinerario pre-compilato (se trovato)
+        zoneVisitate,
+        // Dati itinerario pre-compilato (se trovato)
         itinerario: itinerarioMatch,
         costiAccessori: costiAccessoriItinerario,
         extraSuggeriti: extraSuggeriti,
-        zoneUsate: zoneUsate
+        plus: plus // Passa il database plus per gli extra hotel
       }
+    });
+
+    toast.success('Itinerario completato!', {
+      description: 'Ora seleziona gli hotel per le zone visitate'
     });
   };
 

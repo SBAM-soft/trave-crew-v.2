@@ -185,3 +185,122 @@ export const getNumeroZone = (itinerario) => {
 
   return getZoneItinerario(itinerario).length;
 };
+
+/**
+ * Estrai zone visitate dai blocchi confermati
+ * @param {Array} filledBlocks - Array di blocchi giorno confermati
+ * @returns {Array} - Array di oggetti { codice, nome } zone uniche
+ */
+export const getZoneVisitate = (filledBlocks) => {
+  if (!filledBlocks || filledBlocks.length === 0) {
+    return [];
+  }
+
+  const zoneMap = new Map();
+
+  filledBlocks.forEach(block => {
+    if (block.codiceZona && block.zona) {
+      zoneMap.set(block.codiceZona, block.zona);
+    }
+  });
+
+  // Converti in array di oggetti
+  return Array.from(zoneMap.entries()).map(([codice, nome]) => ({
+    codice,
+    nome
+  }));
+};
+
+/**
+ * Filtra hotel per zone visitate
+ * @param {Array} hotels - Array di tutti gli hotel
+ * @param {Array} zoneVisitate - Array di zone visitate { codice, nome }
+ * @returns {Object} - Oggetto { zoneHotels: [...], allHotels: [...] }
+ */
+export const filterHotelsByZone = (hotels, zoneVisitate) => {
+  if (!hotels || !zoneVisitate || zoneVisitate.length === 0) {
+    return { zoneHotels: {}, allHotels: [] };
+  }
+
+  const zoneNames = zoneVisitate.map(z => z.nome.toUpperCase().trim());
+  const zoneHotels = {};
+  const allHotels = [];
+
+  hotels.forEach(hotel => {
+    const hotelZone = hotel.ZONA?.toUpperCase().trim();
+
+    if (zoneNames.includes(hotelZone)) {
+      if (!zoneHotels[hotelZone]) {
+        zoneHotels[hotelZone] = [];
+      }
+      zoneHotels[hotelZone].push(hotel);
+      allHotels.push(hotel);
+    }
+  });
+
+  return { zoneHotels, allHotels };
+};
+
+/**
+ * Raggruppa hotel per zona e budget
+ * @param {Array} hotels - Array di hotel
+ * @param {Array} zoneVisitate - Array di zone visitate
+ * @returns {Object} - { zonaNome: { LOW: hotel, MEDIUM: hotel, HIGH: hotel } }
+ */
+export const groupHotelsByZoneAndBudget = (hotels, zoneVisitate) => {
+  if (!hotels || !zoneVisitate || zoneVisitate.length === 0) {
+    return {};
+  }
+
+  const grouped = {};
+  const zoneNames = zoneVisitate.map(z => z.nome.toUpperCase().trim());
+
+  zoneNames.forEach(zoneName => {
+    grouped[zoneName] = {
+      LOW: null,
+      MEDIUM: null,
+      HIGH: null
+    };
+  });
+
+  hotels.forEach(hotel => {
+    const hotelZone = hotel.ZONA?.toUpperCase().trim();
+    const budget = hotel.BUDGET;
+
+    if (zoneNames.includes(hotelZone) && grouped[hotelZone]) {
+      // Prendi il primo hotel disponibile per ogni budget
+      if (!grouped[hotelZone][budget]) {
+        grouped[hotelZone][budget] = hotel;
+      }
+    }
+  });
+
+  return grouped;
+};
+
+/**
+ * Estrai extra hotel dal CSV plus
+ * @param {Object} hotel - Oggetto hotel
+ * @param {Array} plusDB - Database plus/extra
+ * @returns {Array} - Array oggetti extra disponibili per l'hotel
+ */
+export const getHotelExtras = (hotel, plusDB) => {
+  if (!hotel || !plusDB) {
+    return [];
+  }
+
+  const extraCodes = [
+    hotel.EXTRA_1,
+    hotel.EXTRA_2,
+    hotel.EXTRA_3,
+    hotel.EXTRA_4,
+    hotel.EXTRA_5,
+    hotel.EXTRA_6,
+    hotel.EXTRA_7
+  ].filter(code => code && code !== '' && code !== 'None');
+
+  return plusDB.filter(extra =>
+    extraCodes.includes(extra.CODICE) &&
+    extra.APPLICABILE_A?.toLowerCase().includes('hotel')
+  );
+};
