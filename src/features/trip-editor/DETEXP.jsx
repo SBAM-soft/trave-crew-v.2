@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
@@ -9,14 +9,40 @@ import styles from './DETEXP.module.css';
 function DETEXP({ exp, onLike, onDislike, onClose }) {
   const [selectedPlus, setSelectedPlus] = useState([]);
 
+  // Keyboard navigation: Escape to close
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   // Robust validation - prevent crash if exp is invalid
   if (!exp || !exp.nome) {
     return (
-      <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.overlay}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detexp-error-title"
+      >
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.header}>
-            <h2 className={styles.title}>Esperienza non disponibile</h2>
-            <button className={styles.closeButton} onClick={onClose}>✕</button>
+            <h2 id="detexp-error-title" className={styles.title}>
+              Esperienza non disponibile
+            </h2>
+            <button
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Chiudi finestra"
+            >
+              ✕
+            </button>
           </div>
           <div className={styles.content}>
             <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
@@ -78,12 +104,27 @@ function DETEXP({ exp, onLike, onDislike, onClose }) {
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div
+      className={styles.overlay}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detexp-title"
+      aria-describedby="detexp-intro"
+    >
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* Header con close button */}
         <div className={styles.header}>
-          <h2 className={styles.title}>{exp.nome}</h2>
-          <button className={styles.closeButton} onClick={onClose}>✕</button>
+          <h2 id="detexp-title" className={styles.title}>
+            {exp.nome}
+          </h2>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Chiudi dettagli esperienza"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Content scrollabile */}
@@ -98,7 +139,7 @@ function DETEXP({ exp, onLike, onDislike, onClose }) {
           )}
 
           {/* Intro/Hook */}
-          <p className={styles.intro}>
+          <p id="detexp-intro" className={styles.intro}>
             {exp.descrizione ? exp.descrizione.split('.')[0] + '.' :
              'Un\'esperienza unica che renderà il tuo viaggio indimenticabile.'}
           </p>

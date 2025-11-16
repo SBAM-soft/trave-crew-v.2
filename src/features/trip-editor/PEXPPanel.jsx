@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import EXPCard from './EXPCard';
@@ -9,6 +9,18 @@ import styles from './PEXPPanel.module.css';
 function PEXPPanel({ pexp, onConfirm, onClose }) {
   // Stati per le esperienze
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
+
+  // Keyboard navigation: Escape to close
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Stati per DETEXP (Livello 3)
   const [showDETEXP, setShowDETEXP] = useState(false);
@@ -67,11 +79,17 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
 
   if (isLoading) {
     return (
-      <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.overlay}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pexp-panel-loading"
+      >
         <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
           <div className={styles.loadingContent}>
             <div className={styles.spinner}></div>
-            <p>Caricamento esperienze...</p>
+            <p id="pexp-panel-loading">Caricamento esperienze...</p>
           </div>
         </div>
       </div>
@@ -89,14 +107,25 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
   return (
     <>
       {/* Overlay */}
-      <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.overlay}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pexp-panel-title"
+        aria-describedby="pexp-panel-description"
+      >
         <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-          
+
           {/* Header */}
           <div className={styles.header}>
             <div className={styles.headerContent}>
-              <h2 className={styles.title}>{pexp.NOME || pexp.nome}</h2>
-              <p className={styles.subtitle}>{pexp.DESCRIZIONE || 'Pacchetto esperienza completo'}</p>
+              <h2 id="pexp-panel-title" className={styles.title}>
+                {pexp.NOME || pexp.nome}
+              </h2>
+              <p id="pexp-panel-description" className={styles.subtitle}>
+                {pexp.DESCRIZIONE || 'Pacchetto esperienza completo'}
+              </p>
               <div className={styles.meta}>
                 <span className={styles.metaBadge}>📍 {pexp.ZONA || pexp.zona}</span>
                 <span className={styles.metaBadge}>
@@ -109,7 +138,13 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
                 )}
               </div>
             </div>
-            <button className={styles.closeBtn} onClick={onClose}>✕</button>
+            <button
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Chiudi pannello esperienze"
+            >
+              ✕
+            </button>
           </div>
 
           {/* Content scrollabile */}
