@@ -2,13 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 // import useNavigationGuard from '../../hooks/useNavigationGuard'; // Temporarily disabled - causing crashes
-import usePanelStore from '../../store/usePanelStore';
-import usePanelURLSync from '../../hooks/usePanelURLSync';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayBlocksGrid from './DayBlocksGrid';
 import PEXPCard from './PEXPCard';
-import PEXPPanel from './PEXPPanel';
+import PEXPAccordion from './PEXPAccordion';
 import HotelCard from './HotelCard';
 import HotelPanel from './HotelPanel';
 import Button from '../../shared/Button';
@@ -24,10 +22,6 @@ import styles from './TripEditor.module.css';
 function TripEditor() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Panel store management
-  const { pushPanel, popPanel, panelStack, getPanelsByType } = usePanelStore();
-  usePanelURLSync(); // Sync panels with URL
 
   // Recupera dati wizard (passati dalla route)
   const wizardData = location.state?.wizardData || {
@@ -53,6 +47,9 @@ function TripEditor() {
 
   // State per Hotel selection
   const [selectedHotel, setSelectedHotel] = useState(null);
+
+  // State per accordion management (sostituisce panelStack)
+  const [expandedPexpId, setExpandedPexpId] = useState(null);
 
   // State per database itinerari (🆕)
   const [itinerari, setItinerari] = useState([]);
@@ -160,9 +157,10 @@ function TripEditor() {
     console.log(`📦 Pacchetti trovati: ${zonePacchetti.length}`);
   };
 
-  // Handler click pacchetto → Apre PEXP Panel
+  // Handler click pacchetto → Toggle PEXP Accordion
   const handlePacchettoClick = (pexp) => {
-    pushPanel('pexp', { pexp });
+    // Toggle accordion - se è già aperto lo chiude, altrimenti apre questo
+    setExpandedPexpId(expandedPexpId === pexp.CODICE ? null : pexp.CODICE);
   };
 
   // Handler conferma pacchetto dal Panel
@@ -197,17 +195,12 @@ function TripEditor() {
 
     // Aggiungi i nuovi blocchi
     setFilledBlocks([...filledBlocks, ...newBlocks]);
-    popPanel(); // Close the panel
+    setExpandedPexpId(null); // Close the accordion
 
     // Feedback utente con toast
     toast.success(`Pacchetto "${pexp.NOME || pexp.nome}" confermato!`, {
       description: `${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1})`,
     });
-  };
-
-  // Handler chiusura panel
-  const handleClosePanel = () => {
-    popPanel();
   };
 
   // Handler click blocco giorno
@@ -217,21 +210,10 @@ function TripEditor() {
     });
   };
 
-  // Handler click card hotel → Apre Hotel Panel
+  // Handler click card hotel → Apre Hotel Panel (still uses modal for now)
   const handleHotelCardClick = () => {
-    pushPanel('hotel', { destinazione: wizardData.destinazione, zone });
-  };
-
-  // Handler conferma hotel dal panel
-  const handleConfirmHotel = (hotel) => {
-    setSelectedHotel(hotel);
-    popPanel(); // Close hotel panel
-    toast.success(`Hotel "${hotel.NOME}" selezionato!`);
-  };
-
-  // Handler chiusura hotel panel
-  const handleCloseHotelPanel = () => {
-    popPanel();
+    // Hotel panel remains modal for now - can be converted later
+    toast.info('Hotel selection coming soon!');
   };
 
   // Handler crea itinerario (🆕 con logica itinerari pre-compilati)
@@ -360,12 +342,22 @@ function TripEditor() {
             {selectedZone ? (
               filteredPacchetti.length > 0 ? (
                 filteredPacchetti.map((pexp, idx) => (
-                  <PEXPCard
-                    key={pexp.CODICE || idx}
-                    pexp={pexp}
-                    onClick={handlePacchettoClick}
-                    isSelected={selectedPacchetto?.CODICE === pexp.CODICE}
-                  />
+                  <div key={pexp.CODICE || idx} className={styles.pexpContainer}>
+                    {/* PEXPCard - Clickable */}
+                    <PEXPCard
+                      pexp={pexp}
+                      onClick={handlePacchettoClick}
+                      isSelected={selectedPacchetto?.CODICE === pexp.CODICE}
+                    />
+
+                    {/* PEXPAccordion - Expanded inline */}
+                    <PEXPAccordion
+                      pexp={pexp}
+                      isOpen={expandedPexpId === pexp.CODICE}
+                      onToggle={() => setExpandedPexpId(expandedPexpId === pexp.CODICE ? null : pexp.CODICE)}
+                      onConfirm={handleConfirmPackage}
+                    />
+                  </div>
                 ))
               ) : (
                 <div className={styles.noPacchetti}>
@@ -403,36 +395,6 @@ function TripEditor() {
 
       {/* Sonner Toaster for notifications */}
       <Toaster position="top-right" richColors />
-
-      {/* Render panels from stack */}
-      {panelStack.map((panel) => {
-        if (panel.type === 'pexp') {
-          return (
-            <PEXPPanel
-              key={panel.id}
-              panelId={panel.id}
-              pexp={panel.data.pexp}
-              onConfirm={handleConfirmPackage}
-              onClose={handleClosePanel}
-            />
-          );
-        }
-
-        if (panel.type === 'hotel') {
-          return (
-            <HotelPanel
-              key={panel.id}
-              panelId={panel.id}
-              destinazione={panel.data.destinazione || wizardData.destinazione}
-              zone={panel.data.zone || zone}
-              onConfirm={handleConfirmHotel}
-              onClose={handleCloseHotelPanel}
-            />
-          );
-        }
-
-        return null;
-      })}
     </div>
   );
 }

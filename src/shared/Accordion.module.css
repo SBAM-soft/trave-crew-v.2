@@ -1,0 +1,145 @@
+/* Accordion Container */
+.accordion {
+  border-radius: 0.66rem; /* +10% from 0.6rem */
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 1.1rem; /* +10% from 1rem */
+}
+
+.accordion[data-open="true"] {
+  box-shadow: 0 4.4px 17.6px rgba(102, 126, 234, 0.15); /* +10% */
+}
+
+/* Level 1 - Top level accordion (PEXP) */
+.level1 {
+  background: white;
+  border: 1.65px solid #e5e7eb; /* +10% from 1.5px */
+}
+
+.level1 .header {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  padding: 1.65rem; /* +10% from 1.5rem */
+  font-size: 1.375rem; /* +10% from 1.25rem */
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Level 2 - Nested accordion (Experience in PEXP) */
+.level2 {
+  background: #f9fafb;
+  border: 1.1px solid #e5e7eb; /* +10% from 1px */
+  margin-bottom: 0.88rem; /* +10% from 0.8rem */
+}
+
+.level2 .header {
+  background: white;
+  padding: 1.1rem; /* +10% from 1rem */
+  font-size: 1.1rem; /* +10% from 1rem */
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Level 3 - Deep nested accordion (DETEXP) */
+.level3 {
+  background: white;
+  border: 1.1px solid #d1d5db; /* +10% */
+  margin-top: 0.88rem; /* +10% */
+}
+
+.level3 .header {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  padding: 0.99rem; /* +10% from 0.9rem */
+  font-size: 1.045rem; /* +10% from 0.95rem */
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* Header - Clickable button */
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem; /* +10% from 1rem */
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.header:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+}
+
+.header:active {
+  transform: scale(0.995);
+}
+
+/* Icon (arrow) */
+.icon {
+  font-size: 1.21rem; /* +10% from 1.1rem */
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  color: #667eea;
+}
+
+.iconOpen {
+  transform: rotate(90deg);
+}
+
+/* Title */
+.title {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* Content - Expandable area */
+.content {
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contentInner {
+  padding: 1.65rem; /* +10% from 1.5rem */
+}
+
+.level2 .contentInner {
+  padding: 1.1rem; /* +10% from 1rem */
+}
+
+.level3 .contentInner {
+  padding: 0.99rem; /* +10% from 0.9rem */
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-11px); /* +10% */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .level1 .header {
+    padding: 1.21rem; /* +10% from 1.1rem */
+    font-size: 1.21rem; /* +10% */
+  }
+
+  .level2 .header {
+    padding: 0.88rem; /* +10% from 0.8rem */
+    font-size: 0.99rem; /* +10% from 0.9rem */
+  }
+
+  .contentInner {
+    padding: 1.1rem; /* +10% */
+  }
+
+  .level2 .contentInner,
+  .level3 .contentInner {
+    padding: 0.88rem; /* +10% */
+  }
+}
