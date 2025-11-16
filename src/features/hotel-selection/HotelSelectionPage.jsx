@@ -368,7 +368,7 @@ function HotelSelectionPage() {
               <HotelCard
                 key={hotel.CODICE}
                 hotel={hotel}
-                onClick={() => handleSelectHotel(hotel)}
+                onSelect={handleSelectHotel}
                 isSelected={selectedHotel?.CODICE === hotel.CODICE}
               />
             ))}
