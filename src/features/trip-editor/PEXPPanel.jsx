@@ -1,63 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import EXPCard from './EXPCard';
 import DETEXP from './DETEXP';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { useExperiences } from '../../hooks/useExperiences';
 import styles from './PEXPPanel.module.css';
 
 function PEXPPanel({ pexp, onConfirm, onClose }) {
   // Stati per le esperienze
-  const [experiences, setExperiences] = useState([]);
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   // Stati per DETEXP (Livello 3)
   const [showDETEXP, setShowDETEXP] = useState(false);
   const [selectedExp, setSelectedExp] = useState(null);
 
-  // Carica esperienze reali dal CSV
-  useEffect(() => {
-    const loadExperiences = async () => {
-      try {
-        setLoading(true);
-        const experiencesData = await loadCSV('esperienze.csv');
-
-        // Filtra esperienze del pacchetto
-        const pexpExperiences = [];
-
-        // Prendi le esperienze dagli slot del pacchetto
-        ['DAY2_ESPERIENZA_STD', 'DAY3_ESPERIENZA_STD', 'DAY4_ESPERIENZA_STD',
-         'DAY5_ESPERIENZA_STD', 'DAY6_ESPERIENZA_STD', 'DAY7_ESPERIENZA_STD',
-         'DAY8_ESPERIENZA_STD', 'DAY9_ESPERIENZA_STD', 'DAY10_ESPERIENZA_STD'].forEach(slot => {
-          if (pexp[slot]) {
-            const exp = experiencesData.find(e => e.CODICE === pexp[slot]);
-            if (exp) {
-              pexpExperiences.push({
-                id: exp.CODICE,
-                nome: exp.ESPERIENZE || exp.ESPERIENZA,
-                descrizione: exp.DESCRIZIONE || '',
-                durata: `${exp.SLOT || 1} giorni`,
-                prezzo: exp.PRX_PAX || 0,
-                tags: [],
-                difficolta: exp.DIFFICOLTA || 1,
-                include: '',
-                nonInclude: ''
-              });
-            }
-          }
-        });
-
-        setExperiences(pexpExperiences);
-        setLoading(false);
-      } catch (err) {
-        console.error('Errore caricamento esperienze:', err);
-        setLoading(false);
+  // Extract experience IDs from package
+  const experienceIds = useMemo(() => {
+    const ids = [];
+    ['DAY2_ESPERIENZA_STD', 'DAY3_ESPERIENZA_STD', 'DAY4_ESPERIENZA_STD',
+     'DAY5_ESPERIENZA_STD', 'DAY6_ESPERIENZA_STD', 'DAY7_ESPERIENZA_STD',
+     'DAY8_ESPERIENZA_STD', 'DAY9_ESPERIENZA_STD', 'DAY10_ESPERIENZA_STD'].forEach(slot => {
+      if (pexp[slot]) {
+        ids.push(pexp[slot]);
       }
-    };
-
-    loadExperiences();
+    });
+    return ids;
   }, [pexp]);
+
+  // Load experiences with caching
+  const { experiences: allExperiences, isLoading } = useExperiences({ experienceIds });
+
+  // Map experiences to expected format
+  const experiences = useMemo(() => {
+    return allExperiences.map(exp => ({
+      id: exp.CODICE,
+      nome: exp.ESPERIENZE || exp.ESPERIENZA,
+      descrizione: exp.DESCRIZIONE || '',
+      durata: `${exp.SLOT || 1} giorni`,
+      prezzo: exp.PRX_PAX || 0,
+      tags: [],
+      difficolta: exp.DIFFICOLTA || 1,
+      include: '',
+      nonInclude: ''
+    }));
+  }, [allExperiences]);
 
   // Handler click su esperienza → Apre DETEXP (Livello 3)
   const handleExpClick = (exp) => {
@@ -79,7 +65,7 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
     // Esperienza confermata!
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={styles.overlay} onClick={onClose}>
         <div className={styles.panel} onClick={(e) => e.stopPropagation()}>

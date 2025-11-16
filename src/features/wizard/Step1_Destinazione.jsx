@@ -1,29 +1,12 @@
-import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { useDestinations } from '../../hooks/useDestinations';
 import styles from './Step1_Destinazione.module.css';
 
 function Step1_Destinazione({ value, destinazione, onChange, error }) {
-  const [destinazioni, setDestinazioni] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(null);
+  // Use custom hook with automatic caching
+  const { destinations: destinazioni, isLoading, error: loadError } = useDestinations();
 
-  useEffect(() => {
-    console.log('🔄 Loading destinazioni CSV...');
-    loadCSV('/data/destinazioni.csv')
-      .then(data => {
-        console.log('✅ Destinazioni loaded:', data.length, 'items');
-        setDestinazioni(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('❌ Errore caricamento destinazioni:', err);
-        setLoadError(err.message || 'Errore durante il caricamento delle destinazioni');
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={styles.loading}>
         <div className={styles.spinner}></div>

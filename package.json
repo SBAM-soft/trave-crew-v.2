@@ -11,6 +11,7 @@
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.9",
     "leaflet": "^1.9.4",
     "papaparse": "^5.4.1",
     "prop-types": "^15.8.1",

@@ -1,15 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import HotelCard from './HotelCard';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { useHotels } from '../../hooks/useHotels';
 import styles from './PEXPPanel.module.css'; // Riutilizziamo lo stesso stile di PEXP Panel
 
 function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
-  const [hotels, setHotels] = useState([]);
-  const [filteredHotels, setFilteredHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Filtri
   const [budgetFilter, setBudgetFilter] = useState('ALL');
@@ -21,62 +18,14 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
     piscina: false
   });
 
-  // Carica hotel dal CSV
-  useEffect(() => {
-    const loadHotels = async () => {
-      try {
-        setLoading(true);
-        const hotelsData = await loadCSV('hotel.csv');
-
-        // Filtra hotel per destinazione
-        const destHotels = hotelsData.filter(h =>
-          h.DESTINAZIONE?.toLowerCase() === destinazione?.toLowerCase()
-        );
-
-        setHotels(destHotels);
-        setFilteredHotels(destHotels);
-        setLoading(false);
-      } catch (err) {
-        console.error('Errore caricamento hotel:', err);
-        setLoading(false);
-      }
-    };
-
-    loadHotels();
-  }, [destinazione]);
-
-  // Applica filtri
-  useEffect(() => {
-    let filtered = [...hotels];
-
-    // Filtro budget
-    if (budgetFilter !== 'ALL') {
-      filtered = filtered.filter(h => h.BUDGET === budgetFilter);
-    }
-
-    // Filtro stelle
-    if (stelleFilter !== 'ALL') {
-      filtered = filtered.filter(h => parseInt(h.STELLE) === parseInt(stelleFilter));
-    }
-
-    // Filtro zona
-    if (zonaFilter !== 'ALL') {
-      filtered = filtered.filter(h => h.ZONA === zonaFilter);
-    }
-
-    // Filtri servizi
-    if (serviziFiltri.colazione) {
-      filtered = filtered.filter(h => h.COLAZIONE_INCLUSA === 'si');
-    }
-    if (serviziFiltri.wifi) {
-      filtered = filtered.filter(h => h.WIFI === 'si');
-    }
-    if (serviziFiltri.piscina) {
-      filtered = filtered.filter(h => h.PISCINA === 'si');
-    }
-
-    setFilteredHotels(filtered);
-  }, [budgetFilter, stelleFilter, zonaFilter, serviziFiltri, hotels]);
+  // Use custom hook for hotels with automatic caching and filtering
+  const { filteredHotels, isLoading } = useHotels({
+    destinazione,
+    budget: budgetFilter,
+    stelle: stelleFilter,
+    zona: zonaFilter,
+    servizi: serviziFiltri,
+  });
 
   const handleSelectHotel = (hotel) => {
     setSelectedHotel(hotel);
@@ -95,7 +44,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
     }));
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={styles.overlay} onClick={onClose}>
         <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
