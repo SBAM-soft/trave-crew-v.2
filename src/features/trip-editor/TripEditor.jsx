@@ -101,13 +101,28 @@ function TripEditor() {
       });
 
       // Trova destinazione selezionata (case-insensitive + trim)
-      const destName = wizardData.destinazione?.toLowerCase().trim();
-      console.log('🎯 Cercando destinazione:', destName);
+      // Il wizard può passare sia il NOME che il CODICE
+      const destInput = wizardData.destinazione?.toLowerCase().trim();
+      console.log('🎯 Cercando destinazione (input wizard):', destInput);
 
       const dest = destinazioniData.find(d =>
-        d.NOME?.toLowerCase().trim() === destName
+        d.NOME?.toLowerCase().trim() === destInput ||
+        d.CODICE?.toLowerCase().trim() === destInput
       );
+
+      if (!dest) {
+        console.error('❌ Destinazione non trovata:', destInput);
+        setError('Destinazione non trovata');
+        setLoading(false);
+        return;
+      }
+
+      console.log('✅ Destinazione trovata:', dest.NOME, '(', dest.CODICE, ')');
       setDestinazioneData(dest);
+
+      // Usa il NOME della destinazione per filtrare zone e pacchetti
+      const destName = dest.NOME?.toLowerCase().trim();
+      console.log('🔍 Filtrando per nome destinazione:', destName);
 
       // Filtra zone per destinazione (case-insensitive + trim)
       const destZone = zoneData.filter(z => {
