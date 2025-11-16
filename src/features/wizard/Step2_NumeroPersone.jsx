@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import styles from './Step2_NumeroPersone.module.css';
 
 function Step2_NumeroPersone({ numeroPersone, tipoViaggio, etaRange, genere, onChange, errors }) {
@@ -165,5 +166,18 @@ function Step2_NumeroPersone({ numeroPersone, tipoViaggio, etaRange, genere, onC
     </div>
   );
 }
+
+Step2_NumeroPersone.propTypes = {
+  numeroPersone: PropTypes.number.isRequired,
+  tipoViaggio: PropTypes.oneOf(['privato', 'pubblico']).isRequired,
+  etaRange: PropTypes.arrayOf(PropTypes.string).isRequired,
+  genere: PropTypes.oneOf(['misto', 'uomini', 'donne']).isRequired,
+  onChange: PropTypes.func.isRequired,
+  errors: PropTypes.shape({
+    numeroPersone: PropTypes.string,
+    etaRange: PropTypes.string,
+    genere: PropTypes.string,
+  }),
+};
 
 export default Step2_NumeroPersone;

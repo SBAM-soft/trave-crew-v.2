@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import HotelCard from './HotelCard';
 import { loadCSV } from '../../core/utils/dataLoader';
@@ -256,5 +257,12 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
     </div>
   );
 }
+
+HotelPanel.propTypes = {
+  destinazione: PropTypes.string.isRequired,
+  zone: PropTypes.array,
+  onConfirm: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default HotelPanel;

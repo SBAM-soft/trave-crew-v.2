@@ -1,5 +1,6 @@
 // src/components/explore/TripCard.jsx
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import styles from './TripCard.module.css';
 
 function TripCard({ viaggio }) {
@@ -181,5 +182,22 @@ function TripCard({ viaggio }) {
     </div>
   );
 }
+
+TripCard.propTypes = {
+  viaggio: PropTypes.shape({
+    CODICE: PropTypes.string.isRequired,
+    TITOLO: PropTypes.string.isRequired,
+    DESTINAZIONE: PropTypes.string.isRequired,
+    DESCRIZIONE: PropTypes.string,
+    IMMAGINE_URL: PropTypes.string,
+    DURATA_GIORNI: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    BUDGET_CATEGORIA: PropTypes.oneOf(['LOW', 'MEDIUM', 'HIGH']),
+    STATO: PropTypes.oneOf(['aperto', 'completo', 'in_corso']),
+    COSTO_TOTALE_PP: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    ETA_MIN: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    ETA_MAX: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    GENERE: PropTypes.oneOf(['misto', 'donne', 'uomini']),
+  }).isRequired,
+};
 
 export default TripCard;

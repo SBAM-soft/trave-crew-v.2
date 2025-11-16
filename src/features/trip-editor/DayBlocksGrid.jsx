@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './DayBlocksGrid.module.css';
 
 function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
@@ -120,4 +122,20 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick }) {
   );
 }
 
-export default DayBlocksGrid;
+DayBlocksGrid.propTypes = {
+  totalDays: PropTypes.number.isRequired,
+  filledBlocks: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.shape({
+        day: PropTypes.number,
+        experience: PropTypes.shape({
+          nome: PropTypes.string,
+        }),
+      }),
+    ])
+  ),
+  onBlockClick: PropTypes.func,
+};
+
+export default memo(DayBlocksGrid);

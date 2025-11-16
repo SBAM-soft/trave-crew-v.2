@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import styles from './MediaSlider.module.css';
 
 function MediaSlider({ videoUrl, images = [] }) {
@@ -115,5 +116,10 @@ function MediaSlider({ videoUrl, images = [] }) {
     </div>
   );
 }
+
+MediaSlider.propTypes = {
+  videoUrl: PropTypes.string,
+  images: PropTypes.arrayOf(PropTypes.string),
+};
 
 export default MediaSlider;

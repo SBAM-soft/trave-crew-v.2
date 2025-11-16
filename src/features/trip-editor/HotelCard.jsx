@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './HotelCard.module.css';
 
 function HotelCard({ hotel, onSelect, isSelected = false }) {
   const [showDetails, setShowDetails] = useState(false);
 
-  // Null check - prevent crash if hotel is null
-  if (!hotel) {
+  // Robust validation - prevent crash if hotel is invalid
+  if (!hotel || !hotel.NOME || !hotel.CODICE) {
     return (
       <div className={styles.hotelCard} style={{ padding: '2rem', textAlign: 'center' }}>
         <p style={{ color: '#6b7280' }}>Hotel non disponibile</p>
@@ -88,7 +89,7 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
         </div>
 
         {/* Description (collapsible) */}
-        {hotel.DESCRIZIONE && (
+        {hotel.DESCRIZIONE && hotel.DESCRIZIONE.length > 0 && (
           <p className={styles.description}>
             {showDetails ? hotel.DESCRIZIONE : `${hotel.DESCRIZIONE.substring(0, 100)}...`}
             {hotel.DESCRIZIONE.length > 100 && (
@@ -161,4 +162,38 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
   );
 }
 
-export default HotelCard;
+HotelCard.propTypes = {
+  hotel: PropTypes.shape({
+    CODICE: PropTypes.string.isRequired,
+    NOME: PropTypes.string.isRequired,
+    DESCRIZIONE: PropTypes.string,
+    TIPO_STRUTTURA: PropTypes.string,
+    ZONA: PropTypes.string,
+    QUARTIERE: PropTypes.string,
+    BUDGET: PropTypes.oneOf(['LOW', 'MEDIUM', 'HIGH']),
+    STELLE: PropTypes.number,
+    IMMAGINE_URL: PropTypes.string,
+    COLAZIONE_INCLUSA: PropTypes.oneOf(['si', 'no']),
+    WIFI: PropTypes.oneOf(['si', 'no']),
+    PISCINA: PropTypes.oneOf(['si', 'no']),
+    SERVIZI_MINIMI: PropTypes.string,
+    RECENSIONE_MEDIA: PropTypes.number,
+    NUMERO_RECENSIONI: PropTypes.number,
+    PRZ_NOTTE_GEN: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_FEB: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_MAR: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_APR: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_MAG: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_GIU: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_LUG: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_AGO: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_SET: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_OTT: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_NOV: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    PRZ_NOTTE_DIC: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+  isSelected: PropTypes.bool,
+};
+
+export default memo(HotelCard);

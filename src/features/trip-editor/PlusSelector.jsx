@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import PropTypes from 'prop-types';
 import styles from './PlusSelector.module.css';
 
 function PlusSelector({ availablePlus = [], selectedPlus = [], onChange }) {
@@ -70,5 +70,23 @@ function PlusSelector({ availablePlus = [], selectedPlus = [], onChange }) {
     </div>
   );
 }
+
+PlusSelector.propTypes = {
+  availablePlus: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      nome: PropTypes.string.isRequired,
+      prezzo: PropTypes.number.isRequired,
+    })
+  ),
+  selectedPlus: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      nome: PropTypes.string.isRequired,
+      prezzo: PropTypes.number.isRequired,
+    })
+  ),
+  onChange: PropTypes.func.isRequired,
+};
 
 export default PlusSelector;

@@ -1,7 +1,9 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './Card.module.css';
 
-function Card({ 
-  children, 
+function Card({
+  children,
   hover = false,
   className = ''
 }) {
@@ -12,4 +14,10 @@ function Card({
   );
 }
 
-export default Card;
+Card.propTypes = {
+  children: PropTypes.node.isRequired,
+  hover: PropTypes.bool,
+  className: PropTypes.string,
+};
+
+export default memo(Card);

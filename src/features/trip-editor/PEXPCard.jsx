@@ -1,8 +1,21 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import Card from '../../shared/Card';
 import styles from './PEXPCard.module.css';
 
 function PEXPCard({ pexp, onClick, isSelected = false }) {
+  // Robust validation - prevent crash if pexp is invalid
+  if (!pexp || (!pexp.NOME_PACCHETTO && !pexp.NOME && !pexp.nome)) {
+    return (
+      <Card className={styles.card}>
+        <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+          Pacchetto non disponibile
+        </p>
+      </Card>
+    );
+  }
+
   // Compatibilità CSV: estrai valori da struttura CSV o mock
   const notti = pexp.MIN_NOTTI || pexp.notti || 2;
   const giorniTotali = notti + 1;
@@ -117,4 +130,38 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
   );
 }
 
-export default PEXPCard;
+PEXPCard.propTypes = {
+  pexp: PropTypes.shape({
+    CODICE: PropTypes.string,
+    NOME_PACCHETTO: PropTypes.string,
+    NOME: PropTypes.string,
+    nome: PropTypes.string,
+    DESCRIZIONE: PropTypes.string,
+    MIN_NOTTI: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    notti: PropTypes.number,
+    ZONA: PropTypes.string,
+    zona_nome: PropTypes.string,
+    PRX_PAX: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    prezzo_base: PropTypes.number,
+    citta_arrivo: PropTypes.string,
+    likes: PropTypes.number,
+    dislikes: PropTypes.number,
+    storytelling: PropTypes.shape({
+      intro: PropTypes.string,
+    }),
+    esperienze_ids: PropTypes.arrayOf(PropTypes.string),
+    DAY2_ESPERIENZA_STD: PropTypes.string,
+    DAY3_ESPERIENZA_STD: PropTypes.string,
+    DAY4_ESPERIENZA_STD: PropTypes.string,
+    DAY5_ESPERIENZA_STD: PropTypes.string,
+    DAY6_ESPERIENZA_STD: PropTypes.string,
+    DAY7_ESPERIENZA_STD: PropTypes.string,
+    DAY8_ESPERIENZA_STD: PropTypes.string,
+    DAY9_ESPERIENZA_STD: PropTypes.string,
+    DAY10_ESPERIENZA_STD: PropTypes.string,
+  }).isRequired,
+  onClick: PropTypes.func,
+  isSelected: PropTypes.bool,
+};
+
+export default memo(PEXPCard);
