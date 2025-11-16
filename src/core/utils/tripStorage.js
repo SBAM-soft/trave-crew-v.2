@@ -185,6 +185,19 @@ export const saveTripComplete = (tripData, category = 'saved') => {
   try {
     const trips = getAllTrips();
 
+    // Valida che la categoria sia valida e che trips[category] sia un array
+    const validCategories = ['upcoming', 'past', 'saved'];
+    if (!validCategories.includes(category)) {
+      console.warn(`Categoria non valida: ${category}, uso 'saved'`);
+      category = 'saved';
+    }
+
+    // Assicurati che trips[category] sia un array
+    if (!Array.isArray(trips[category])) {
+      console.warn(`trips[${category}] non è un array, lo inizializzo`);
+      trips[category] = [];
+    }
+
     // Calcola costo totale includendo hotel e extra
     const costoBase = tripData.costoBase || 0;
     const costoHotels = tripData.selectedHotels?.reduce((acc, selection) => {
