@@ -1,24 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import usePanelStore from '../../store/usePanelStore';
+import PanelContainer from '../../components/PanelContainer';
 import Button from '../../shared/Button';
 import HotelCard from './HotelCard';
 import { useHotels } from '../../hooks/useHotels';
 import styles from './PEXPPanel.module.css'; // Riutilizziamo lo stesso stile di PEXP Panel
 
-function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
+function HotelPanel({ panelId, destinazione, zone, onConfirm, onClose }) {
+  const { popPanel } = usePanelStore();
   const [selectedHotel, setSelectedHotel] = useState(null);
-
-  // Keyboard navigation: Escape to close
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
 
   // Filtri
   const [budgetFilter, setBudgetFilter] = useState('ALL');
@@ -56,35 +47,26 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
     }));
   };
 
+  const handleClose = () => {
+    popPanel();
+  };
+
   if (isLoading) {
     return (
-      <div
-        className={styles.overlay}
-        onClick={onClose}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="hotel-panel-loading"
-      >
-        <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+      <PanelContainer panelId={panelId} onClose={handleClose}>
+        <div className={styles.panel}>
           <div className={styles.loadingContent}>
             <div className={styles.spinner}></div>
-            <p id="hotel-panel-loading">Caricamento hotel...</p>
+            <p>Caricamento hotel...</p>
           </div>
         </div>
-      </div>
+      </PanelContainer>
     );
   }
 
   return (
-    <div
-      className={styles.overlay}
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="hotel-panel-title"
-      aria-describedby="hotel-panel-description"
-    >
-      <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+    <PanelContainer panelId={panelId} onClose={handleClose}>
+      <div className={styles.panel}>
 
         {/* Header */}
         <div className={styles.header}>
@@ -108,7 +90,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
           </div>
           <button
             className={styles.closeBtn}
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Chiudi pannello hotel"
           >
             ✕
@@ -222,7 +204,7 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
 
         {/* Footer */}
         <div className={styles.footer}>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={handleClose}>
             Annulla
           </Button>
           <Button
@@ -234,11 +216,12 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
           </Button>
         </div>
       </div>
-    </div>
+    </PanelContainer>
   );
 }
 
 HotelPanel.propTypes = {
+  panelId: PropTypes.string.isRequired,
   destinazione: PropTypes.string.isRequired,
   zone: PropTypes.array,
   onConfirm: PropTypes.func.isRequired,

@@ -1,44 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import usePanelStore from '../../store/usePanelStore';
+import PanelContainer from '../../components/PanelContainer';
 import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
 import CostSummary from './CostSummary';
 import styles from './DETEXP.module.css';
 
-function DETEXP({ exp, onLike, onDislike, onClose }) {
+function DETEXP({ panelId, exp, onLike, onDislike }) {
+  const { popPanel } = usePanelStore();
   const [selectedPlus, setSelectedPlus] = useState([]);
 
-  // Keyboard navigation: Escape to close
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  const handleClose = () => {
+    popPanel();
+  };
 
   // Robust validation - prevent crash if exp is invalid
   if (!exp || !exp.nome) {
     return (
-      <div
-        className={styles.overlay}
-        onClick={onClose}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="detexp-error-title"
-      >
-        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <PanelContainer panelId={panelId} onClose={handleClose}>
+        <div className={styles.modal}>
           <div className={styles.header}>
-            <h2 id="detexp-error-title" className={styles.title}>
+            <h2 className={styles.title}>
               Esperienza non disponibile
             </h2>
             <button
               className={styles.closeButton}
-              onClick={onClose}
+              onClick={handleClose}
               aria-label="Chiudi finestra"
             >
               ✕
@@ -50,7 +39,7 @@ function DETEXP({ exp, onLike, onDislike, onClose }) {
             </p>
           </div>
         </div>
-      </div>
+      </PanelContainer>
     );
   }
 
@@ -103,24 +92,27 @@ function DETEXP({ exp, onLike, onDislike, onClose }) {
     setSelectedPlus(newSelectedPlus);
   };
 
+  const handleLike = () => {
+    onLike();
+    handleClose();
+  };
+
+  const handleDislike = () => {
+    onDislike();
+    handleClose();
+  };
+
   return (
-    <div
-      className={styles.overlay}
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="detexp-title"
-      aria-describedby="detexp-intro"
-    >
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <PanelContainer panelId={panelId} onClose={handleClose}>
+      <div className={styles.modal}>
         {/* Header con close button */}
         <div className={styles.header}>
-          <h2 id="detexp-title" className={styles.title}>
+          <h2 className={styles.title}>
             {exp.nome}
           </h2>
           <button
             className={styles.closeButton}
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Chiudi dettagli esperienza"
           >
             ✕
@@ -223,17 +215,18 @@ function DETEXP({ exp, onLike, onDislike, onClose }) {
           {/* Like/Dislike Buttons */}
           <div className={styles.section}>
             <LikeDislikeButtons
-              onLike={onLike}
-              onDislike={onDislike}
+              onLike={handleLike}
+              onDislike={handleDislike}
             />
           </div>
         </div>
       </div>
-    </div>
+    </PanelContainer>
   );
 }
 
 DETEXP.propTypes = {
+  panelId: PropTypes.string.isRequired,
   exp: PropTypes.shape({
     codice: PropTypes.string,
     nome: PropTypes.string.isRequired,
@@ -247,7 +240,6 @@ DETEXP.propTypes = {
   }).isRequired,
   onLike: PropTypes.func.isRequired,
   onDislike: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default DETEXP;

@@ -1,30 +1,19 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'sonner';
+import usePanelStore from '../../store/usePanelStore';
+import PanelContainer from '../../components/PanelContainer';
 import Button from '../../shared/Button';
 import EXPCard from './EXPCard';
 import DETEXP from './DETEXP';
 import { useExperiences } from '../../hooks/useExperiences';
 import styles from './PEXPPanel.module.css';
 
-function PEXPPanel({ pexp, onConfirm, onClose }) {
+function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
+  const { pushPanel, getPanelsByType } = usePanelStore();
+
   // Stati per le esperienze
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
-
-  // Keyboard navigation: Escape to close
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
-  // Stati per DETEXP (Livello 3)
-  const [showDETEXP, setShowDETEXP] = useState(false);
-  const [selectedExp, setSelectedExp] = useState(null);
 
   // Extract experience IDs from package
   const experienceIds = useMemo(() => {
@@ -59,63 +48,53 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
 
   // Handler click su esperienza → Apre DETEXP (Livello 3)
   const handleExpClick = (exp) => {
-    setSelectedExp(exp);
-    setShowDETEXP(true);
+    pushPanel('detexp', { exp, pexpId: panelId });
   };
 
   // Handler dislike da DETEXP
   const handleExpDislike = (expId) => {
     setDislikedExperiences([...dislikedExperiences, expId]);
-    setShowDETEXP(false);
-    setSelectedExp(null);
+    toast.info('Esperienza rifiutata', {
+      description: 'Puoi sostituirla con un\'alternativa',
+    });
   };
 
   // Handler like da DETEXP
   const handleExpLike = () => {
-    setShowDETEXP(false);
-    setSelectedExp(null);
-    // Esperienza confermata!
+    toast.success('Esperienza confermata!');
+  };
+
+  // Handler sostituzione esperienza (se slot vuoto)
+  const handleReplaceExp = (oldExpId) => {
+    toast.info('Funzionalità sostituzione esperienza in arrivo!', {
+      description: 'Per ora puoi lasciare vuoto o confermare il pacchetto',
+    });
   };
 
   if (isLoading) {
     return (
-      <div
-        className={styles.overlay}
-        onClick={onClose}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="pexp-panel-loading"
-      >
-        <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+      <PanelContainer panelId={panelId} onClose={onClose}>
+        <div className={styles.panel}>
           <div className={styles.loadingContent}>
             <div className={styles.spinner}></div>
-            <p id="pexp-panel-loading">Caricamento esperienze...</p>
+            <p>Caricamento esperienze...</p>
           </div>
         </div>
-      </div>
+      </PanelContainer>
     );
   }
 
-  // Handler sostituzione esperienza (se slot vuoto)
-  const handleReplaceExp = (oldExpId) => {
-    // Per ora alert, poi si può implementare modale con alternative
-    alert('Funzionalità sostituzione esperienza in arrivo!\nPer ora puoi lasciare vuoto o confermare il pacchetto.');
-  };
-
   const validExperiences = experiences.filter(exp => !dislikedExperiences.includes(exp.id));
+
+  // Get DETEXP panels for this PEXP
+  const detexpPanels = getPanelsByType('detexp').filter(
+    (panel) => panel.data.pexpId === panelId
+  );
 
   return (
     <>
-      {/* Overlay */}
-      <div
-        className={styles.overlay}
-        onClick={onClose}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="pexp-panel-title"
-        aria-describedby="pexp-panel-description"
-      >
-        <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+      <PanelContainer panelId={panelId} onClose={onClose}>
+        <div className={styles.panel}>
 
           {/* Header */}
           <div className={styles.header}>
@@ -202,10 +181,7 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
             </Button>
             <Button
               variant="primary"
-              onClick={() => {
-                onConfirm(validExperiences);
-                onClose();
-              }}
+              onClick={() => onConfirm(validExperiences, pexp)}
               disabled={validExperiences.length === 0}
             >
               ✓ Conferma Pacchetto ({validExperiences.length} exp.)
@@ -213,22 +189,24 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
           </div>
 
         </div>
-      </div>
+      </PanelContainer>
 
-      {/* DETEXP Modal (Livello 3) */}
-      {showDETEXP && selectedExp && (
+      {/* DETEXP Modals (Livello 3) - Rendered from panel stack */}
+      {detexpPanels.map((panel) => (
         <DETEXP
-          exp={selectedExp}
+          key={panel.id}
+          panelId={panel.id}
+          exp={panel.data.exp}
           onLike={handleExpLike}
-          onDislike={() => handleExpDislike(selectedExp.id)}
-          onClose={() => setShowDETEXP(false)}
+          onDislike={() => handleExpDislike(panel.data.exp.id)}
         />
-      )}
+      ))}
     </>
   );
 }
 
 PEXPPanel.propTypes = {
+  panelId: PropTypes.string.isRequired,
   pexp: PropTypes.object.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
