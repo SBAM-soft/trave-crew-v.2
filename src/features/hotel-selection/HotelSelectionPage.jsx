@@ -13,6 +13,11 @@ function HotelSelectionPage() {
   const tripData = location.state || {};
   const { wizardData = {}, filledBlocks = [], totalDays = 7 } = tripData;
 
+  // DEBUG: Log dati ricevuti
+  console.log('🏨 HotelSelectionPage - location.state:', location.state);
+  console.log('🏨 HotelSelectionPage - tripData:', tripData);
+  console.log('🏨 HotelSelectionPage - wizardData:', wizardData);
+
   const [hotels, setHotels] = useState([]);
   const [filteredHotels, setFilteredHotels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,22 +41,42 @@ function HotelSelectionPage() {
     const loadData = async () => {
       try {
         setLoading(true);
+
+        console.log('🔍 DEBUG - wizardData completo:', wizardData);
+        console.log('🔍 DEBUG - destinazione:', wizardData.destinazione);
+        console.log('🔍 DEBUG - destinazioneNome:', wizardData.destinazioneNome);
+
         const [hotelsData, zoneData] = await Promise.all([
           loadCSV('hotel.csv'),
           loadCSV('zone.csv')
         ]);
+
+        console.log('📦 DEBUG - Hotel caricati dal CSV:', hotelsData.length);
+        console.log('📦 DEBUG - Zone caricate dal CSV:', zoneData.length);
+
+        // Mostra alcuni hotel come esempio
+        if (hotelsData.length > 0) {
+          console.log('🏨 Esempio hotel 1:', {
+            CODICE: hotelsData[0].CODICE,
+            DESTINAZIONE: hotelsData[0].DESTINAZIONE,
+            ZONA: hotelsData[0].ZONA,
+            BUDGET: hotelsData[0].BUDGET
+          });
+        }
 
         // Filtra per destinazione
         // wizardData.destinazione può contenere il CODICE (es. "DTH01") o il NOME (es. "THAILANDIA")
         // wizardData.destinazioneNome contiene sempre il nome
         const destInput = (wizardData.destinazioneNome || wizardData.destinazione || '').toLowerCase().trim();
 
-        console.log('🏨 Caricamento hotel per destinazione:', destInput);
+        console.log('🎯 Cercando hotel per destinazione:', destInput);
 
         const destHotels = hotelsData.filter(h => {
           const destNome = h.DESTINAZIONE?.toLowerCase().trim();
           const match = destNome === destInput;
-          if (match) console.log('✅ Hotel trovato:', h.CODICE, h.DESTINAZIONE);
+          if (match) {
+            console.log('✅ Hotel trovato:', h.CODICE, '-', h.DESTINAZIONE, '-', h.ZONA);
+          }
           return match;
         });
 
@@ -60,23 +85,28 @@ function HotelSelectionPage() {
           return destNome === destInput;
         });
 
-        console.log('📊 Risultati filtro hotel:', destHotels.length, 'hotel trovati');
-        console.log('📊 Risultati filtro zone:', destZone.length, 'zone trovate');
+        console.log('📊 RISULTATO FINALE - Hotel trovati:', destHotels.length);
+        console.log('📊 RISULTATO FINALE - Zone trovate:', destZone.length);
 
         setHotels(destHotels);
         setFilteredHotels(destHotels);
         setZone(destZone);
         setLoading(false);
       } catch (err) {
-        console.error('Errore caricamento dati:', err);
+        console.error('❌ ERRORE caricamento dati:', err);
         setLoading(false);
       }
     };
 
-    if (wizardData.destinazione) {
+    console.log('🚀 useEffect triggered - checking wizardData.destinazione:', wizardData.destinazione);
+
+    if (wizardData.destinazione || wizardData.destinazioneNome) {
       loadData();
+    } else {
+      console.warn('⚠️ Nessuna destinazione trovata in wizardData!');
+      setLoading(false);
     }
-  }, [wizardData.destinazione]);
+  }, [wizardData.destinazione, wizardData.destinazioneNome]);
 
   // Applica filtri
   useEffect(() => {
@@ -314,8 +344,20 @@ function HotelSelectionPage() {
             <div className={styles.emptyIcon}>🏨</div>
             <h3 className={styles.emptyTitle}>Nessun hotel trovato</h3>
             <p className={styles.emptyText}>
-              Modifica i filtri per vedere più opzioni
+              {hotels.length === 0
+                ? `Nessun hotel disponibile per ${wizardData.destinazioneNome || wizardData.destinazione || 'questa destinazione'}. Verifica la console (F12) per dettagli.`
+                : 'Modifica i filtri per vedere più opzioni'}
             </p>
+            {hotels.length === 0 && (
+              <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '0.5rem' }}>
+                <p style={{ margin: 0, fontSize: '0.875rem', color: '#856404' }}>
+                  Debug: destinazione = "{wizardData.destinazione}", destinazioneNome = "{wizardData.destinazioneNome}"
+                </p>
+                <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem', color: '#856404' }}>
+                  Apri la Console (F12) per vedere i log di caricamento
+                </p>
+              </div>
+            )}
             <button className={styles.emptyBtn} onClick={handleResetFilters}>
               Reset filtri
             </button>
