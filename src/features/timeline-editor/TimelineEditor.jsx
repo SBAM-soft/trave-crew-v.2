@@ -249,7 +249,7 @@ function TimelineEditor() {
                   🔗 Genera link condivisione
                 </button>
                 <button className={styles.exportOption} onClick={handleExportPDF}>
-                  📕 Scarica PDF (presto)
+                  📕 Scarica PDF
                 </button>
               </div>
             )}

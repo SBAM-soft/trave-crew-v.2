@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import { useUser } from '../../contexts/UserContext';
 import { saveTripComplete } from '../../core/utils/tripStorage';
-import { downloadAsText, downloadAsJSON, copyToClipboard } from '../../core/utils/exportHelpers';
+import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard } from '../../core/utils/exportHelpers';
 import Button from '../../shared/Button';
 import styles from './TripSummary.module.css';
 
@@ -98,12 +98,13 @@ function TripSummary() {
   };
 
   // Handler esporta
-  const handleExport = (type) => {
+  const handleExport = async (type) => {
     const exportData = {
       wizardData,
       timeline,
       totalDays,
-      totalCost: costs.total
+      totalCost: costs.total,
+      selectedHotels
     };
 
     if (type === 'text') {
@@ -115,6 +116,13 @@ function TripSummary() {
       const result = downloadAsJSON({ ...tripData, costs });
       if (result.success) {
         toast.success('JSON esportato!');
+      }
+    } else if (type === 'pdf') {
+      const result = await downloadAsPDF(exportData);
+      if (result.success) {
+        toast.success('PDF generato con successo!');
+      } else {
+        toast.error(result.error || 'Errore generazione PDF');
       }
     } else if (type === 'clipboard') {
       copyToClipboard(exportData).then(result => {
@@ -363,6 +371,9 @@ function TripSummary() {
                   </button>
                   <button className={styles.exportOption} onClick={() => handleExport('clipboard')}>
                     📋 Copia Clipboard
+                  </button>
+                  <button className={styles.exportOption} onClick={() => handleExport('pdf')}>
+                    📕 Scarica PDF
                   </button>
                 </div>
               )}

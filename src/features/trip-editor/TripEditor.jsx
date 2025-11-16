@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
-// import useNavigationGuard from '../../hooks/useNavigationGuard'; // Disabilitato temporaneamente
+import useNavigationGuard from '../../hooks/useNavigationGuard';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayBlocksGrid from './DayBlocksGrid';
@@ -64,13 +64,12 @@ function TripEditor() {
   const [costiAccessori, setCostiAccessori] = useState([]);
   const [plus, setPlus] = useState([]);
 
-  // Protezione navigazione - DISABILITATA temporaneamente per compatibilità
-  // TODO: Riabilitare quando react-router-dom supporta useBlocker stabilmente
-  // const hasUnsavedChanges = filledBlocks.length > 0 || selectedHotel !== null;
-  // useNavigationGuard(
-  //   hasUnsavedChanges,
-  //   'Sei sicuro di voler uscire dal Trip Editor? Il viaggio non è stato completato e le modifiche andranno perse.'
-  // );
+  // Protezione navigazione - Previene perdita dati non salvati
+  const hasUnsavedChanges = filledBlocks.length > 0 && filledBlocks.length < totalDays - 1;
+  useNavigationGuard(
+    hasUnsavedChanges,
+    'Sei sicuro di voler uscire dal Trip Editor? Il viaggio non è stato completato e le modifiche andranno perse.'
+  );
 
   // Carica dati iniziali
   useEffect(() => {
