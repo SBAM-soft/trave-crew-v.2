@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast, Toaster } from 'sonner';
 // import useNavigationGuard from '../../hooks/useNavigationGuard'; // Temporarily disabled - causing crashes
+import usePanelStore from '../../store/usePanelStore';
+import usePanelURLSync from '../../hooks/usePanelURLSync';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayBlocksGrid from './DayBlocksGrid';
@@ -21,7 +24,11 @@ import styles from './TripEditor.module.css';
 function TripEditor() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
+  // Panel store management
+  const { pushPanel, popPanel, panelStack, getPanelsByType } = usePanelStore();
+  usePanelURLSync(); // Sync panels with URL
+
   // Recupera dati wizard (passati dalla route)
   const wizardData = location.state?.wizardData || {
     destinazione: 'Thailandia',
@@ -44,12 +51,7 @@ function TripEditor() {
   const [filledBlocks, setFilledBlocks] = useState([]);
   const [totalDays, setTotalDays] = useState(7); // Default 7 giorni
 
-  // State per PEXP Panel (Livello 2)
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [currentPexp, setCurrentPexp] = useState(null);
-
-  // State per Hotel Panel
-  const [isHotelPanelOpen, setIsHotelPanelOpen] = useState(false);
+  // State per Hotel selection
   const [selectedHotel, setSelectedHotel] = useState(null);
 
   // State per database itinerari (🆕)
@@ -147,17 +149,16 @@ function TripEditor() {
 
   // Handler click pacchetto → Apre PEXP Panel
   const handlePacchettoClick = (pexp) => {
-    setCurrentPexp(pexp);
-    setIsPanelOpen(true);
+    pushPanel('pexp', { pexp });
   };
 
   // Handler conferma pacchetto dal Panel
-  const handleConfirmPackage = (validExperiences) => {
-    if (!currentPexp || !validExperiences || validExperiences.length === 0) return;
+  const handleConfirmPackage = (validExperiences, pexp) => {
+    if (!pexp || !validExperiences || validExperiences.length === 0) return;
 
     // Trova codice zona corrispondente (🆕)
     const zonaObj = zone.find(z =>
-      z.ZONA?.toLowerCase() === currentPexp.ZONA?.toLowerCase()
+      z.ZONA?.toLowerCase() === pexp.ZONA?.toLowerCase()
     );
     const codiceZona = zonaObj?.CODICE || null;
 
@@ -174,8 +175,8 @@ function TripEditor() {
         newBlocks.push({
           day: dayNum,
           experience: validExperiences[i],
-          packageName: currentPexp.NOME || currentPexp.nome,
-          zona: currentPexp.ZONA, // 🆕 Traccia zona del pacchetto
+          packageName: pexp.NOME || pexp.nome,
+          zona: pexp.ZONA, // 🆕 Traccia zona del pacchetto
           codiceZona: codiceZona // 🆕 Codice zona (es: ZTHBA01)
         });
       }
@@ -183,44 +184,47 @@ function TripEditor() {
 
     // Aggiungi i nuovi blocchi
     setFilledBlocks([...filledBlocks, ...newBlocks]);
-    setIsPanelOpen(false);
-    setCurrentPexp(null);
+    popPanel(); // Close the panel
 
-    // Feedback utente
-    alert(`✓ Pacchetto "${currentPexp.NOME || currentPexp.nome}" confermato!\n${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1}).`);
+    // Feedback utente con toast
+    toast.success(`Pacchetto "${pexp.NOME || pexp.nome}" confermato!`, {
+      description: `${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1})`,
+    });
   };
 
   // Handler chiusura panel
   const handleClosePanel = () => {
-    setIsPanelOpen(false);
-    setCurrentPexp(null);
+    popPanel();
   };
 
   // Handler click blocco giorno
   const handleBlockClick = (day) => {
-    alert(`Modifica giorno ${day}\n(Da implementare - riaprire PEXP Panel per modifiche)`);
+    toast.info(`Modifica giorno ${day}`, {
+      description: 'Da implementare - riaprire PEXP Panel per modifiche',
+    });
   };
 
   // Handler click card hotel → Apre Hotel Panel
   const handleHotelCardClick = () => {
-    setIsHotelPanelOpen(true);
+    pushPanel('hotel', { destinazione: wizardData.destinazione, zone });
   };
 
   // Handler conferma hotel dal panel
   const handleConfirmHotel = (hotel) => {
     setSelectedHotel(hotel);
-    setIsHotelPanelOpen(false);
+    popPanel(); // Close hotel panel
+    toast.success(`Hotel "${hotel.NOME}" selezionato!`);
   };
 
   // Handler chiusura hotel panel
   const handleCloseHotelPanel = () => {
-    setIsHotelPanelOpen(false);
+    popPanel();
   };
 
   // Handler crea itinerario (🆕 con logica itinerari pre-compilati)
   const handleCreateItinerary = () => {
     if (filledBlocks.length < totalDays - 1) {
-      alert('Completa tutti i giorni prima di creare l\'itinerario!');
+      toast.warning('Completa tutti i giorni prima di creare l\'itinerario!');
       return;
     }
 
@@ -384,24 +388,38 @@ function TripEditor() {
         </section>
       </div>
 
-      {/* PEXP Panel (Livello 2) - Modal */}
-      {isPanelOpen && currentPexp && (
-        <PEXPPanel
-          pexp={currentPexp}
-          onConfirm={handleConfirmPackage}
-          onClose={handleClosePanel}
-        />
-      )}
+      {/* Sonner Toaster for notifications */}
+      <Toaster position="top-right" richColors />
 
-      {/* Hotel Panel - Modal */}
-      {isHotelPanelOpen && (
-        <HotelPanel
-          destinazione={wizardData.destinazione}
-          zone={zone}
-          onConfirm={handleConfirmHotel}
-          onClose={handleCloseHotelPanel}
-        />
-      )}
+      {/* Render panels from stack */}
+      {panelStack.map((panel) => {
+        if (panel.type === 'pexp') {
+          return (
+            <PEXPPanel
+              key={panel.id}
+              panelId={panel.id}
+              pexp={panel.data.pexp}
+              onConfirm={handleConfirmPackage}
+              onClose={handleClosePanel}
+            />
+          );
+        }
+
+        if (panel.type === 'hotel') {
+          return (
+            <HotelPanel
+              key={panel.id}
+              panelId={panel.id}
+              destinazione={panel.data.destinazione || wizardData.destinazione}
+              zone={panel.data.zone || zone}
+              onConfirm={handleConfirmHotel}
+              onClose={handleCloseHotelPanel}
+            />
+          );
+        }
+
+        return null;
+      })}
     </div>
   );
 }
