@@ -29,7 +29,7 @@ function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
   }, [pexp]);
 
   // Load experiences with caching
-  const { experiences: allExperiences, isLoading } = useExperiences({ experienceIds });
+  const { filteredExperiences: allExperiences, isLoading } = useExperiences({ experienceIds });
 
   // Map experiences to expected format
   const experiences = useMemo(() => {
