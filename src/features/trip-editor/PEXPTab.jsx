@@ -12,7 +12,17 @@ import styles from './PEXPTab.module.css';
 /**
  * PEXP Tab - Fullscreen tab showing package experiences
  */
-function PEXPTab({ pexp, onClose, onConfirm, onExpClick, totalDays = 7, filledBlocks = [] }) {
+function PEXPTab({
+  pexp,
+  onClose,
+  onConfirm,
+  onExpClick,
+  totalDays = 7,
+  filledBlocks = [],
+  isEditing = false,
+  editingBlock = null,
+  onRemove = null
+}) {
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
 
   // Extract experience IDs from package
@@ -62,8 +72,17 @@ function PEXPTab({ pexp, onClose, onConfirm, onExpClick, totalDays = 7, filledBl
       <span>📍 {pexp.ZONA || pexp.zona}</span>
       <span>🗓️ {pexp.MIN_NOTTI + 1 || 3} giorni / {pexp.MIN_NOTTI || 2} notti</span>
       {pexp.PRX_PAX && <span>💰 €{pexp.PRX_PAX} p.p.</span>}
+      {isEditing && editingBlock && (
+        <span style={{ color: '#ff9800' }}>✏️ Modifica Giorno {editingBlock.day}</span>
+      )}
     </div>
   );
+
+  const handleRemoveClick = () => {
+    if (editingBlock && onRemove) {
+      onRemove(editingBlock.day);
+    }
+  };
 
   return (
     <TabView
@@ -73,13 +92,24 @@ function PEXPTab({ pexp, onClose, onConfirm, onExpClick, totalDays = 7, filledBl
       subtitle={subtitle}
       zIndex={1000}
       headerActions={
-        <Button
-          variant="primary"
-          onClick={handleConfirm}
-          disabled={validExperiences.length === 0}
-        >
-          ✓ Conferma Pacchetto ({validExperiences.length})
-        </Button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          {isEditing && onRemove && (
+            <Button
+              variant="outline"
+              onClick={handleRemoveClick}
+              style={{ color: '#f44336' }}
+            >
+              🗑️ Rimuovi Giorno
+            </Button>
+          )}
+          <Button
+            variant="primary"
+            onClick={handleConfirm}
+            disabled={validExperiences.length === 0}
+          >
+            {isEditing ? '✓ Sostituisci' : '✓ Conferma Pacchetto'} ({validExperiences.length})
+          </Button>
+        </div>
       }
     >
       {isLoading ? (
@@ -157,6 +187,9 @@ PEXPTab.propTypes = {
   onExpClick: PropTypes.func.isRequired,
   totalDays: PropTypes.number,
   filledBlocks: PropTypes.array,
+  isEditing: PropTypes.bool,
+  editingBlock: PropTypes.object,
+  onRemove: PropTypes.func,
 };
 
 export default PEXPTab;

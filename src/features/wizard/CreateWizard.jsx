@@ -211,6 +211,7 @@ function CreateWizard() {
           <Step5_DataPartenza
             value={dataPartenza}
             onChange={(data) => setDataPartenza(data)}
+            destinazione={destinazione}
           />
         );
 
