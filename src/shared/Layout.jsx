@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './Layout.module.css';
 
 function Layout({ children }) {
   const location = useLocation();
+  const { isAuthenticated, user } = useAuth();
 
-  // Mock user state (in futuro da context)
-  const isLoggedIn = true; // Cambia a false per testare login
+  const isLoggedIn = isAuthenticated;
 
   return (
     <div className={styles.layout}>
@@ -49,9 +50,10 @@ function Layout({ children }) {
                 <Link
                   to="/profile"
                   className={styles.profileLink}
+                  title={user?.nome || user?.email || 'Profilo'}
                 >
                   <img
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mario"
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.nome || user?.email || 'User'}`}
                     alt="Profilo"
                     className={styles.avatar}
                   />

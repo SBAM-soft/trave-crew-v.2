@@ -1,46 +1,96 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast, Toaster } from 'sonner';
+import { useAuth } from '../../contexts/AuthContext';
+import { useUser } from '../../contexts/UserContext';
 import Button from '../../shared/Button';
 import styles from './Profile.module.css';
 
 function Profile() {
   const navigate = useNavigate();
-
-  // Mock user data (in futuro da backend/context)
-  const [user, setUser] = useState({
-    nome: 'Mario',
-    cognome: 'Rossi',
-    email: 'mario.rossi@email.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mario',
-    telefono: '+39 333 123 4567',
-    citta: 'Milano',
-    paese: 'Italia',
-    bio: 'Appassionato di viaggi e avventure. Sempre alla ricerca di nuove destinazioni.',
-    interessi: ['Natura', 'Avventura', 'Cultura', 'Food'],
-    viaggiCompletati: 12,
-    viaggiProssimi: 2,
-    dataDiIscrizione: 'Gennaio 2024'
-  });
+  const { user: authUser, logout, isAuthenticated } = useAuth();
+  const { userProfile, updateUserProfile, loading: profileLoading } = useUser();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState({ ...user });
+  const [saving, setSaving] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({});
+
+  // Redirect se non autenticato
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error('Devi effettuare il login per accedere al profilo');
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Inizializza editedProfile quando userProfile è caricato
+  useEffect(() => {
+    if (userProfile) {
+      setEditedProfile(userProfile);
+    }
+  }, [userProfile]);
 
   // Handler salva modifiche
-  const handleSave = () => {
-    setUser(editedUser);
-    setIsEditing(false);
-    alert('✓ Profilo aggiornato con successo!');
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const result = await updateUserProfile(editedProfile);
+
+      if (result.success) {
+        toast.success('Profilo aggiornato con successo!');
+        setIsEditing(false);
+      } else {
+        toast.error(result.error || 'Errore durante l\'aggiornamento');
+      }
+    } catch (error) {
+      toast.error('Si è verificato un errore');
+      console.error('Errore salvataggio profilo:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Handler annulla modifiche
   const handleCancel = () => {
-    setEditedUser({ ...user });
+    setEditedProfile(userProfile);
     setIsEditing(false);
   };
 
   // Handler change input
   const handleChange = (field, value) => {
-    setEditedUser({ ...editedUser, [field]: value });
+    setEditedProfile({ ...editedProfile, [field]: value });
+  };
+
+  // Handler logout
+  const handleLogout = () => {
+    logout();
+    toast.success('Logout effettuato con successo');
+    navigate('/');
+  };
+
+  if (!authUser || !userProfile) {
+    return (
+      <div className={styles.profilePage}>
+        <div className={styles.loading}>
+          <p>Caricamento profilo...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Combina dati auth e profile
+  const displayData = {
+    nome: authUser.nome || 'Utente',
+    email: authUser.email,
+    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${authUser.nome || authUser.email}`,
+    telefono: editedProfile.telefono || '',
+    citta: editedProfile.citta || '',
+    paese: editedProfile.paese || 'Italia',
+    bio: editedProfile.bio || '',
+    interessi: ['Natura', 'Avventura', 'Cultura'], // TODO: Aggiungere gestione interessi
+    viaggiCreati: editedProfile.statistiche?.viaggiCreati || 0,
+    viaggiCompletati: editedProfile.statistiche?.viaggiCompletati || 0,
+    dataDiIscrizione: authUser.createdAt ? new Date(authUser.createdAt).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }) : 'N/A'
   };
 
   return (
@@ -59,35 +109,40 @@ function Profile() {
         <div className={styles.card}>
           <div className={styles.avatarSection}>
             <img
-              src={user.avatar}
-              alt={`${user.nome} ${user.cognome}`}
+              src={displayData.avatar}
+              alt={displayData.nome}
               className={styles.avatar}
             />
             <div className={styles.avatarInfo}>
-              <h2 className={styles.userName}>{user.nome} {user.cognome}</h2>
-              <p className={styles.userEmail}>{user.email}</p>
+              <h2 className={styles.userName}>{displayData.nome}</h2>
+              <p className={styles.userEmail}>{displayData.email}</p>
               <div className={styles.stats}>
                 <div className={styles.statItem}>
-                  <span className={styles.statValue}>{user.viaggiCompletati}</span>
+                  <span className={styles.statValue}>{displayData.viaggiCompletati}</span>
                   <span className={styles.statLabel}>Viaggi completati</span>
                 </div>
                 <div className={styles.statItem}>
-                  <span className={styles.statValue}>{user.viaggiProssimi}</span>
-                  <span className={styles.statLabel}>Prossimi viaggi</span>
+                  <span className={styles.statValue}>{displayData.viaggiCreati}</span>
+                  <span className={styles.statLabel}>Viaggi creati</span>
                 </div>
                 <div className={styles.statItem}>
-                  <span className={styles.statValue}>{user.interessi.length}</span>
+                  <span className={styles.statValue}>{displayData.interessi.length}</span>
                   <span className={styles.statLabel}>Interessi</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {!isEditing && (
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              ✏️ Modifica Profilo
+          <div className={styles.avatarActions}>
+            {!isEditing && (
+              <Button variant="outline" onClick={() => setIsEditing(true)}>
+                ✏️ Modifica Profilo
+              </Button>
+            )}
+            <Button variant="outline" onClick={handleLogout} className={styles.logoutBtn}>
+              🚪 Logout
             </Button>
-          )}
+          </div>
         </div>
 
         {/* Card Informazioni Personali */}
@@ -103,12 +158,12 @@ function Profile() {
                 {isEditing ? (
                   <input
                     type="text"
-                    value={editedUser.nome}
+                    value={editedProfile.nome}
                     onChange={(e) => handleChange('nome', e.target.value)}
                     className={styles.input}
                   />
                 ) : (
-                  <p className={styles.value}>{user.nome}</p>
+                  <p className={styles.value}>{displayData.nome}</p>
                 )}
               </div>
 
@@ -117,12 +172,12 @@ function Profile() {
                 {isEditing ? (
                   <input
                     type="text"
-                    value={editedUser.cognome}
+                    value={editedProfile.cognome}
                     onChange={(e) => handleChange('cognome', e.target.value)}
                     className={styles.input}
                   />
                 ) : (
-                  <p className={styles.value}>{user.cognome}</p>
+                  <p className={styles.value}>{displayData.cognome}</p>
                 )}
               </div>
 
@@ -131,12 +186,12 @@ function Profile() {
                 {isEditing ? (
                   <input
                     type="email"
-                    value={editedUser.email}
+                    value={editedProfile.email}
                     onChange={(e) => handleChange('email', e.target.value)}
                     className={styles.input}
                   />
                 ) : (
-                  <p className={styles.value}>{user.email}</p>
+                  <p className={styles.value}>{displayData.email}</p>
                 )}
               </div>
 
@@ -145,12 +200,12 @@ function Profile() {
                 {isEditing ? (
                   <input
                     type="tel"
-                    value={editedUser.telefono}
+                    value={editedProfile.telefono}
                     onChange={(e) => handleChange('telefono', e.target.value)}
                     className={styles.input}
                   />
                 ) : (
-                  <p className={styles.value}>{user.telefono}</p>
+                  <p className={styles.value}>{displayData.telefono}</p>
                 )}
               </div>
 
@@ -159,12 +214,12 @@ function Profile() {
                 {isEditing ? (
                   <input
                     type="text"
-                    value={editedUser.citta}
+                    value={editedProfile.citta}
                     onChange={(e) => handleChange('citta', e.target.value)}
                     className={styles.input}
                   />
                 ) : (
-                  <p className={styles.value}>{user.citta}</p>
+                  <p className={styles.value}>{displayData.citta}</p>
                 )}
               </div>
 
@@ -173,12 +228,12 @@ function Profile() {
                 {isEditing ? (
                   <input
                     type="text"
-                    value={editedUser.paese}
+                    value={editedProfile.paese}
                     onChange={(e) => handleChange('paese', e.target.value)}
                     className={styles.input}
                   />
                 ) : (
-                  <p className={styles.value}>{user.paese}</p>
+                  <p className={styles.value}>{displayData.paese}</p>
                 )}
               </div>
             </div>
@@ -187,13 +242,13 @@ function Profile() {
               <label className={styles.label}>Bio</label>
               {isEditing ? (
                 <textarea
-                  value={editedUser.bio}
+                  value={editedProfile.bio}
                   onChange={(e) => handleChange('bio', e.target.value)}
                   className={styles.textarea}
                   rows={3}
                 />
               ) : (
-                <p className={styles.value}>{user.bio}</p>
+                <p className={styles.value}>{displayData.bio || 'Nessuna bio inserita'}</p>
               )}
             </div>
           </div>
@@ -203,8 +258,8 @@ function Profile() {
               <Button variant="outline" onClick={handleCancel}>
                 Annulla
               </Button>
-              <Button variant="primary" onClick={handleSave}>
-                💾 Salva Modifiche
+              <Button variant="primary" onClick={handleSave} disabled={saving}>
+                {saving ? 'Salvataggio...' : '💾 Salva Modifiche'}
               </Button>
             </div>
           )}
@@ -217,7 +272,7 @@ function Profile() {
           </div>
           <div className={styles.cardBody}>
             <div className={styles.interests}>
-              {user.interessi.map((interesse, i) => (
+              {displayData.interessi.map((interesse, i) => (
                 <span key={i} className={styles.interestBadge}>
                   {interesse}
                 </span>
@@ -257,9 +312,10 @@ function Profile() {
 
         {/* Info Account */}
         <div className={styles.infoBox}>
-          <p>👤 Membro dal {user.dataDiIscrizione}</p>
+          <p>👤 Membro dal {displayData.dataDiIscrizione}</p>
         </div>
       </div>
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
 import CostSummary from './CostSummary';
+import { DISPONIBILE_PLUS, MOCK_MEDIA } from '../../core/utils/mockData';
 import styles from './DETEXP.module.css';
 
 function DETEXP({ panelId, exp, onLike, onDislike }) {
@@ -72,21 +73,9 @@ function DETEXP({ panelId, exp, onLike, onDislike }) {
   if (exp.durata) infoGenerali.push({ icon: '⏱️', label: 'Durata', value: exp.durata });
   if (exp.difficolta) infoGenerali.push({ icon: '🚶', label: 'Difficoltà', value: `${exp.difficolta}/3` });
 
-  // Mock plus (in futuro si possono caricare dal CSV plus.csv)
-  const disponibile_plus = [
-    { id: 'plus1', nome: 'Extra premium', prezzo: 25 },
-    { id: 'plus2', nome: 'Fotografo professionista', prezzo: 60 }
-  ];
-
-  // Mock immagini (in futuro si possono collegare ai media)
-  const media = {
-    video: null,
-    images: [
-      'https://images.unsplash.com/photo-1563492065211-4f7e3a4c9c3e?w=800',
-      'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800',
-      'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800'
-    ]
-  };
+  // TODO: In futuro collegare a dati reali dal CSV plus.csv e media
+  const disponibile_plus = DISPONIBILE_PLUS;
+  const media = MOCK_MEDIA;
 
   const handlePlusChange = (newSelectedPlus) => {
     setSelectedPlus(newSelectedPlus);

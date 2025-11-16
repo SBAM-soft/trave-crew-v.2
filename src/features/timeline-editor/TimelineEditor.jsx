@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast, Toaster } from 'sonner';
 import Button from '../../shared/Button';
 import DayTimeline from './DayTimeline';
+import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard, generateShareLink } from '../../core/utils/exportHelpers';
 import styles from './TimelineEditor.module.css';
 
 function TimelineEditor() {
@@ -20,6 +22,7 @@ function TimelineEditor() {
   // State
   const [timeline, setTimeline] = useState([]);
   const [showCostSummary, setShowCostSummary] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Costruisci timeline completa
   useEffect(() => {
@@ -103,9 +106,105 @@ function TimelineEditor() {
     navigate(-1);
   };
 
-  // Handler condividi/esporta
-  const handleExport = () => {
-    alert('Funzionalità esportazione in arrivo!\nPotrai esportare in PDF, condividere via link, o salvare sul tuo account.');
+  // Toggle export menu
+  const toggleExportMenu = () => {
+    setShowExportMenu(!showExportMenu);
+  };
+
+  // Handler esporta come testo
+  const handleExportText = () => {
+    const exportData = {
+      wizardData,
+      timeline,
+      totalDays,
+      totalCost
+    };
+
+    const result = downloadAsText(exportData);
+    if (result.success) {
+      toast.success('Itinerario scaricato come file di testo!');
+    } else {
+      toast.error('Errore durante il download');
+    }
+    setShowExportMenu(false);
+  };
+
+  // Handler esporta come JSON
+  const handleExportJSON = () => {
+    const exportData = {
+      wizardData,
+      timeline,
+      filledBlocks,
+      totalDays,
+      totalCost,
+      exportedAt: new Date().toISOString()
+    };
+
+    const result = downloadAsJSON(exportData);
+    if (result.success) {
+      toast.success('Itinerario esportato come JSON!');
+    } else {
+      toast.error('Errore durante l\'esportazione');
+    }
+    setShowExportMenu(false);
+  };
+
+  // Handler copia negli appunti
+  const handleCopyClipboard = async () => {
+    const exportData = {
+      wizardData,
+      timeline,
+      totalDays,
+      totalCost
+    };
+
+    const result = await copyToClipboard(exportData);
+    if (result.success) {
+      toast.success('Itinerario copiato negli appunti!');
+    } else {
+      toast.error('Errore durante la copia');
+    }
+    setShowExportMenu(false);
+  };
+
+  // Handler genera link condivisione
+  const handleShareLink = () => {
+    const exportData = {
+      wizardData,
+      totalDays,
+      totalCost: wizardData.numeroPersone
+    };
+
+    const result = generateShareLink(exportData);
+    if (result.success) {
+      copyToClipboard({ wizardData: { destinazione: result.url }, timeline: [], totalDays: 1, totalCost: 0 });
+      toast.success('Link copiato negli appunti!', {
+        description: result.message
+      });
+    } else {
+      toast.error('Errore durante la generazione del link');
+    }
+    setShowExportMenu(false);
+  };
+
+  // Handler esporta PDF
+  const handleExportPDF = async () => {
+    const exportData = {
+      wizardData,
+      timeline,
+      totalDays,
+      totalCost
+    };
+
+    const result = await downloadAsPDF(exportData);
+    if (result.success) {
+      toast.success('PDF generato con successo!');
+    } else {
+      toast.info('Esportazione PDF', {
+        description: result.error
+      });
+    }
+    setShowExportMenu(false);
   };
 
   const totalCost = calculateTotalCost();
@@ -131,9 +230,30 @@ function TimelineEditor() {
           <Button variant="outline" onClick={() => setShowCostSummary(!showCostSummary)}>
             💰 Riepilogo Costi
           </Button>
-          <Button variant="primary" onClick={handleExport}>
-            📤 Esporta Itinerario
-          </Button>
+          <div className={styles.exportButtonWrapper}>
+            <Button variant="primary" onClick={toggleExportMenu}>
+              📤 Esporta Itinerario {showExportMenu ? '▲' : '▼'}
+            </Button>
+            {showExportMenu && (
+              <div className={styles.exportMenu}>
+                <button className={styles.exportOption} onClick={handleExportText}>
+                  📄 Scarica come Testo
+                </button>
+                <button className={styles.exportOption} onClick={handleExportJSON}>
+                  📋 Esporta JSON
+                </button>
+                <button className={styles.exportOption} onClick={handleCopyClipboard}>
+                  📋 Copia negli appunti
+                </button>
+                <button className={styles.exportOption} onClick={handleShareLink}>
+                  🔗 Genera link condivisione
+                </button>
+                <button className={styles.exportOption} onClick={handleExportPDF}>
+                  📕 Scarica PDF (presto)
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -192,7 +312,7 @@ function TimelineEditor() {
             </Button>
             <Button
               variant="primary"
-              onClick={() => navigate('/hotel-selector', { state: tripData })}
+              onClick={() => navigate('/hotel-selection', { state: tripData })}
               size="lg"
             >
               🏨 Fase 2: Scegli Hotel →
@@ -200,6 +320,7 @@ function TimelineEditor() {
           </div>
         </div>
       </div>
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
