@@ -6,7 +6,8 @@ import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayBlocksGrid from './DayBlocksGrid';
 import PEXPCard from './PEXPCard';
-import PEXPAccordion from './PEXPAccordion';
+import PEXPTab from './PEXPTab';
+import DETEXPTab from './DETEXPTab';
 import HotelCard from './HotelCard';
 import HotelPanel from './HotelPanel';
 import Button from '../../shared/Button';
@@ -48,8 +49,10 @@ function TripEditor() {
   // State per Hotel selection
   const [selectedHotel, setSelectedHotel] = useState(null);
 
-  // State per accordion management (sostituisce panelStack)
-  const [expandedPexpId, setExpandedPexpId] = useState(null);
+  // State per tab management fullscreen (sostituisce accordion/panelStack)
+  const [activeTab, setActiveTab] = useState(null); // 'pexp' | 'detexp' | null
+  const [currentPexp, setCurrentPexp] = useState(null);
+  const [currentExp, setCurrentExp] = useState(null);
 
   // State per database itinerari (🆕)
   const [itinerari, setItinerari] = useState([]);
@@ -177,10 +180,28 @@ function TripEditor() {
     console.log(`📦 Pacchetti trovati: ${zonePacchetti.length}`);
   };
 
-  // Handler click pacchetto → Toggle PEXP Accordion
+  // Handler click pacchetto → Apre TAB PEXP fullscreen
   const handlePacchettoClick = (pexp) => {
-    // Toggle accordion - se è già aperto lo chiude, altrimenti apre questo
-    setExpandedPexpId(expandedPexpId === pexp.CODICE ? null : pexp.CODICE);
+    setCurrentPexp(pexp);
+    setActiveTab('pexp');
+  };
+
+  // Handler chiusura TAB PEXP
+  const handleClosePexpTab = () => {
+    setActiveTab(null);
+    setCurrentPexp(null);
+  };
+
+  // Handler click esperienza → Apre TAB DETEXP fullscreen
+  const handleExpClick = (exp) => {
+    setCurrentExp(exp);
+    setActiveTab('detexp');
+  };
+
+  // Handler chiusura TAB DETEXP
+  const handleCloseDetexpTab = () => {
+    setActiveTab('pexp'); // Torna alla tab PEXP
+    setCurrentExp(null);
   };
 
   // Handler conferma pacchetto dal Panel
@@ -215,10 +236,14 @@ function TripEditor() {
 
     // Aggiungi i nuovi blocchi
     setFilledBlocks([...filledBlocks, ...newBlocks]);
-    setExpandedPexpId(null); // Close the accordion
+
+    // Chiudi tutte le tab
+    setActiveTab(null);
+    setCurrentPexp(null);
+    setCurrentExp(null);
 
     // Feedback utente con toast
-    toast.success(`Pacchetto "${pexp.NOME || pexp.nome}" confermato!`, {
+    toast.success(`Pacchetto "${pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome}" confermato!`, {
       description: `${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1})`,
     });
   };
@@ -432,22 +457,12 @@ function TripEditor() {
             {selectedZone ? (
               filteredPacchetti.length > 0 ? (
                 filteredPacchetti.map((pexp, idx) => (
-                  <div key={pexp.CODICE || idx} className={styles.pexpContainer}>
-                    {/* PEXPCard - Clickable */}
-                    <PEXPCard
-                      pexp={pexp}
-                      onClick={handlePacchettoClick}
-                      isSelected={selectedPacchetto?.CODICE === pexp.CODICE}
-                    />
-
-                    {/* PEXPAccordion - Expanded inline */}
-                    <PEXPAccordion
-                      pexp={pexp}
-                      isOpen={expandedPexpId === pexp.CODICE}
-                      onToggle={() => setExpandedPexpId(expandedPexpId === pexp.CODICE ? null : pexp.CODICE)}
-                      onConfirm={handleConfirmPackage}
-                    />
-                  </div>
+                  <PEXPCard
+                    key={pexp.CODICE || idx}
+                    pexp={pexp}
+                    onClick={handlePacchettoClick}
+                    isSelected={selectedPacchetto?.CODICE === pexp.CODICE}
+                  />
                 ))
               ) : (
                 <div className={styles.noPacchetti}>
@@ -496,6 +511,24 @@ function TripEditor() {
 
       {/* Sonner Toaster for notifications */}
       <Toaster position="top-right" richColors />
+
+      {/* PEXP Tab (fullscreen) */}
+      {activeTab === 'pexp' && currentPexp && (
+        <PEXPTab
+          pexp={currentPexp}
+          onClose={handleClosePexpTab}
+          onConfirm={handleConfirmPackage}
+          onExpClick={handleExpClick}
+        />
+      )}
+
+      {/* DETEXP Tab (fullscreen) */}
+      {activeTab === 'detexp' && currentExp && (
+        <DETEXPTab
+          exp={currentExp}
+          onClose={handleCloseDetexpTab}
+        />
+      )}
     </div>
   );
 }
