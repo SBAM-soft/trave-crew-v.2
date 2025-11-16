@@ -41,6 +41,11 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
   const [mapCenter, setMapCenter] = useState([13.7563, 100.5018]); // Default Bangkok
   const [mapZoom, setMapZoom] = useState(6);
 
+  // Debug log
+  useEffect(() => {
+    console.log('🗺️ MapInteractive ricevuto zone:', zone?.length || 0, zone);
+  }, [zone]);
+
   // Aggiorna centro mappa quando cambia destinazione
   useEffect(() => {
     if (zone && zone.length > 0) {

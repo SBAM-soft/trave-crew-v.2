@@ -75,6 +75,8 @@ function TripEditor() {
     try {
       setLoading(true);
 
+      console.log('📥 Caricamento CSV in corso...');
+
       // Carica tutti i CSV necessari (🆕 aggiunti itinerario, plus, costi_accessori)
       const [
         destinazioniData,
@@ -84,13 +86,22 @@ function TripEditor() {
         plusData,
         costiAccessoriData
       ] = await Promise.all([
-        loadCSV('destinazioni.csv'),
-        loadCSV('zone.csv'),
-        loadCSV('pacchetti.csv'),
-        loadCSV('itinerario.csv'),
-        loadCSV('plus.csv'),
-        loadCSV('costi_accessori.csv')
+        loadCSV('destinazioni.csv').catch(e => { console.error('❌ Errore destinazioni.csv:', e); return []; }),
+        loadCSV('zone.csv').catch(e => { console.error('❌ Errore zone.csv:', e); return []; }),
+        loadCSV('pacchetti.csv').catch(e => { console.error('❌ Errore pacchetti.csv:', e); return []; }),
+        loadCSV('itinerario.csv').catch(e => { console.error('❌ Errore itinerario.csv:', e); return []; }),
+        loadCSV('plus.csv').catch(e => { console.error('❌ Errore plus.csv:', e); return []; }),
+        loadCSV('costi_accessori.csv').catch(e => { console.error('❌ Errore costi_accessori.csv:', e); return []; })
       ]);
+
+      console.log('✅ CSV caricati:', {
+        destinazioni: destinazioniData.length,
+        zone: zoneData.length,
+        pacchetti: pacchettiData.length,
+        itinerari: itinerariData.length,
+        plus: plusData.length,
+        costiAccessori: costiAccessoriData.length
+      });
 
       // Trova destinazione selezionata (case-insensitive)
       const dest = destinazioniData.find(d =>
@@ -102,12 +113,14 @@ function TripEditor() {
       const destZone = zoneData.filter(z =>
         z.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
       );
+      console.log('🗺️ Zone caricate:', destZone.length, destZone);
       setZone(destZone);
 
       // Carica pacchetti reali dal CSV
       const destPacchetti = pacchettiData.filter(p =>
         p.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
       );
+      console.log('📦 Pacchetti caricati:', destPacchetti.length, destPacchetti);
       setPacchetti(destPacchetti);
 
       // Salva database itinerari, plus e costi accessori (🆕)
