@@ -34,19 +34,21 @@ function TripSummary() {
     // Costo esperienze
     filledBlocks.forEach(block => {
       if (block.experience && block.experience.prezzo) {
-        experiencesCost += block.experience.prezzo * wizardData.numeroPersone;
+        const price = parseFloat(block.experience.prezzo) || 0;
+        experiencesCost += price * wizardData.numeroPersone;
       }
     });
 
     // Costo hotel
     selectedHotels.forEach(item => {
       if (item.hotel && item.hotel.PREZZO) {
-        hotelsCost += item.hotel.PREZZO * totalDays;
+        const price = parseFloat(item.hotel.PREZZO) || 0;
+        hotelsCost += price * totalDays;
       }
       // Extra hotel
       if (item.extras) {
         item.extras.forEach(extra => {
-          const price = extra.PRZ_PAX_GEN || extra.PRZ_PAX_FEB || 0;
+          const price = parseFloat(extra.PRZ_PAX_GEN || extra.PRZ_PAX_FEB || 0);
           extrasCost += price * wizardData.numeroPersone;
         });
       }
@@ -245,7 +247,7 @@ function TripSummary() {
                         {exp.durata && <p className={styles.expDuration}>⏱️ {exp.durata}</p>}
                       </div>
                       <div className={styles.expPrice}>
-                        €{(exp.prezzo || 0).toFixed(2)}
+                        €{(parseFloat(exp.prezzo) || 0).toFixed(2)}
                       </div>
                     </div>
                   );
@@ -289,7 +291,7 @@ function TripSummary() {
                         )}
                       </div>
                       <div className={styles.hotelPrice}>
-                        €{(hotel.PREZZO || 0).toFixed(2)} / notte
+                        €{(parseFloat(hotel.PREZZO) || 0).toFixed(2)} / notte
                       </div>
                     </div>
                   );
