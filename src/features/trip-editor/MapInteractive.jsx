@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import styles from './MapInteractive.module.css';
@@ -36,7 +36,7 @@ function MapCenterController({ center, zones }) {
   return null;
 }
 
-function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
+function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledBlocks = [] }) {
   const [hoveredZone, setHoveredZone] = useState(null);
   const [mapCenter, setMapCenter] = useState([13.7563, 100.5018]); // Default Bangkok
   const [mapZoom, setMapZoom] = useState(6);
@@ -60,8 +60,45 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
     }
   }, [zone]);
 
+  // Estrai percorso dalle zone visitate in ordine
+  const visitedPath = useMemo(() => {
+    if (!filledBlocks || filledBlocks.length === 0) return [];
+
+    // Estrai zone uniche mantenendo l'ordine di visita
+    const visitedZonesMap = new Map();
+
+    filledBlocks
+      .filter(block => block.codiceZona && block.zona)
+      .forEach((block, index) => {
+        if (!visitedZonesMap.has(block.codiceZona)) {
+          visitedZonesMap.set(block.codiceZona, {
+            codice: block.codiceZona,
+            nome: block.zona,
+            order: index + 1
+          });
+        }
+      });
+
+    return Array.from(visitedZonesMap.values());
+  }, [filledBlocks]);
+
+  // Calcola coordinate del percorso per la Polyline
+  const pathCoordinates = useMemo(() => {
+    if (visitedPath.length === 0 || !zone) return [];
+
+    return visitedPath
+      .map(vz => {
+        const zona = zone.find(z => z.CODICE === vz.codice || z.ZONA === vz.nome);
+        if (zona && zona.COORDINATE_LAT && zona.COORDINATE_LNG) {
+          return [parseFloat(zona.COORDINATE_LAT), parseFloat(zona.COORDINATE_LNG)];
+        }
+        return null;
+      })
+      .filter(coord => coord !== null);
+  }, [visitedPath, zone]);
+
   // Crea icone personalizzate per le zone
-  const createZoneIcon = (zona, isSelected, isHovered) => {
+  const createZoneIcon = (zona, isSelected, isHovered, visitOrder = null) => {
     const iconMap = {
       'città': '🏙️',
       'mare': '🏖️',
@@ -74,17 +111,37 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
 
     const emoji = iconMap[zona.TIPO_AREA] || '📍';
     const size = isSelected || isHovered ? 40 : 32;
-    const color = isSelected ? '#667eea' : isHovered ? '#764ba2' : '#f97316';
+    const badgeColor = visitOrder ? '#10b981' : isSelected ? '#667eea' : isHovered ? '#764ba2' : '#f97316';
 
     return L.divIcon({
       html: `
         <div style="
+          position: relative;
           font-size: ${size}px;
           filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
           transition: all 0.2s ease;
           cursor: pointer;
         ">
           ${emoji}
+          ${visitOrder ? `
+            <div style="
+              position: absolute;
+              top: -8px;
+              right: -8px;
+              background: ${badgeColor};
+              color: white;
+              border-radius: 50%;
+              width: 20px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: bold;
+              border: 2px solid white;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            ">${visitOrder}</div>
+          ` : ''}
         </div>
       `,
       className: 'custom-marker',
@@ -116,6 +173,21 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
 
           <MapCenterController center={mapCenter} zones={zone} />
 
+          {/* Linea del percorso ottimizzato */}
+          {pathCoordinates.length > 1 && (
+            <Polyline
+              positions={pathCoordinates}
+              pathOptions={{
+                color: '#667eea',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '10, 10',
+                lineCap: 'round',
+                lineJoin: 'round'
+              }}
+            />
+          )}
+
           {/* Marker per ogni zona */}
           {zone && zone.map((zona) => {
             if (!zona.COORDINATE_LAT || !zona.COORDINATE_LNG) return null;
@@ -123,11 +195,17 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
             const isSelected = selectedZone === zona.CODICE;
             const isHovered = hoveredZone === zona.CODICE;
 
+            // Trova ordine di visita se la zona è nel percorso
+            const visitedZone = visitedPath.find(vz =>
+              vz.codice === zona.CODICE || vz.nome === zona.ZONA
+            );
+            const visitOrder = visitedZone ? visitedZone.order : null;
+
             return (
               <Marker
                 key={zona.CODICE}
                 position={[parseFloat(zona.COORDINATE_LAT), parseFloat(zona.COORDINATE_LNG)]}
-                icon={createZoneIcon(zona, isSelected, isHovered)}
+                icon={createZoneIcon(zona, isSelected, isHovered, visitOrder)}
                 eventHandlers={{
                   click: () => onZoneClick(zona),
                   mouseover: () => setHoveredZone(zona.CODICE),
@@ -137,6 +215,11 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick }) {
                 <Popup>
                   <div className={styles.popupContent}>
                     <h4>{zona.ZONA}</h4>
+                    {visitOrder && (
+                      <p className={styles.visitOrder}>
+                        🗓️ Tappa #{visitOrder} del tuo itinerario
+                      </p>
+                    )}
                     {zona.CITTA_PRINCIPALE && <p>📍 {zona.CITTA_PRINCIPALE}</p>}
                     {zona.GIORNI_CONSIGLIATI && <p>📅 {zona.GIORNI_CONSIGLIATI} giorni consigliati</p>}
                     {zona.DESCRIZIONE && <p className={styles.popupDesc}>{zona.DESCRIZIONE.substring(0, 100)}...</p>}

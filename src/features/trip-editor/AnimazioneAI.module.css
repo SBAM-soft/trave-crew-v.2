@@ -1,0 +1,311 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.content {
+  text-align: center;
+}
+
+/* Icona animata */
+.iconContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+}
+
+.spinnerOuter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(79, 172, 254, 0.2);
+  border-top-color: #4facfe;
+  animation: spin 1.5s linear infinite;
+}
+
+.spinnerInner {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 242, 254, 0.2);
+  border-top-color: #00f2fe;
+  animation: spin 1s linear infinite reverse;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mainIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* Testo */
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Step corrente */
+.stepContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  min-height: 30px;
+}
+
+.stepIcon {
+  font-size: 1.5rem;
+  animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.stepMessage {
+  color: #a0aec0;
+  font-size: 1rem;
+  font-weight: 500;
+  animation: fadeInText 0.6s ease-in;
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Barra di progresso */
+.progressBar {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+}
+
+.progressText {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+/* Info viaggio */
+.tripInfo {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.infoItem {
+  color: #cbd5e0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Lista step */
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.stepsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stepsList::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.stepsList::-webkit-scrollbar-thumb {
+  background: rgba(79, 172, 254, 0.3);
+  border-radius: 10px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.stepItem.completed {
+  background: rgba(72, 187, 120, 0.1);
+}
+
+.stepItem.active {
+  background: rgba(79, 172, 254, 0.15);
+  animation: highlightStep 1s ease-in-out;
+}
+
+@keyframes highlightStep {
+  0%, 100% {
+    background: rgba(79, 172, 254, 0.15);
+  }
+  50% {
+    background: rgba(79, 172, 254, 0.3);
+  }
+}
+
+.stepItem.pending {
+  opacity: 0.5;
+}
+
+.stepCheckbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.stepItem.completed .stepCheckbox {
+  background: #48bb78;
+  color: white;
+}
+
+.stepItem.active .stepCheckbox {
+  background: #4facfe;
+  color: white;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.stepItem.pending .stepCheckbox {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.stepLabel {
+  color: #cbd5e0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.stepItem.completed .stepLabel {
+  color: #48bb78;
+}
+
+.stepItem.active .stepLabel {
+  color: #4facfe;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .tripInfo {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .iconContainer {
+    width: 100px;
+    height: 100px;
+  }
+
+  .mainIcon {
+    font-size: 2.5rem;
+  }
+}
