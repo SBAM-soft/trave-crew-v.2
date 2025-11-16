@@ -433,6 +433,52 @@ function TripEditor() {
 
       {/* Contenuto principale */}
       <div className={styles.content}>
+        {/* Blocchi giorni - SEMPRE IN ALTO */}
+        <section className={styles.section}>
+          <DayBlocksGrid
+            totalDays={totalDays}
+            filledBlocks={filledBlocks}
+            onBlockClick={handleBlockClick}
+          />
+        </section>
+
+        {/* Azioni principali - SEMPRE IN ALTO */}
+        <section className={styles.actionsSection}>
+          <div className={styles.actionsCard}>
+            <div className={styles.actionsInfo}>
+              <h3>
+                {allBlocksFilled
+                  ? '✅ Tutti i giorni completati!'
+                  : `⏳ ${totalDays - 1 - filledBlocks.length} giorni da pianificare`}
+              </h3>
+              <p>
+                {allBlocksFilled
+                  ? 'Crea ora il tuo itinerario ottimizzato'
+                  : 'Seleziona i pacchetti esperienza dalla mappa qui sotto'}
+              </p>
+            </div>
+            <div className={styles.actionsButtons}>
+              {!allBlocksFilled && (
+                <Button
+                  onClick={handleAutoFill}
+                  variant="outline"
+                  size="lg"
+                >
+                  🎲 Crea Automatico
+                </Button>
+              )}
+              <Button
+                onClick={handleCreateItinerary}
+                variant="primary"
+                size="lg"
+                disabled={!allBlocksFilled}
+              >
+                {allBlocksFilled ? '🚀 Crea Itinerario' : '⏳ Completa i giorni'}
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Mappa interattiva */}
         <section className={styles.section}>
           <MapInteractive
@@ -440,15 +486,6 @@ function TripEditor() {
             zone={zone}
             selectedZone={selectedZone}
             onZoneClick={handleZoneClick}
-          />
-        </section>
-
-        {/* Blocchi giorni */}
-        <section className={styles.section}>
-          <DayBlocksGrid
-            totalDays={totalDays}
-            filledBlocks={filledBlocks}
-            onBlockClick={handleBlockClick}
           />
         </section>
 
@@ -486,37 +523,6 @@ function TripEditor() {
                 <p>Seleziona una zona sulla mappa per vedere i pacchetti disponibili.</p>
               </div>
             )}
-          </div>
-        </section>
-
-        {/* Pulsante crea itinerario */}
-        <section className={styles.finalSection}>
-          <div className={styles.finalCard}>
-            <h3>🎯 Pronto per creare l'itinerario?</h3>
-            <p>
-              {allBlocksFilled
-                ? 'Tutti i giorni sono pianificati! Crea ora il tuo itinerario ottimizzato.'
-                : `Mancano ancora ${totalDays - 1 - filledBlocks.length} giorni da pianificare.`}
-            </p>
-            <div className={styles.finalActions}>
-              {!allBlocksFilled && (
-                <Button
-                  onClick={handleAutoFill}
-                  variant="outline"
-                  size="lg"
-                >
-                  🎲 Crea Automatico
-                </Button>
-              )}
-              <Button
-                onClick={handleCreateItinerary}
-                variant="primary"
-                size="lg"
-                disabled={!allBlocksFilled}
-              >
-                {allBlocksFilled ? '🚀 Crea Itinerario' : '⏳ Completa i giorni'}
-              </Button>
-            </div>
           </div>
         </section>
       </div>

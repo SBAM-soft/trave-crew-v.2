@@ -41,19 +41,27 @@ function HotelSelectionPage() {
           loadCSV('zone.csv')
         ]);
 
-        // Filtra per destinazione (cerca sia per NOME che per CODICE)
-        const destInput = (wizardData.destinazione || wizardData.destinazioneNome || '').toLowerCase().trim();
+        // Filtra per destinazione
+        // wizardData.destinazione può contenere il CODICE (es. "DTH01") o il NOME (es. "THAILANDIA")
+        // wizardData.destinazioneNome contiene sempre il nome
+        const destInput = (wizardData.destinazioneNome || wizardData.destinazione || '').toLowerCase().trim();
+
+        console.log('🏨 Caricamento hotel per destinazione:', destInput);
+
         const destHotels = hotelsData.filter(h => {
           const destNome = h.DESTINAZIONE?.toLowerCase().trim();
-          const destCodice = h.CODICE_DEST?.toLowerCase().trim();
-          return destNome === destInput || destCodice === destInput;
+          const match = destNome === destInput;
+          if (match) console.log('✅ Hotel trovato:', h.CODICE, h.DESTINAZIONE);
+          return match;
         });
 
         const destZone = zoneData.filter(z => {
           const destNome = z.DESTINAZIONE?.toLowerCase().trim();
-          const destCodice = z.CODICE_DEST?.toLowerCase().trim();
-          return destNome === destInput || destCodice === destInput;
+          return destNome === destInput;
         });
+
+        console.log('📊 Risultati filtro hotel:', destHotels.length, 'hotel trovati');
+        console.log('📊 Risultati filtro zone:', destZone.length, 'zone trovate');
 
         setHotels(destHotels);
         setFilteredHotels(destHotels);
