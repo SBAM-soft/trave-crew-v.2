@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import Button from '../../shared/Button';
 import DayTimeline from './DayTimeline';
+import AnimazioneAI from '../trip-editor/AnimazioneAI';
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard, generateShareLink } from '../../core/utils/exportHelpers';
 import styles from './TimelineEditor.module.css';
 
@@ -23,6 +24,7 @@ function TimelineEditor() {
   const [timeline, setTimeline] = useState([]);
   const [showCostSummary, setShowCostSummary] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showAIAnimation, setShowAIAnimation] = useState(false);
 
   // Costruisci timeline completa
   useEffect(() => {
@@ -104,6 +106,17 @@ function TimelineEditor() {
   // Handler torna indietro
   const handleBack = () => {
     navigate(-1);
+  };
+
+  // Handler procedi alla Fase 2 (con animazione AI)
+  const handleProceedToHotelSelection = () => {
+    setShowAIAnimation(true);
+  };
+
+  // Handler completamento animazione AI
+  const handleAIComplete = () => {
+    setShowAIAnimation(false);
+    navigate('/hotel-selection', { state: tripData });
   };
 
   // Toggle export menu
@@ -312,7 +325,7 @@ function TimelineEditor() {
             </Button>
             <Button
               variant="primary"
-              onClick={() => navigate('/hotel-selection', { state: tripData })}
+              onClick={handleProceedToHotelSelection}
               size="lg"
             >
               🏨 Fase 2: Scegli Hotel →
@@ -320,6 +333,15 @@ function TimelineEditor() {
           </div>
         </div>
       </div>
+
+      {/* Animazione AI per ottimizzazione */}
+      {showAIAnimation && (
+        <AnimazioneAI
+          onComplete={handleAIComplete}
+          tripData={tripData}
+        />
+      )}
+
       <Toaster position="top-right" richColors />
     </div>
   );

@@ -72,7 +72,8 @@ function TripSummary() {
     setSaving(true);
 
     try {
-      const saved = saveTripComplete(tripData, 'completed');
+      // Usa 'upcoming' per viaggi confermati pronti alla partenza
+      const saved = saveTripComplete(tripData, 'upcoming');
 
       if (saved) {
         // Incrementa statistiche utente
