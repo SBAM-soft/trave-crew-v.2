@@ -6,7 +6,8 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
   const [showDetails, setShowDetails] = useState(false);
 
   // Robust validation - prevent crash if hotel is invalid
-  if (!hotel || !hotel.NOME || !hotel.CODICE) {
+  if (!hotel || !hotel.CODICE) {
+    console.warn('❌ HotelCard: hotel invalido', hotel);
     return (
       <div className={styles.hotelCard} style={{ padding: '2rem', textAlign: 'center' }}>
         <p style={{ color: '#6b7280' }}>Hotel non disponibile</p>
@@ -14,20 +15,41 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
     );
   }
 
-  // Calcola prezzo medio per notte
+  // Estrai stelle dai SERVIZI_MINIMI (es. "3 o 4 stelle" → 3, "Max 2 stelle" → 2, "5 stelle" → 5)
+  const getStelle = () => {
+    const servizi = hotel.SERVIZI_MINIMI || '';
+    if (servizi.includes('5 stelle')) return 5;
+    if (servizi.includes('3 o 4 stelle')) return 4;
+    if (servizi.includes('Max 2 stelle') || servizi.includes('2 stelle')) return 2;
+    return 3; // default
+  };
+
+  // Nome hotel generato da ZONA + QUARTIERE
+  const getNome = () => {
+    const zona = hotel.ZONA || '';
+    const quartiere = hotel.QUARTIERE ? ` - ${hotel.QUARTIERE.split('|')[0].trim()}` : '';
+    return `${zona}${quartiere}`;
+  };
+
+  // Calcola prezzo medio per notte (usa PRZ_PAX_NIGHT_*)
   const getPrezzoMedioNotte = () => {
-    const mesi = [
-      'PRZ_NOTTE_GEN', 'PRZ_NOTTE_FEB', 'PRZ_NOTTE_MAR', 'PRZ_NOTTE_APR',
-      'PRZ_NOTTE_MAG', 'PRZ_NOTTE_GIU', 'PRZ_NOTTE_LUG', 'PRZ_NOTTE_AGO',
-      'PRZ_NOTTE_SET', 'PRZ_NOTTE_OTT', 'PRZ_NOTTE_NOV', 'PRZ_NOTTE_DIC'
-    ];
-    const prezzi = mesi.map(mese => parseFloat(hotel[mese]) || 0).filter(p => p > 0);
+    const campiPrezzo = Object.keys(hotel).filter(k => k.startsWith('PRZ_PAX_NIGHT_'));
+    const prezzi = campiPrezzo
+      .map(campo => parseFloat(hotel[campo]) || 0)
+      .filter(p => p > 0);
+
+    if (prezzi.length === 0) return 0;
+
     const media = prezzi.reduce((a, b) => a + b, 0) / prezzi.length;
     return Math.round(media);
   };
 
-  // Formatta servizi
-  const serviziArray = hotel.SERVIZI_MINIMI ? hotel.SERVIZI_MINIMI.split(';').filter(s => s.trim()) : [];
+  // Formatta servizi (separati da |, rimuovi info stelle)
+  const serviziArray = hotel.SERVIZI_MINIMI
+    ? hotel.SERVIZI_MINIMI.split('|')
+        .filter(s => s.trim())
+        .filter(s => !s.includes('stelle')) // Rimuovi "Max 2 stelle", "3 o 4 stelle", ecc
+    : [];
 
   // Badge budget
   const getBudgetBadge = () => {
@@ -41,6 +63,8 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
 
   const budgetBadge = getBudgetBadge();
   const prezzoMedio = getPrezzoMedioNotte();
+  const stelle = getStelle();
+  const nomeHotel = getNome();
 
   return (
     <div className={`${styles.hotelCard} ${isSelected ? styles.selected : ''}`}>
@@ -48,7 +72,7 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
       <div className={styles.imageWrapper}>
         <img
           src={hotel.IMMAGINE_URL || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'}
-          alt={hotel.NOME}
+          alt={nomeHotel}
           className={styles.image}
         />
 
@@ -61,7 +85,7 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
             {budgetBadge.text}
           </span>
           <span className={styles.starsBadge}>
-            {'⭐'.repeat(hotel.STELLE || 3)}
+            {'⭐'.repeat(stelle)}
           </span>
         </div>
 
@@ -77,8 +101,8 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h4 className={styles.name}>{hotel.NOME}</h4>
-            <p className={styles.type}>{hotel.TIPO_STRUTTURA}</p>
+            <h4 className={styles.name}>{nomeHotel}</h4>
+            <p className={styles.type}>{hotel.ZONA} • {hotel.BUDGET}</p>
           </div>
         </div>
 
@@ -88,59 +112,19 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
           <span>{hotel.QUARTIERE || hotel.ZONA}</span>
         </div>
 
-        {/* Description (collapsible) */}
-        {hotel.DESCRIZIONE && hotel.DESCRIZIONE.length > 0 && (
-          <p className={styles.description}>
-            {showDetails ? hotel.DESCRIZIONE : `${hotel.DESCRIZIONE.substring(0, 100)}...`}
-            {hotel.DESCRIZIONE.length > 100 && (
-              <button
-                className={styles.toggleBtn}
-                onClick={() => setShowDetails(!showDetails)}
-              >
-                {showDetails ? 'Mostra meno' : 'Leggi tutto'}
-              </button>
-            )}
-          </p>
-        )}
-
-        {/* Features */}
-        <div className={styles.features}>
-          {hotel.COLAZIONE_INCLUSA === 'si' && (
-            <span className={styles.feature}>🍳 Colazione</span>
-          )}
-          {hotel.WIFI === 'si' && (
-            <span className={styles.feature}>📶 WiFi</span>
-          )}
-          {hotel.PISCINA === 'si' && (
-            <span className={styles.feature}>🏊 Piscina</span>
-          )}
-        </div>
-
-        {/* Servizi (primi 3) */}
+        {/* Servizi (tutti dalla descrizione) */}
         {serviziArray.length > 0 && (
           <div className={styles.services}>
-            {serviziArray.slice(0, 3).map((servizio, i) => (
+            {serviziArray.slice(0, 2).map((servizio, i) => (
               <span key={i} className={styles.service}>
                 • {servizio.trim()}
               </span>
             ))}
-            {serviziArray.length > 3 && (
+            {serviziArray.length > 2 && (
               <span className={styles.service}>
-                +{serviziArray.length - 3} altri
+                +{serviziArray.length - 2} altri
               </span>
             )}
-          </div>
-        )}
-
-        {/* Recensioni */}
-        {hotel.RECENSIONE_MEDIA && (
-          <div className={styles.reviews}>
-            <span className={styles.rating}>
-              ⭐ {hotel.RECENSIONE_MEDIA}
-            </span>
-            <span className={styles.reviewCount}>
-              ({hotel.NUMERO_RECENSIONI} recensioni)
-            </span>
           </div>
         )}
 
@@ -165,32 +149,13 @@ function HotelCard({ hotel, onSelect, isSelected = false }) {
 HotelCard.propTypes = {
   hotel: PropTypes.shape({
     CODICE: PropTypes.string.isRequired,
-    NOME: PropTypes.string.isRequired,
-    DESCRIZIONE: PropTypes.string,
-    TIPO_STRUTTURA: PropTypes.string,
+    TIPO: PropTypes.string,
+    DESTINAZIONE: PropTypes.string,
     ZONA: PropTypes.string,
     QUARTIERE: PropTypes.string,
     BUDGET: PropTypes.oneOf(['LOW', 'MEDIUM', 'HIGH']),
-    STELLE: PropTypes.number,
-    IMMAGINE_URL: PropTypes.string,
-    COLAZIONE_INCLUSA: PropTypes.oneOf(['si', 'no']),
-    WIFI: PropTypes.oneOf(['si', 'no']),
-    PISCINA: PropTypes.oneOf(['si', 'no']),
     SERVIZI_MINIMI: PropTypes.string,
-    RECENSIONE_MEDIA: PropTypes.number,
-    NUMERO_RECENSIONI: PropTypes.number,
-    PRZ_NOTTE_GEN: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_FEB: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_MAR: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_APR: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_MAG: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_GIU: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_LUG: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_AGO: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_SET: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_OTT: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_NOV: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    PRZ_NOTTE_DIC: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    IMMAGINE_URL: PropTypes.string,
   }).isRequired,
   onSelect: PropTypes.func.isRequired,
   isSelected: PropTypes.bool,
