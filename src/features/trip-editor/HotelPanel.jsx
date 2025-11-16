@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import HotelCard from './HotelCard';
@@ -7,6 +7,18 @@ import styles from './PEXPPanel.module.css'; // Riutilizziamo lo stesso stile di
 
 function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
   const [selectedHotel, setSelectedHotel] = useState(null);
+
+  // Keyboard navigation: Escape to close
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Filtri
   const [budgetFilter, setBudgetFilter] = useState('ALL');
@@ -46,11 +58,17 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
 
   if (isLoading) {
     return (
-      <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.overlay}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hotel-panel-loading"
+      >
         <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
           <div className={styles.loadingContent}>
             <div className={styles.spinner}></div>
-            <p>Caricamento hotel...</p>
+            <p id="hotel-panel-loading">Caricamento hotel...</p>
           </div>
         </div>
       </div>
@@ -58,14 +76,23 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div
+      className={styles.overlay}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="hotel-panel-title"
+      aria-describedby="hotel-panel-description"
+    >
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <h2 className={styles.title}>🏨 Scegli il tuo Hotel</h2>
-            <p className={styles.subtitle}>
+            <h2 id="hotel-panel-title" className={styles.title}>
+              🏨 Scegli il tuo Hotel
+            </h2>
+            <p id="hotel-panel-description" className={styles.subtitle}>
               Trova l'alloggio perfetto per il tuo viaggio a {destinazione}
             </p>
             <div className={styles.meta}>
@@ -79,7 +106,11 @@ function HotelPanel({ destinazione, zone, onConfirm, onClose }) {
               )}
             </div>
           </div>
-          <button className={styles.closeBtn} onClick={onClose}>
+          <button
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Chiudi pannello hotel"
+          >
             ✕
           </button>
         </div>

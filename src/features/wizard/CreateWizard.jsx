@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import useNavigationGuard from '../../hooks/useNavigationGuard'; // Temporarily disabled - causing crashes
+import useWizardStore from '../../store/useWizardStore';
 import WizardProgress from './WizardProgress';
 import Step1_Destinazione from './Step1_Destinazione';
 import Step2_NumeroPersone from './Step2_NumeroPersone';
@@ -12,42 +12,32 @@ import styles from './CreateWizard.module.css';
 function CreateWizard() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
-  
-  const [wizardData, setWizardData] = useState(() => {
-    try {
-      const saved = localStorage.getItem('wizardData');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        console.log('✅ Wizard data loaded from localStorage:', parsed);
-        return parsed;
-      }
-    } catch (error) {
-      console.error('⚠️ Error loading wizard data from localStorage:', error);
-      localStorage.removeItem('wizardData');
-    }
 
-    return {
-      stato_id: null,
-      destinazione: '',
-      numeroPersone: 1,
-      tipoViaggio: 'privato',
-      etaRange: [], // Array vuoto per multi-select
-      genere: 'misto',
-      budget: '',
-      interessi: [],
-      dataPartenza: null
-    };
-  });
+  // Zustand store - eliminates props drilling and manual localStorage
+  const {
+    destinazione,
+    destinazioneNome,
+    numeroPersone,
+    tipoViaggio,
+    etaRange,
+    genere,
+    budget,
+    interessi,
+    dataPartenza,
+    currentStep,
+    setDestinazione,
+    setNumeroPersone,
+    setTipoViaggio,
+    setEtaRange,
+    setGenere,
+    setBudget,
+    setInteressi,
+    setDataPartenza,
+    setCurrentStep,
+    getWizardData,
+  } = useWizardStore();
 
-  const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
-
-  // Protezione navigazione - TEMPORARILY DISABLED due to useBlocker issues
-  // const hasStartedWizard = currentStep > 1 || wizardData.stato_id !== null;
-  // useNavigationGuard(
-  //   hasStartedWizard,
-  //   'Sei sicuro di voler uscire? I dati inseriti nel wizard andranno persi.'
-  // );
 
   // Scroll to top quando cambia step
   useEffect(() => {
@@ -56,23 +46,34 @@ function CreateWizard() {
     }
   }, [currentStep]);
 
-  useEffect(() => {
-    localStorage.setItem('wizardData', JSON.stringify(wizardData));
-  }, [wizardData]);
-
   const updateWizardData = (field, value) => {
-    setWizardData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    // Update via Zustand store based on field
+    switch (field) {
+      case 'numeroPersone':
+        setNumeroPersone(value);
+        break;
+      case 'tipoViaggio':
+        setTipoViaggio(value);
+        break;
+      case 'etaRange':
+        setEtaRange(value);
+        break;
+      case 'genere':
+        setGenere(value);
+        break;
+      default:
+        break;
+    }
+
+    // Clear error for this field
     if (errors[field]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
       });
     }
-    
+
     // Scroll down leggermente dopo selezione
     setTimeout(() => {
       window.scrollBy({ top: 150, behavior: 'smooth' });
@@ -82,39 +83,39 @@ function CreateWizard() {
   const validateStep = (step) => {
     const newErrors = {};
 
-    switch(step) {
+    switch (step) {
       case 1:
-        if (!wizardData.stato_id) {
-          newErrors.stato_id = 'Seleziona una destinazione';
+        if (!destinazione) {
+          newErrors.destinazione = 'Seleziona una destinazione';
         }
         break;
-      
+
       case 2:
-        if (!wizardData.numeroPersone || wizardData.numeroPersone < 1) {
+        if (!numeroPersone || numeroPersone < 1) {
           newErrors.numeroPersone = 'Indica il numero di persone';
         }
-        if (wizardData.tipoViaggio === 'pubblico') {
-          if (wizardData.etaRange.length === 0) {
-            newErrors.etaRange = 'Seleziona almeno una fascia d\'età';
+        if (tipoViaggio === 'pubblico') {
+          if (etaRange.length === 0) {
+            newErrors.etaRange = "Seleziona almeno una fascia d'età";
           }
-          if (!wizardData.genere) {
+          if (!genere) {
             newErrors.genere = 'Seleziona la composizione del gruppo';
           }
         }
         break;
-      
+
       case 3:
         break;
-      
+
       case 4:
-        if (wizardData.interessi.length === 0) {
+        if (interessi.length === 0) {
           newErrors.interessi = 'Seleziona almeno un interesse';
         }
         break;
-      
+
       case 5:
         break;
-      
+
       default:
         break;
     }
@@ -129,72 +130,90 @@ function CreateWizard() {
     }
 
     if (currentStep === 5) {
+      const wizardData = getWizardData();
       console.log('✅ Wizard completato:', wizardData);
       navigate('/trip-editor', { state: { wizardData } });
       return;
     }
 
-    setCurrentStep(prev => prev + 1);
+    setCurrentStep(currentStep + 1);
   };
 
   const goBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep(currentStep - 1);
     }
   };
 
   const renderStep = () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         return (
           <Step1_Destinazione
-            value={wizardData.stato_id}
-            destinazione={wizardData.destinazione}
+            value={destinazione}
+            destinazione={destinazioneNome}
             onChange={(id, nome) => {
-              updateWizardData('stato_id', id);
-              updateWizardData('destinazione', nome);
+              setDestinazione(id, nome);
+              // Clear error
+              if (errors.destinazione) {
+                setErrors((prev) => {
+                  const newErrors = { ...prev };
+                  delete newErrors.destinazione;
+                  return newErrors;
+                });
+              }
             }}
-            error={errors.stato_id}
+            error={errors.destinazione}
           />
         );
-      
+
       case 2:
         return (
           <Step2_NumeroPersone
-            numeroPersone={wizardData.numeroPersone}
-            tipoViaggio={wizardData.tipoViaggio}
-            etaRange={wizardData.etaRange}
-            genere={wizardData.genere}
+            numeroPersone={numeroPersone}
+            tipoViaggio={tipoViaggio}
+            etaRange={etaRange}
+            genere={genere}
             onChange={updateWizardData}
             errors={errors}
           />
         );
-      
+
       case 3:
         return (
           <Step3_Budget
-            value={wizardData.budget}
-            onChange={(budget) => updateWizardData('budget', budget)}
+            value={budget}
+            onChange={(budgetValue) => setBudget(budgetValue)}
           />
         );
       
       case 4:
         return (
           <Step4_Interessi
-            value={wizardData.interessi}
-            onChange={(interessi) => updateWizardData('interessi', interessi)}
+            value={interessi}
+            onChange={(interessiValue) => {
+              setInteressi(interessiValue);
+              // Clear error
+              if (errors.interessi) {
+                setErrors((prev) => {
+                  const newErrors = { ...prev };
+                  delete newErrors.interessi;
+                  return newErrors;
+                });
+              }
+            }}
             error={errors.interessi}
           />
         );
-      
+
       case 5:
         return (
           <Step5_DataPartenza
-            value={wizardData.dataPartenza}
-            onChange={(data) => updateWizardData('dataPartenza', data)}
+            value={dataPartenza}
+            onChange={(data) => setDataPartenza(data)}
           />
         );
-      
+
       default:
         return null;
     }
