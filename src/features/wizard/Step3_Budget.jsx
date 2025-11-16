@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './Step3_Budget.module.css';
 
 function Step3_Budget({ value, onChange }) {
@@ -90,4 +92,9 @@ function Step3_Budget({ value, onChange }) {
   );
 }
 
-export default Step3_Budget;
+Step3_Budget.propTypes = {
+  value: PropTypes.oneOf(['LOW', 'MEDIUM', 'HIGH']),
+  onChange: PropTypes.func.isRequired,
+};
+
+export default memo(Step3_Budget);

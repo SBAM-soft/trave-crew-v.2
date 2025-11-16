@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './EXPCard.module.css';
 
 function EXPCard({ exp, onClick }) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Robust validation - prevent crash if exp is invalid
+  if (!exp || !exp.nome || !exp.descrizione) {
+    return (
+      <div className={styles.card} style={{ padding: '2rem', textAlign: 'center' }}>
+        <p style={{ color: '#6b7280' }}>Esperienza non disponibile</p>
+      </div>
+    );
+  }
 
   // Estrai dati esperienza
   const immagine = exp.immagine || 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400';
@@ -78,4 +88,18 @@ function EXPCard({ exp, onClick }) {
   );
 }
 
-export default EXPCard;
+EXPCard.propTypes = {
+  exp: PropTypes.shape({
+    codice: PropTypes.string,
+    nome: PropTypes.string.isRequired,
+    descrizione: PropTypes.string.isRequired,
+    immagine: PropTypes.string,
+    durata: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    prezzo: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    difficolta: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }).isRequired,
+  onClick: PropTypes.func,
+};
+
+export default memo(EXPCard);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { loadCSV } from '../../core/utils/dataLoader';
 import styles from './Step1_Destinazione.module.css';
 
@@ -114,5 +115,12 @@ function Step1_Destinazione({ value, destinazione, onChange, error }) {
     </div>
   );
 }
+
+Step1_Destinazione.propTypes = {
+  value: PropTypes.string,
+  destinazione: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  error: PropTypes.string,
+};
 
 export default Step1_Destinazione;

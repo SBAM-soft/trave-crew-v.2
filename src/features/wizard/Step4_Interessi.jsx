@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './Step4_Interessi.module.css';
 
 function Step4_Interessi({ value, onChange, error }) {
@@ -75,4 +77,10 @@ function Step4_Interessi({ value, onChange, error }) {
   );
 }
 
-export default Step4_Interessi;
+Step4_Interessi.propTypes = {
+  value: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChange: PropTypes.func.isRequired,
+  error: PropTypes.string,
+};
+
+export default memo(Step4_Interessi);

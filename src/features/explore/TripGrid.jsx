@@ -1,4 +1,6 @@
 // src/components/explore/TripGrid.jsx
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import TripCard from './TripCard';
 import styles from './TripGrid.module.css';
 
@@ -22,4 +24,12 @@ function TripGrid({ viaggi }) {
   );
 }
 
-export default TripGrid;
+TripGrid.propTypes = {
+  viaggi: PropTypes.arrayOf(
+    PropTypes.shape({
+      CODICE: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
+
+export default memo(TripGrid);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
@@ -7,6 +8,25 @@ import styles from './DETEXP.module.css';
 
 function DETEXP({ exp, onLike, onDislike, onClose }) {
   const [selectedPlus, setSelectedPlus] = useState([]);
+
+  // Robust validation - prevent crash if exp is invalid
+  if (!exp || !exp.nome) {
+    return (
+      <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.header}>
+            <h2 className={styles.title}>Esperienza non disponibile</h2>
+            <button className={styles.closeButton} onClick={onClose}>✕</button>
+          </div>
+          <div className={styles.content}>
+            <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+              Le informazioni per questa esperienza non sono disponibili.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Formatta descrizione con paragrafi
   const formatDescription = (desc) => {
@@ -171,5 +191,22 @@ function DETEXP({ exp, onLike, onDislike, onClose }) {
     </div>
   );
 }
+
+DETEXP.propTypes = {
+  exp: PropTypes.shape({
+    codice: PropTypes.string,
+    nome: PropTypes.string.isRequired,
+    descrizione: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    durata: PropTypes.string,
+    difficolta: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    include: PropTypes.string,
+    nonInclude: PropTypes.string,
+    prezzo: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }).isRequired,
+  onLike: PropTypes.func.isRequired,
+  onDislike: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default DETEXP;

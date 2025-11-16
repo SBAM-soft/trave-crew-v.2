@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './Step5_DataPartenza.module.css';
 
 function Step5_DataPartenza({ value, onChange }) {
@@ -45,4 +47,9 @@ function Step5_DataPartenza({ value, onChange }) {
   );
 }
 
-export default Step5_DataPartenza;
+Step5_DataPartenza.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+};
+
+export default memo(Step5_DataPartenza);

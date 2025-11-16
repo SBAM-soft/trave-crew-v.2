@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import EXPCard from './EXPCard';
 import DETEXP from './DETEXP';
@@ -205,5 +206,11 @@ function PEXPPanel({ pexp, onConfirm, onClose }) {
     </>
   );
 }
+
+PEXPPanel.propTypes = {
+  pexp: PropTypes.object.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default PEXPPanel;

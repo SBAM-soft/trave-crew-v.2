@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './WizardProgress.module.css';
 
 function WizardProgress({ currentStep, totalSteps }) {
@@ -46,4 +48,9 @@ function getStepLabel(step) {
   return labels[step];
 }
 
-export default WizardProgress;
+WizardProgress.propTypes = {
+  currentStep: PropTypes.number.isRequired,
+  totalSteps: PropTypes.number.isRequired,
+};
+
+export default memo(WizardProgress);

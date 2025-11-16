@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import styles from './LikeDislikeButtons.module.css';
 
 function LikeDislikeButtons({ onLike, onDislike }) {
@@ -52,5 +53,10 @@ function LikeDislikeButtons({ onLike, onDislike }) {
     </div>
   );
 }
+
+LikeDislikeButtons.propTypes = {
+  onLike: PropTypes.func.isRequired,
+  onDislike: PropTypes.func.isRequired,
+};
 
 export default LikeDislikeButtons;

@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import styles from './CostSummary.module.css';
 
 function CostSummary({ baseCost, selectedPlus = [] }) {
@@ -59,4 +61,14 @@ function CostSummary({ baseCost, selectedPlus = [] }) {
   );
 }
 
-export default CostSummary;
+CostSummary.propTypes = {
+  baseCost: PropTypes.number.isRequired,
+  selectedPlus: PropTypes.arrayOf(
+    PropTypes.shape({
+      nome: PropTypes.string.isRequired,
+      prezzo: PropTypes.number.isRequired,
+    })
+  ),
+};
+
+export default memo(CostSummary);

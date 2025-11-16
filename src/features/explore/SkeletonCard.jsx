@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styles from './SkeletonCard.module.css';
 
 function SkeletonCard() {
@@ -17,4 +18,4 @@ function SkeletonCard() {
   );
 }
 
-export default SkeletonCard;
+export default memo(SkeletonCard);
