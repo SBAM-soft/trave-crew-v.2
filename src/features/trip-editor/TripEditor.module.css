@@ -108,6 +108,17 @@
   line-height: 1.6;
 }
 
+.finalActions {
+  display: flex;
+  gap: 1.1rem; /* +10% from 1rem */
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.finalActions button {
+  min-width: 200px;
+}
+
 /* Loading state */
 .loading {
   display: flex;

@@ -100,23 +100,28 @@ function TripEditor() {
         costiAccessori: costiAccessoriData.length
       });
 
-      // Trova destinazione selezionata (case-insensitive)
+      // Trova destinazione selezionata (case-insensitive + trim)
+      const destName = wizardData.destinazione?.toLowerCase().trim();
+      console.log('🎯 Cercando destinazione:', destName);
+
       const dest = destinazioniData.find(d =>
-        d.NOME?.toLowerCase() === wizardData.destinazione?.toLowerCase()
+        d.NOME?.toLowerCase().trim() === destName
       );
       setDestinazioneData(dest);
 
-      // Filtra zone per destinazione (case-insensitive)
-      const destZone = zoneData.filter(z =>
-        z.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
-      );
+      // Filtra zone per destinazione (case-insensitive + trim)
+      const destZone = zoneData.filter(z => {
+        const zoneDest = z.DESTINAZIONE?.toLowerCase().trim();
+        return zoneDest === destName;
+      });
       console.log('🗺️ Zone caricate:', destZone.length, destZone);
       setZone(destZone);
 
       // Carica pacchetti reali dal CSV
-      const destPacchetti = pacchettiData.filter(p =>
-        p.DESTINAZIONE?.toLowerCase() === wizardData.destinazione?.toLowerCase()
-      );
+      const destPacchetti = pacchettiData.filter(p => {
+        const paccDest = p.DESTINAZIONE?.toLowerCase().trim();
+        return paccDest === destName;
+      });
       console.log('📦 Pacchetti caricati:', destPacchetti.length, destPacchetti);
       setPacchetti(destPacchetti);
 
@@ -214,6 +219,76 @@ function TripEditor() {
   const handleHotelCardClick = () => {
     // Hotel panel remains modal for now - can be converted later
     toast.info('Hotel selection coming soon!');
+  };
+
+  // Handler crea automatico - Riempie tutti i blocchi con pacchetti random
+  const handleAutoFill = () => {
+    if (pacchetti.length === 0) {
+      toast.error('Nessun pacchetto disponibile per questa destinazione!');
+      return;
+    }
+
+    // Calcola quanti giorni restano da riempire
+    const daysToFill = totalDays - 1 - filledBlocks.length;
+
+    if (daysToFill <= 0) {
+      toast.info('Tutti i giorni sono già pianificati!');
+      return;
+    }
+
+    // Seleziona pacchetti random fino a riempire tutti i giorni
+    const newBlocks = [];
+    let currentDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2;
+    let remainingDays = daysToFill;
+
+    while (remainingDays > 0 && pacchetti.length > 0) {
+      // Seleziona un pacchetto random
+      const randomPexp = pacchetti[Math.floor(Math.random() * pacchetti.length)];
+      const pexpDays = randomPexp.MIN_NOTTI || 3;
+
+      // Estrai esperienze dal pacchetto
+      const experienceIds = [];
+      ['DAY2_ESPERIENZA_STD', 'DAY3_ESPERIENZA_STD', 'DAY4_ESPERIENZA_STD',
+       'DAY5_ESPERIENZA_STD', 'DAY6_ESPERIENZA_STD', 'DAY7_ESPERIENZA_STD',
+       'DAY8_ESPERIENZA_STD', 'DAY9_ESPERIENZA_STD', 'DAY10_ESPERIENZA_STD'].forEach(slot => {
+        if (randomPexp[slot]) {
+          experienceIds.push(randomPexp[slot]);
+        }
+      });
+
+      // Trova codice zona
+      const zonaObj = zone.find(z =>
+        z.ZONA?.toLowerCase() === randomPexp.ZONA?.toLowerCase()
+      );
+      const codiceZona = zonaObj?.CODICE || null;
+
+      // Aggiungi blocchi per questo pacchetto
+      const daysForThisPackage = Math.min(experienceIds.length, remainingDays);
+
+      for (let i = 0; i < daysForThisPackage; i++) {
+        newBlocks.push({
+          day: currentDay,
+          experience: {
+            id: experienceIds[i],
+            nome: `Esperienza ${experienceIds[i]}`,
+            descrizione: 'Auto-generata',
+            durata: '1 giorno',
+            prezzo: 0
+          },
+          packageName: randomPexp.NOME_PACCHETTO || randomPexp.nome,
+          zona: randomPexp.ZONA,
+          codiceZona: codiceZona
+        });
+        currentDay++;
+        remainingDays--;
+      }
+    }
+
+    setFilledBlocks([...filledBlocks, ...newBlocks]);
+
+    toast.success('Itinerario creato automaticamente!', {
+      description: `${newBlocks.length} giorni pianificati con pacchetti selezionati`,
+    });
   };
 
   // Handler crea itinerario (🆕 con logica itinerari pre-compilati)
@@ -377,18 +452,29 @@ function TripEditor() {
           <div className={styles.finalCard}>
             <h3>🎯 Pronto per creare l'itinerario?</h3>
             <p>
-              {allBlocksFilled 
-                ? 'Tutti i giorni sono pianificati! Crea ora il tuo itinerario ottimizzato.' 
+              {allBlocksFilled
+                ? 'Tutti i giorni sono pianificati! Crea ora il tuo itinerario ottimizzato.'
                 : `Mancano ancora ${totalDays - 1 - filledBlocks.length} giorni da pianificare.`}
             </p>
-            <Button
-              onClick={handleCreateItinerary}
-              variant="primary"
-              size="lg"
-              disabled={!allBlocksFilled}
-            >
-              {allBlocksFilled ? '🚀 Crea Itinerario' : '⏳ Completa i giorni'}
-            </Button>
+            <div className={styles.finalActions}>
+              {!allBlocksFilled && (
+                <Button
+                  onClick={handleAutoFill}
+                  variant="outline"
+                  size="lg"
+                >
+                  🎲 Crea Automatico
+                </Button>
+              )}
+              <Button
+                onClick={handleCreateItinerary}
+                variant="primary"
+                size="lg"
+                disabled={!allBlocksFilled}
+              >
+                {allBlocksFilled ? '🚀 Crea Itinerario' : '⏳ Completa i giorni'}
+              </Button>
+            </div>
           </div>
         </section>
       </div>
