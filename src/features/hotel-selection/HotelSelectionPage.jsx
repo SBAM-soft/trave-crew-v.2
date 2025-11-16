@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast, Toaster } from 'sonner';
 import { loadCSV } from '../../core/utils/dataLoader';
+import { groupHotelsByZoneAndBudget, getHotelExtras } from '../../core/utils/itinerarioHelpers';
+import { saveTripComplete } from '../../core/utils/tripStorage';
 import HotelCard from '../trip-editor/HotelCard';
 import Button from '../../shared/Button';
 import styles from './HotelSelectionPage.module.css';
@@ -9,186 +12,205 @@ function HotelSelectionPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Recupera dati della Fase 1
-  const tripData = location.state || {};
-  const { wizardData = {}, filledBlocks = [], totalDays = 7 } = tripData;
+  // Recupera dati dalla navigazione
+  const {
+    wizardData = {},
+    filledBlocks = [],
+    totalDays = 7,
+    zoneVisitate = [],
+    itinerario = null,
+    costiAccessori = [],
+    extraSuggeriti = [],
+    plus = []
+  } = location.state || {};
 
-  // DEBUG: Log dati ricevuti
-  console.log('🏨 HotelSelectionPage - location.state:', location.state);
-  console.log('🏨 HotelSelectionPage - tripData:', tripData);
+  const [loading, setLoading] = useState(true);
+  const [hotels, setHotels] = useState([]);
+  const [groupedHotels, setGroupedHotels] = useState({});
+  const [plusDB, setPlusDB] = useState(plus);
+
+  // State per selezioni hotel (un hotel per zona)
+  // { zonaNome: { hotel: {...}, extras: [codiceExtra1, codiceExtra2...] } }
+  const [selections, setSelections] = useState({});
+
+  // State per extra panel aperto
+  const [activeExtraZone, setActiveExtraZone] = useState(null);
+
+  console.log('🏨 HotelSelectionPage - zoneVisitate:', zoneVisitate);
   console.log('🏨 HotelSelectionPage - wizardData:', wizardData);
 
-  const [hotels, setHotels] = useState([]);
-  const [filteredHotels, setFilteredHotels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [zone, setZone] = useState([]);
-
-  // Filtri
-  const [filters, setFilters] = useState({
-    budget: 'ALL',
-    stelle: 'ALL',
-    zona: 'ALL',
-    servizi: {
-      colazione: false,
-      wifi: false,
-      piscina: false
-    }
-  });
-
-  // Carica hotel e zone
+  // Carica dati hotel
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
 
-        console.log('🔍 DEBUG - wizardData completo:', wizardData);
-        console.log('🔍 DEBUG - destinazione:', wizardData.destinazione);
-        console.log('🔍 DEBUG - destinazioneNome:', wizardData.destinazioneNome);
-
-        const [hotelsData, zoneData] = await Promise.all([
+        // Carica hotel e plus (se non già passati)
+        const [hotelsData, plusData] = await Promise.all([
           loadCSV('hotel.csv'),
-          loadCSV('zone.csv')
+          plusDB.length > 0 ? Promise.resolve(plusDB) : loadCSV('plus.csv')
         ]);
 
-        console.log('📦 DEBUG - Hotel caricati dal CSV:', hotelsData.length);
-        console.log('📦 DEBUG - Zone caricate dal CSV:', zoneData.length);
+        console.log('📦 Hotel caricati:', hotelsData.length);
+        console.log('📦 Plus caricati:', plusData.length);
 
-        // Mostra alcuni hotel come esempio
-        if (hotelsData.length > 0) {
-          console.log('🏨 Esempio hotel 1:', {
-            CODICE: hotelsData[0].CODICE,
-            DESTINAZIONE: hotelsData[0].DESTINAZIONE,
-            ZONA: hotelsData[0].ZONA,
-            BUDGET: hotelsData[0].BUDGET
-          });
-        }
-
-        // Filtra per destinazione
-        // wizardData.destinazione può contenere il CODICE (es. "DTH01") o il NOME (es. "THAILANDIA")
-        // wizardData.destinazioneNome contiene sempre il nome
+        // Filtra hotel per destinazione
         const destInput = (wizardData.destinazioneNome || wizardData.destinazione || '').toLowerCase().trim();
+        const destHotels = hotelsData.filter(h =>
+          h.DESTINAZIONE?.toLowerCase().trim() === destInput
+        );
 
-        console.log('🎯 Cercando hotel per destinazione:', destInput);
-
-        const destHotels = hotelsData.filter(h => {
-          const destNome = h.DESTINAZIONE?.toLowerCase().trim();
-          const match = destNome === destInput;
-          if (match) {
-            console.log('✅ Hotel trovato:', h.CODICE, '-', h.DESTINAZIONE, '-', h.ZONA);
-          }
-          return match;
-        });
-
-        const destZone = zoneData.filter(z => {
-          const destNome = z.DESTINAZIONE?.toLowerCase().trim();
-          return destNome === destInput;
-        });
-
-        console.log('📊 RISULTATO FINALE - Hotel trovati:', destHotels.length);
-        console.log('📊 RISULTATO FINALE - Zone trovate:', destZone.length);
+        console.log('🎯 Hotel per destinazione:', destHotels.length);
 
         setHotels(destHotels);
-        setFilteredHotels(destHotels);
-        setZone(destZone);
+        setPlusDB(plusData);
+
+        // Raggruppa hotel per zona e budget
+        const grouped = groupHotelsByZoneAndBudget(destHotels, zoneVisitate);
+        console.log('📊 Hotel raggruppati per zona:', grouped);
+
+        setGroupedHotels(grouped);
+
+        // Inizializza selezioni vuote per ogni zona
+        const initialSelections = {};
+        zoneVisitate.forEach(zona => {
+          initialSelections[zona.nome] = {
+            hotel: null,
+            extras: []
+          };
+        });
+        setSelections(initialSelections);
+
         setLoading(false);
       } catch (err) {
-        console.error('❌ ERRORE caricamento dati:', err);
+        console.error('❌ Errore caricamento dati:', err);
+        toast.error('Errore nel caricamento degli hotel');
         setLoading(false);
       }
     };
 
-    console.log('🚀 useEffect triggered - checking wizardData.destinazione:', wizardData.destinazione);
-
-    if (wizardData.destinazione || wizardData.destinazioneNome) {
+    if (zoneVisitate.length > 0) {
       loadData();
     } else {
-      console.warn('⚠️ Nessuna destinazione trovata in wizardData!');
+      console.warn('⚠️ Nessuna zona visitata trovata!');
+      toast.error('Errore: nessuna zona visitata trovata');
       setLoading(false);
     }
-  }, [wizardData.destinazione, wizardData.destinazioneNome]);
+  }, []);
 
-  // Applica filtri
-  useEffect(() => {
-    let result = [...hotels];
-
-    if (filters.budget !== 'ALL') {
-      result = result.filter(h => h.BUDGET === filters.budget);
-    }
-
-    if (filters.stelle !== 'ALL') {
-      result = result.filter(h => parseInt(h.STELLE) === parseInt(filters.stelle));
-    }
-
-    if (filters.zona !== 'ALL') {
-      result = result.filter(h => h.ZONA === filters.zona);
-    }
-
-    if (filters.servizi.colazione) {
-      result = result.filter(h => h.COLAZIONE_INCLUSA === 'si');
-    }
-    if (filters.servizi.wifi) {
-      result = result.filter(h => h.WIFI === 'si');
-    }
-    if (filters.servizi.piscina) {
-      result = result.filter(h => h.PISCINA === 'si');
-    }
-
-    setFilteredHotels(result);
-  }, [filters, hotels]);
-
-  // Handler cambio filtro
-  const handleFilterChange = (filterType, value) => {
-    if (filterType === 'servizio') {
-      setFilters({
-        ...filters,
-        servizi: {
-          ...filters.servizi,
-          [value]: !filters.servizi[value]
-        }
-      });
-    } else {
-      setFilters({ ...filters, [filterType]: value });
-    }
-  };
-
-  // Handler selezione hotel
-  const handleSelectHotel = (hotel) => {
-    if (selectedHotel?.CODICE === hotel.CODICE) {
-      setSelectedHotel(null);
-    } else {
-      setSelectedHotel(hotel);
-    }
-  };
-
-  // Reset filtri
-  const handleResetFilters = () => {
-    setFilters({
-      budget: 'ALL',
-      stelle: 'ALL',
-      zona: 'ALL',
-      servizi: {
-        colazione: false,
-        wifi: false,
-        piscina: false
+  // Handler selezione hotel per zona
+  const handleSelectHotel = (zonaNome, hotel) => {
+    setSelections(prev => ({
+      ...prev,
+      [zonaNome]: {
+        ...prev[zonaNome],
+        hotel: hotel
       }
+    }));
+
+    toast.success(`Hotel selezionato per ${zonaNome}`, {
+      description: hotel.ZONA
     });
   };
 
-  // Handler conferma e vai a riepilogo finale
-  const handleConfirmHotel = () => {
-    if (!selectedHotel) {
-      alert('⚠️ Seleziona un hotel prima di continuare');
+  // Handler toggle extra
+  const handleToggleExtra = (zonaNome, extraCodice) => {
+    setSelections(prev => {
+      const currentExtras = prev[zonaNome].extras || [];
+      const newExtras = currentExtras.includes(extraCodice)
+        ? currentExtras.filter(e => e !== extraCodice)
+        : [...currentExtras, extraCodice];
+
+      return {
+        ...prev,
+        [zonaNome]: {
+          ...prev[zonaNome],
+          extras: newExtras
+        }
+      };
+    });
+  };
+
+  // Handler conferma e procedi
+  const handleConfirm = () => {
+    // Verifica che tutti gli hotel siano selezionati
+    const allSelected = Object.keys(selections).every(
+      zonaNome => selections[zonaNome].hotel !== null
+    );
+
+    if (!allSelected) {
+      toast.warning('Seleziona un hotel per ogni zona prima di continuare');
       return;
     }
 
-    // Naviga al riepilogo finale con tutti i dati
-    navigate('/trip-summary', {
+    // Converti selections in formato più compatto
+    const selectedHotels = Object.entries(selections).map(([zonaNome, data]) => ({
+      zona: zonaNome,
+      hotel: data.hotel,
+      extras: data.extras.map(extraCode => {
+        return plusDB.find(p => p.CODICE === extraCode);
+      }).filter(e => e !== undefined)
+    }));
+
+    console.log('✅ Hotel selezionati:', selectedHotels);
+
+    // Naviga alla timeline/salvataggio con tutti i dati
+    navigate('/timeline-editor', {
       state: {
-        ...tripData,
-        selectedHotel
+        wizardData,
+        filledBlocks,
+        totalDays,
+        zoneVisitate,
+        selectedHotels,
+        itinerario,
+        costiAccessori,
+        extraSuggeriti
       }
     });
+
+    toast.success('Selezione completata!');
+  };
+
+  // Handler salva come bozza
+  const handleSaveAsDraft = () => {
+    // Converti selections in formato compatto
+    const selectedHotels = Object.entries(selections)
+      .filter(([_, data]) => data.hotel !== null)
+      .map(([zonaNome, data]) => ({
+        zona: zonaNome,
+        hotel: data.hotel,
+        extras: data.extras.map(extraCode => {
+          return plusDB.find(p => p.CODICE === extraCode);
+        }).filter(e => e !== undefined)
+      }));
+
+    // Prepara i dati del viaggio
+    const tripData = {
+      wizardData,
+      filledBlocks,
+      giorni: totalDays,
+      zoneVisitate,
+      selectedHotels,
+      itinerario,
+      costiAccessori,
+      extraSuggeriti
+    };
+
+    // Salva come bozza (categoria 'saved')
+    const saved = saveTripComplete(tripData, 'saved');
+
+    if (saved) {
+      toast.success('Bozza salvata!', {
+        description: 'Puoi riprendere la modifica da "I miei viaggi"'
+      });
+
+      // Naviga ai miei viaggi
+      setTimeout(() => {
+        navigate('/my-trips');
+      }, 1500);
+    } else {
+      toast.error('Errore nel salvataggio della bozza');
+    }
   };
 
   if (loading) {
@@ -200,21 +222,35 @@ function HotelSelectionPage() {
     );
   }
 
+  if (zoneVisitate.length === 0) {
+    return (
+      <div className={styles.error}>
+        <h2>⚠️ Errore</h2>
+        <p>Nessuna zona visitata trovata. Torna al Trip Editor.</p>
+        <Button onClick={() => navigate(-1)}>← Torna indietro</Button>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.hotelSelectionPage}>
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.phaseIndicator}>
-            <span className={styles.phaseNumber}>Fase 2/2</span>
+            <span className={styles.phaseNumber}>Fase 2/3</span>
             <div className={styles.phaseSteps}>
-              <div className={styles.stepCompleted}>✓ Esperienze</div>
+              <div className={styles.stepCompleted}>✓ Itinerario</div>
               <div className={styles.stepActive}>🏨 Hotel</div>
+              <div className={styles.stepPending}>📋 Riepilogo</div>
             </div>
           </div>
-          <h1 className={styles.title}>Scegli il tuo Hotel</h1>
+          <h1 className={styles.title}>Scegli gli Hotel</h1>
           <p className={styles.subtitle}>
             {wizardData.destinazione} • {totalDays} giorni • {wizardData.numeroPersone} {wizardData.numeroPersone === 1 ? 'persona' : 'persone'}
+          </p>
+          <p className={styles.zoneInfo}>
+            🗺️ Zone da visitare: {zoneVisitate.map(z => z.nome).join(', ')}
           </p>
         </div>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>
@@ -222,182 +258,181 @@ function HotelSelectionPage() {
         </button>
       </div>
 
-      {/* Filtri */}
-      <div className={styles.filters}>
-        {/* Budget */}
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Budget</label>
-          <div className={styles.filterButtons}>
-            <button
-              className={`${styles.filterBtn} ${filters.budget === 'ALL' ? styles.active : ''}`}
-              onClick={() => handleFilterChange('budget', 'ALL')}
-            >
-              Tutti
-            </button>
-            <button
-              className={`${styles.filterBtn} ${filters.budget === 'LOW' ? styles.active : ''}`}
-              onClick={() => handleFilterChange('budget', 'LOW')}
-            >
-              € Budget
-            </button>
-            <button
-              className={`${styles.filterBtn} ${filters.budget === 'MEDIUM' ? styles.active : ''}`}
-              onClick={() => handleFilterChange('budget', 'MEDIUM')}
-            >
-              €€ Medio
-            </button>
-            <button
-              className={`${styles.filterBtn} ${filters.budget === 'HIGH' ? styles.active : ''}`}
-              onClick={() => handleFilterChange('budget', 'HIGH')}
-            >
-              €€€ Lusso
-            </button>
-          </div>
-        </div>
-
-        {/* Stelle */}
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Stelle</label>
-          <div className={styles.filterButtons}>
-            <button
-              className={`${styles.filterBtn} ${filters.stelle === 'ALL' ? styles.active : ''}`}
-              onClick={() => handleFilterChange('stelle', 'ALL')}
-            >
-              Tutte
-            </button>
-            {[2, 3, 4, 5].map(stelle => (
-              <button
-                key={stelle}
-                className={`${styles.filterBtn} ${filters.stelle === stelle ? styles.active : ''}`}
-                onClick={() => handleFilterChange('stelle', stelle)}
-              >
-                {'⭐'.repeat(stelle)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Zona */}
-        {zone.length > 0 && (
-          <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Zona</label>
-            <select
-              value={filters.zona}
-              onChange={(e) => handleFilterChange('zona', e.target.value)}
-              className={styles.filterSelect}
-            >
-              <option value="ALL">Tutte le zone</option>
-              {zone.map((z, i) => (
-                <option key={i} value={z.ZONA}>{z.ZONA}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Servizi */}
-        <div className={styles.filterGroup}>
-          <label className={styles.filterLabel}>Servizi</label>
-          <div className={styles.checkboxGroup}>
-            <label className={styles.checkbox}>
-              <input
-                type="checkbox"
-                checked={filters.servizi.colazione}
-                onChange={() => handleFilterChange('servizio', 'colazione')}
-              />
-              <span>🍳 Colazione</span>
-            </label>
-            <label className={styles.checkbox}>
-              <input
-                type="checkbox"
-                checked={filters.servizi.wifi}
-                onChange={() => handleFilterChange('servizio', 'wifi')}
-              />
-              <span>📶 WiFi</span>
-            </label>
-            <label className={styles.checkbox}>
-              <input
-                type="checkbox"
-                checked={filters.servizi.piscina}
-                onChange={() => handleFilterChange('servizio', 'piscina')}
-              />
-              <span>🏊 Piscina</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Reset */}
-        <button className={styles.resetBtn} onClick={handleResetFilters}>
-          🔄 Reset
-        </button>
-      </div>
-
-      {/* Hotel Grid */}
+      {/* Contenuto principale */}
       <div className={styles.content}>
-        <div className={styles.resultsHeader}>
-          <h3 className={styles.resultsTitle}>
-            {filteredHotels.length} hotel disponibili
-          </h3>
-        </div>
+        {/* Sezioni per zona */}
+        {zoneVisitate.map((zona, index) => {
+          const zoneHotels = groupedHotels[zona.nome] || {};
+          const hasLow = zoneHotels.LOW !== null;
+          const hasMedium = zoneHotels.MEDIUM !== null;
+          const hasHigh = zoneHotels.HIGH !== null;
+          const selectedHotel = selections[zona.nome]?.hotel;
+          const selectedExtras = selections[zona.nome]?.extras || [];
 
-        {filteredHotels.length === 0 ? (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>🏨</div>
-            <h3 className={styles.emptyTitle}>Nessun hotel trovato</h3>
-            <p className={styles.emptyText}>
-              {hotels.length === 0
-                ? `Nessun hotel disponibile per ${wizardData.destinazioneNome || wizardData.destinazione || 'questa destinazione'}. Verifica la console (F12) per dettagli.`
-                : 'Modifica i filtri per vedere più opzioni'}
-            </p>
-            {hotels.length === 0 && (
-              <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '0.5rem' }}>
-                <p style={{ margin: 0, fontSize: '0.875rem', color: '#856404' }}>
-                  Debug: destinazione = "{wizardData.destinazione}", destinazioneNome = "{wizardData.destinazioneNome}"
-                </p>
-                <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem', color: '#856404' }}>
-                  Apri la Console (F12) per vedere i log di caricamento
+          return (
+            <section key={zona.codice} className={styles.zoneSection}>
+              <div className={styles.zoneSectionHeader}>
+                <h2 className={styles.zoneTitle}>
+                  {index + 1}. {zona.nome}
+                </h2>
+                <p className={styles.zoneSubtitle}>
+                  Seleziona un hotel tra le 3 opzioni disponibili
                 </p>
               </div>
-            )}
-            <button className={styles.emptyBtn} onClick={handleResetFilters}>
-              Reset filtri
-            </button>
-          </div>
-        ) : (
-          <div className={styles.hotelsGrid}>
-            {filteredHotels.map((hotel) => (
-              <HotelCard
-                key={hotel.CODICE}
-                hotel={hotel}
-                onSelect={handleSelectHotel}
-                isSelected={selectedHotel?.CODICE === hotel.CODICE}
-              />
-            ))}
-          </div>
-        )}
+
+              <div className={styles.budgetOptions}>
+                {/* Budget LOW */}
+                {hasLow && (
+                  <div className={styles.budgetColumn}>
+                    <div className={styles.budgetHeader}>
+                      <span className={styles.budgetBadge} style={{ backgroundColor: '#10b981' }}>
+                        € Budget
+                      </span>
+                    </div>
+                    <HotelCard
+                      hotel={zoneHotels.LOW}
+                      onSelect={() => handleSelectHotel(zona.nome, zoneHotels.LOW)}
+                      isSelected={selectedHotel?.CODICE === zoneHotels.LOW.CODICE}
+                    />
+                  </div>
+                )}
+
+                {/* Budget MEDIUM */}
+                {hasMedium && (
+                  <div className={styles.budgetColumn}>
+                    <div className={styles.budgetHeader}>
+                      <span className={styles.budgetBadge} style={{ backgroundColor: '#f59e0b' }}>
+                        €€ Medio
+                      </span>
+                    </div>
+                    <HotelCard
+                      hotel={zoneHotels.MEDIUM}
+                      onSelect={() => handleSelectHotel(zona.nome, zoneHotels.MEDIUM)}
+                      isSelected={selectedHotel?.CODICE === zoneHotels.MEDIUM.CODICE}
+                    />
+                  </div>
+                )}
+
+                {/* Budget HIGH */}
+                {hasHigh && (
+                  <div className={styles.budgetColumn}>
+                    <div className={styles.budgetHeader}>
+                      <span className={styles.budgetBadge} style={{ backgroundColor: '#ef4444' }}>
+                        €€€ Lusso
+                      </span>
+                    </div>
+                    <HotelCard
+                      hotel={zoneHotels.HIGH}
+                      onSelect={() => handleSelectHotel(zona.nome, zoneHotels.HIGH)}
+                      isSelected={selectedHotel?.CODICE === zoneHotels.HIGH.CODICE}
+                    />
+                  </div>
+                )}
+
+                {!hasLow && !hasMedium && !hasHigh && (
+                  <div className={styles.noHotels}>
+                    <p>Nessun hotel disponibile per {zona.nome}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Extra hotel */}
+              {selectedHotel && (
+                <div className={styles.extrasSection}>
+                  <div className={styles.extrasHeader}>
+                    <h3 className={styles.extrasTitle}>✨ Extra disponibili per questo hotel</h3>
+                    <button
+                      className={styles.extrasToggle}
+                      onClick={() => setActiveExtraZone(activeExtraZone === zona.nome ? null : zona.nome)}
+                    >
+                      {activeExtraZone === zona.nome ? '▲ Nascondi' : '▼ Mostra extra'}
+                    </button>
+                  </div>
+
+                  {activeExtraZone === zona.nome && (() => {
+                    const extras = getHotelExtras(selectedHotel, plusDB);
+
+                    if (extras.length === 0) {
+                      return (
+                        <div className={styles.noExtras}>
+                          <p>Nessun extra disponibile per questo hotel</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className={styles.extrasGrid}>
+                        {extras.map(extra => (
+                          <div
+                            key={extra.CODICE}
+                            className={`${styles.extraCard} ${selectedExtras.includes(extra.CODICE) ? styles.selected : ''}`}
+                            onClick={() => handleToggleExtra(zona.nome, extra.CODICE)}
+                          >
+                            <div className={styles.extraHeader}>
+                              <span className={styles.extraIcon}>{extra.ICON || '✨'}</span>
+                              <div className={styles.extraInfo}>
+                                <h4 className={styles.extraName}>{extra.PLUS}</h4>
+                                <p className={styles.extraCategory}>{extra.CATEGORIA}</p>
+                              </div>
+                              <div className={styles.extraCheckbox}>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedExtras.includes(extra.CODICE)}
+                                  onChange={() => {}}
+                                />
+                              </div>
+                            </div>
+                            <p className={styles.extraDescription}>{extra.DESCRIZIONE}</p>
+                            <div className={styles.extraFooter}>
+                              <span className={styles.extraPrice}>
+                                €{extra.PRZ_PAX_GEN || extra.PRZ_PAX_FEB || 0} / persona
+                              </span>
+                              {extra.POPOLARITA && (
+                                <span className={styles.extraPopularity}>
+                                  {extra.POPOLARITA === 'alta' ? '🔥 Popolare' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </section>
+          );
+        })}
       </div>
 
       {/* Footer fisso */}
       <div className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerInfo}>
-            {selectedHotel ? (
+            {Object.values(selections).filter(s => s.hotel !== null).length === zoneVisitate.length ? (
               <>
-                <span className={styles.selectedLabel}>Hotel selezionato:</span>
-                <span className={styles.selectedName}>{selectedHotel.NOME}</span>
-                <span className={styles.selectedStars}>{'⭐'.repeat(parseInt(selectedHotel.STELLE || 0))}</span>
+                <span className={styles.selectedLabel}>✓ Tutti gli hotel selezionati</span>
+                <span className={styles.selectedCount}>
+                  {Object.values(selections).reduce((acc, s) => acc + s.extras.length, 0)} extra aggiunti
+                </span>
               </>
             ) : (
-              <span className={styles.selectedLabel}>Seleziona un hotel per continuare</span>
+              <span className={styles.selectedLabel}>
+                {Object.values(selections).filter(s => s.hotel !== null).length} / {zoneVisitate.length} hotel selezionati
+              </span>
             )}
           </div>
           <div className={styles.footerActions}>
+            <Button variant="outline" onClick={handleSaveAsDraft}>
+              💾 Salva bozza
+            </Button>
             <Button variant="outline" onClick={() => navigate(-1)}>
               ← Indietro
             </Button>
             <Button
               variant="primary"
-              onClick={handleConfirmHotel}
-              disabled={!selectedHotel}
+              onClick={handleConfirm}
+              disabled={Object.values(selections).filter(s => s.hotel !== null).length !== zoneVisitate.length}
               size="lg"
             >
               Conferma e Continua →
@@ -405,6 +440,8 @@ function HotelSelectionPage() {
           </div>
         </div>
       </div>
+
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

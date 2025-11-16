@@ -180,6 +180,93 @@ export const exportTripAsJSON = (tripId) => {
   return true;
 };
 
+// Salva viaggio completo con hotel e extra
+export const saveTripComplete = (tripData, category = 'saved') => {
+  try {
+    const trips = getAllTrips();
+
+    // Calcola costo totale includendo hotel e extra
+    const costoBase = tripData.costoBase || 0;
+    const costoHotels = tripData.selectedHotels?.reduce((acc, selection) => {
+      const hotelCost = calculateHotelCost(selection.hotel, tripData.giorni);
+      const extrasCost = selection.extras?.reduce((sum, extra) => {
+        return sum + (parseFloat(extra.PRZ_PAX_GEN || extra.PRZ_PAX_FEB || 0) * (tripData.wizardData?.numeroPersone || 1));
+      }, 0) || 0;
+      return acc + hotelCost + extrasCost;
+    }, 0) || 0;
+
+    const costoTotale = costoBase + costoHotels;
+
+    // Estrai zone visitate
+    const zoneVisitate = tripData.zoneVisitate?.map(z => z.nome).join(', ') || '';
+
+    const newTrip = {
+      id: tripData.id || Date.now(),
+      destinazione: tripData.wizardData?.destinazione || 'Destinazione',
+      zona: zoneVisitate,
+      dataPartenza: tripData.wizardData?.dataPartenza || null,
+      dataRitorno: calculateDataRitorno(tripData.wizardData?.dataPartenza, tripData.giorni),
+      giorni: tripData.giorni || 7,
+      persone: tripData.wizardData?.numeroPersone || 1,
+      immagine: tripData.immagine || 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800',
+      status: category === 'saved' ? 'saved' : category === 'upcoming' ? 'confirmed' : 'completed',
+      costoTotale,
+      // Dati completi per modifica
+      wizardData: tripData.wizardData,
+      filledBlocks: tripData.filledBlocks || [],
+      zoneVisitate: tripData.zoneVisitate || [],
+      selectedHotels: tripData.selectedHotels || [],
+      itinerario: tripData.itinerario || null,
+      costiAccessori: tripData.costiAccessori || [],
+      extraSuggeriti: tripData.extraSuggeriti || [],
+      createdAt: tripData.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    // Se esiste già, aggiorna invece di creare
+    const existingIndex = trips[category].findIndex(t => t.id === newTrip.id);
+    if (existingIndex !== -1) {
+      trips[category][existingIndex] = newTrip;
+    } else {
+      trips[category].push(newTrip);
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+
+    return newTrip;
+  } catch (error) {
+    console.error('Errore salvataggio viaggio completo:', error);
+    return null;
+  }
+};
+
+// Helper: calcola costo hotel
+const calculateHotelCost = (hotel, giorni) => {
+  if (!hotel) return 0;
+
+  // Usa il campo PRZ_PAX_NIGHT_* più recente disponibile
+  const priceKeys = Object.keys(hotel).filter(k => k.startsWith('PRZ_PAX_NIGHT_'));
+  const prices = priceKeys
+    .map(key => parseFloat(hotel[key]) || 0)
+    .filter(p => p > 0);
+
+  if (prices.length === 0) return 0;
+
+  const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+  return Math.round(avgPrice * (giorni - 1)); // -1 perché il primo giorno è arrivo
+};
+
+// Helper: calcola data ritorno
+const calculateDataRitorno = (dataPartenza, giorni) => {
+  if (!dataPartenza) return null;
+
+  const partenza = new Date(dataPartenza);
+  const ritorno = new Date(partenza);
+  ritorno.setDate(partenza.getDate() + (giorni - 1));
+
+  return ritorno.toISOString().split('T')[0];
+};
+
 // Popola storage con dati di esempio per testing
 export const populateTestData = () => {
   const testTrips = {
