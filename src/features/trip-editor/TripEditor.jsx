@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
-// import useNavigationGuard from '../../hooks/useNavigationGuard'; // Disabilitato temporaneamente
+import useNavigationGuard from '../../hooks/useNavigationGuard';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayBlocksGrid from './DayBlocksGrid';
@@ -56,18 +56,20 @@ function TripEditor() {
   const [currentPexp, setCurrentPexp] = useState(null);
   const [currentExp, setCurrentExp] = useState(null);
 
+  // State per editing blocchi riempiti
+  const [editingBlock, setEditingBlock] = useState(null);
+
   // State per database itinerari (🆕)
   const [itinerari, setItinerari] = useState([]);
   const [costiAccessori, setCostiAccessori] = useState([]);
   const [plus, setPlus] = useState([]);
 
-  // Protezione navigazione - DISABILITATA temporaneamente per compatibilità
-  // TODO: Riabilitare quando react-router-dom supporta useBlocker stabilmente
-  // const hasUnsavedChanges = filledBlocks.length > 0 || selectedHotel !== null;
-  // useNavigationGuard(
-  //   hasUnsavedChanges,
-  //   'Sei sicuro di voler uscire dal Trip Editor? Il viaggio non è stato completato e le modifiche andranno perse.'
-  // );
+  // Protezione navigazione - Previene perdita dati non salvati
+  const hasUnsavedChanges = filledBlocks.length > 0 && filledBlocks.length < totalDays - 1;
+  useNavigationGuard(
+    hasUnsavedChanges,
+    'Sei sicuro di voler uscire dal Trip Editor? Il viaggio non è stato completato e le modifiche andranno perse.'
+  );
 
   // Carica dati iniziali
   useEffect(() => {
@@ -193,6 +195,7 @@ function TripEditor() {
   const handleClosePexpTab = () => {
     setActiveTab(null);
     setCurrentPexp(null);
+    setEditingBlock(null); // Reset editing mode
   };
 
   // Handler click esperienza → Apre TAB DETEXP fullscreen
@@ -217,6 +220,43 @@ function TripEditor() {
     );
     const codiceZona = zonaObj?.CODICE || null;
 
+    // MODALITÀ EDITING - Sostituisci blocco esistente
+    if (editingBlock) {
+      // Rimuovi il blocco vecchio
+      const updatedBlocks = filledBlocks.filter(b => b.day !== editingBlock.day);
+
+      // Se c'è una sola esperienza, sostituisci nello stesso giorno
+      if (validExperiences.length === 1) {
+        const newBlock = {
+          day: editingBlock.day,
+          experience: validExperiences[0],
+          packageName: pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome,
+          zona: pexp.ZONA,
+          codiceZona: codiceZona
+        };
+
+        setFilledBlocks([...updatedBlocks, newBlock]);
+
+        toast.success(`Giorno ${editingBlock.day} modificato!`, {
+          description: `Nuova esperienza: ${validExperiences[0].nome}`,
+        });
+      } else {
+        // Se ci sono più esperienze, avvisa l'utente
+        toast.warning('Attenzione', {
+          description: `Il pacchetto selezionato contiene ${validExperiences.length} esperienze. Puoi sostituire solo un giorno alla volta.`,
+        });
+      }
+
+      // Esci dalla modalità editing
+      setEditingBlock(null);
+      setActiveTab(null);
+      setCurrentPexp(null);
+      setCurrentExp(null);
+
+      return;
+    }
+
+    // MODALITÀ NORMALE - Aggiungi nuovi blocchi
     // Calcola giorni necessari (1 esperienza = 1 giorno)
     const experienceDays = validExperiences.length;
 
@@ -230,7 +270,7 @@ function TripEditor() {
         newBlocks.push({
           day: dayNum,
           experience: validExperiences[i],
-          packageName: pexp.NOME || pexp.nome,
+          packageName: pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome,
           zona: pexp.ZONA, // 🆕 Traccia zona del pacchetto
           codiceZona: codiceZona // 🆕 Codice zona (es: ZTHBA01)
         });
@@ -251,10 +291,57 @@ function TripEditor() {
     });
   };
 
-  // Handler click blocco giorno
+  // Handler rimozione blocco
+  const handleRemoveBlock = (day) => {
+    const block = filledBlocks.find(b => b.day === day);
+
+    if (!block) {
+      toast.error('Blocco non trovato');
+      return;
+    }
+
+    // Rimuovi il blocco
+    const updatedBlocks = filledBlocks.filter(b => b.day !== day);
+    setFilledBlocks(updatedBlocks);
+
+    // Chiudi la tab e esci dalla modalità editing
+    setActiveTab(null);
+    setEditingBlock(null);
+    setCurrentPexp(null);
+    setCurrentExp(null);
+
+    toast.success(`Giorno ${day} rimosso`, {
+      description: `Esperienza "${block.experience?.nome || 'Sconosciuta'}" eliminata`,
+    });
+  };
+
+  // Handler click blocco giorno - Permette modifica o rimozione
   const handleBlockClick = (day) => {
+    // Trova il blocco corrispondente
+    const block = filledBlocks.find(b => b.day === day);
+
+    if (!block) {
+      toast.info('Questo giorno non è ancora pianificato');
+      return;
+    }
+
+    // Trova il pacchetto originale dal nome
+    const originalPexp = pacchetti.find(p =>
+      (p.NOME_PACCHETTO || p.NOME || p.nome) === block.packageName
+    );
+
+    if (!originalPexp) {
+      toast.error('Pacchetto originale non trovato. Impossibile modificare.');
+      return;
+    }
+
+    // Imposta modalità editing
+    setEditingBlock(block);
+    setCurrentPexp(originalPexp);
+    setActiveTab('pexp');
+
     toast.info(`Modifica giorno ${day}`, {
-      description: 'Da implementare - riaprire PEXP Panel per modifiche',
+      description: `Pacchetto: ${block.packageName}`,
     });
   };
 
@@ -549,6 +636,9 @@ function TripEditor() {
           onExpClick={handleExpClick}
           totalDays={totalDays}
           filledBlocks={filledBlocks}
+          isEditing={!!editingBlock}
+          editingBlock={editingBlock}
+          onRemove={handleRemoveBlock}
         />
       )}
 

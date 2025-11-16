@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import TabView from '../../shared/TabView';
@@ -8,13 +8,21 @@ import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
 import CostSummary from './CostSummary';
-import { DISPONIBILE_PLUS, MOCK_MEDIA } from '../../core/utils/mockData';
+import { usePlusSuggeriti } from '../../hooks/usePlus';
+import { generateMediaForExperience } from '../../core/utils/mediaHelpers';
 import styles from './DETEXPTab.module.css';
 
 /**
  * DETEXP Tab - Fullscreen tab showing experience details
  */
-function DETEXPTab({ exp, onClose, totalDays = 7, filledBlocks = [] }) {
+function DETEXPTab({
+  exp,
+  onClose,
+  totalDays = 7,
+  filledBlocks = [],
+  destinazione = '',
+  zona = ''
+}) {
   const [selectedPlus, setSelectedPlus] = useState([]);
 
   if (!exp || !exp.nome) {
@@ -52,9 +60,25 @@ function DETEXPTab({ exp, onClose, totalDays = 7, filledBlocks = [] }) {
   if (exp.durata) infoGenerali.push({ icon: '⏱️', label: 'Durata', value: exp.durata });
   if (exp.difficolta) infoGenerali.push({ icon: '🚶', label: 'Difficoltà', value: `${exp.difficolta}/3` });
 
-  // TODO: In futuro collegare a dati reali dal CSV plus.csv e media
-  const disponibile_plus = DISPONIBILE_PLUS;
-  const media = MOCK_MEDIA;
+  // Carica plus suggeriti dal CSV in base all'esperienza
+  const experienceType = exp.nome || '';
+  const { plusSuggeriti, isLoading: loadingPlus } = usePlusSuggeriti(
+    experienceType,
+    destinazione,
+    zona
+  );
+
+  // Genera media per l'esperienza
+  const media = useMemo(() =>
+    generateMediaForExperience(exp, {
+      count: 6,
+      includeVideo: true,
+      destinazione
+    }),
+    [exp, destinazione]
+  );
+
+  const disponibile_plus = plusSuggeriti;
 
   const handlePlusChange = (newSelectedPlus) => {
     setSelectedPlus(newSelectedPlus);
@@ -209,6 +233,8 @@ DETEXPTab.propTypes = {
   onClose: PropTypes.func.isRequired,
   totalDays: PropTypes.number,
   filledBlocks: PropTypes.array,
+  destinazione: PropTypes.string,
+  zona: PropTypes.string,
 };
 
 export default DETEXPTab;

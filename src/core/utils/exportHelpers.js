@@ -184,17 +184,39 @@ export function downloadAsJSON(tripData) {
 }
 
 /**
- * TODO: Esporta come PDF (richiede libreria html2pdf o jsPDF)
+ * Esporta come PDF usando jsPDF e html2canvas
  *
- * Per implementazione futura:
- * 1. npm install jspdf html2canvas
- * 2. Generare HTML formattato
- * 3. Convertire in PDF con jsPDF
+ * @param {Object} tripData - Dati del viaggio
+ * @returns {Promise<Object>} Risultato esportazione
  */
 export async function downloadAsPDF(tripData) {
-  // Placeholder per futura implementazione
-  return {
-    success: false,
-    error: 'Esportazione PDF in arrivo nella prossima versione! Per ora usa il download come testo.'
-  };
+  try {
+    // Import dinamico per evitare errori se non disponibile
+    const { exportItineraryPDF } = await import('./pdfExport');
+
+    const filename = `itinerario-${tripData.wizardData?.destinazione || 'viaggio'}-${new Date().toISOString().split('T')[0]}`;
+
+    // Prepara dati per PDF
+    const pdfData = {
+      destinazione: tripData.wizardData?.destinazione || 'Viaggio',
+      numeroPersone: tripData.wizardData?.numeroPersone || 2,
+      totalDays: tripData.totalDays || 7,
+      filledBlocks: tripData.timeline || [],
+      selectedHotels: tripData.selectedHotels || [],
+      costoTotale: tripData.totalCost || 0,
+    };
+
+    await exportItineraryPDF(pdfData, filename);
+
+    return {
+      success: true,
+      filename: `${filename}.pdf`
+    };
+  } catch (error) {
+    console.error('Errore esportazione PDF:', error);
+    return {
+      success: false,
+      error: 'Errore durante la generazione del PDF. Riprova.'
+    };
+  }
 }
