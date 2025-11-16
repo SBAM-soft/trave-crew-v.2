@@ -68,17 +68,20 @@ function HotelSelectionPage() {
         // Raggruppa hotel per zona e budget
         const grouped = groupHotelsByZoneAndBudget(destHotels, zoneVisitate);
         console.log('📊 Hotel raggruppati per zona:', grouped);
+        console.log('📊 Zone visitate:', zoneVisitate);
 
         setGroupedHotels(grouped);
 
-        // Inizializza selezioni vuote per ogni zona
+        // Inizializza selezioni vuote per ogni zona (usa UPPERCASE come chiave)
         const initialSelections = {};
         zoneVisitate.forEach(zona => {
-          initialSelections[zona.nome] = {
+          const zonaKey = zona.nome.toUpperCase().trim();
+          initialSelections[zonaKey] = {
             hotel: null,
             extras: []
           };
         });
+        console.log('📊 Initial selections:', initialSelections);
         setSelections(initialSelections);
 
         setLoading(false);
@@ -135,7 +138,7 @@ function HotelSelectionPage() {
   const handleConfirm = () => {
     // Verifica che tutti gli hotel siano selezionati
     const allSelected = Object.keys(selections).every(
-      zonaNome => selections[zonaNome].hotel !== null
+      zonaKey => selections[zonaKey].hotel !== null
     );
 
     if (!allSelected) {
@@ -143,9 +146,9 @@ function HotelSelectionPage() {
       return;
     }
 
-    // Converti selections in formato più compatto
-    const selectedHotels = Object.entries(selections).map(([zonaNome, data]) => ({
-      zona: zonaNome,
+    // Converti selections in formato più compatto (zonaKey è già UPPERCASE)
+    const selectedHotels = Object.entries(selections).map(([zonaKey, data]) => ({
+      zona: zonaKey, // Usa la chiave UPPERCASE
       hotel: data.hotel,
       extras: data.extras.map(extraCode => {
         return plusDB.find(p => p.CODICE === extraCode);
@@ -173,11 +176,11 @@ function HotelSelectionPage() {
 
   // Handler salva come bozza
   const handleSaveAsDraft = () => {
-    // Converti selections in formato compatto
+    // Converti selections in formato compatto (zonaKey è già UPPERCASE)
     const selectedHotels = Object.entries(selections)
       .filter(([_, data]) => data.hotel !== null)
-      .map(([zonaNome, data]) => ({
-        zona: zonaNome,
+      .map(([zonaKey, data]) => ({
+        zona: zonaKey, // Usa la chiave UPPERCASE
         hotel: data.hotel,
         extras: data.extras.map(extraCode => {
           return plusDB.find(p => p.CODICE === extraCode);
@@ -262,12 +265,13 @@ function HotelSelectionPage() {
       <div className={styles.content}>
         {/* Sezioni per zona */}
         {zoneVisitate.map((zona, index) => {
-          const zoneHotels = groupedHotels[zona.nome] || {};
+          const zonaKey = zona.nome.toUpperCase().trim(); // Usa UPPERCASE come chiave
+          const zoneHotels = groupedHotels[zonaKey] || {};
           const hasLow = zoneHotels.LOW !== null;
           const hasMedium = zoneHotels.MEDIUM !== null;
           const hasHigh = zoneHotels.HIGH !== null;
-          const selectedHotel = selections[zona.nome]?.hotel;
-          const selectedExtras = selections[zona.nome]?.extras || [];
+          const selectedHotel = selections[zonaKey]?.hotel;
+          const selectedExtras = selections[zonaKey]?.extras || [];
 
           return (
             <section key={zona.codice} className={styles.zoneSection}>
@@ -291,7 +295,7 @@ function HotelSelectionPage() {
                     </div>
                     <HotelCard
                       hotel={zoneHotels.LOW}
-                      onSelect={() => handleSelectHotel(zona.nome, zoneHotels.LOW)}
+                      onSelect={() => handleSelectHotel(zonaKey, zoneHotels.LOW)}
                       isSelected={selectedHotel?.CODICE === zoneHotels.LOW.CODICE}
                     />
                   </div>
@@ -307,7 +311,7 @@ function HotelSelectionPage() {
                     </div>
                     <HotelCard
                       hotel={zoneHotels.MEDIUM}
-                      onSelect={() => handleSelectHotel(zona.nome, zoneHotels.MEDIUM)}
+                      onSelect={() => handleSelectHotel(zonaKey, zoneHotels.MEDIUM)}
                       isSelected={selectedHotel?.CODICE === zoneHotels.MEDIUM.CODICE}
                     />
                   </div>
@@ -323,7 +327,7 @@ function HotelSelectionPage() {
                     </div>
                     <HotelCard
                       hotel={zoneHotels.HIGH}
-                      onSelect={() => handleSelectHotel(zona.nome, zoneHotels.HIGH)}
+                      onSelect={() => handleSelectHotel(zonaKey, zoneHotels.HIGH)}
                       isSelected={selectedHotel?.CODICE === zoneHotels.HIGH.CODICE}
                     />
                   </div>
@@ -343,13 +347,13 @@ function HotelSelectionPage() {
                     <h3 className={styles.extrasTitle}>✨ Extra disponibili per questo hotel</h3>
                     <button
                       className={styles.extrasToggle}
-                      onClick={() => setActiveExtraZone(activeExtraZone === zona.nome ? null : zona.nome)}
+                      onClick={() => setActiveExtraZone(activeExtraZone === zonaKey ? null : zonaKey)}
                     >
-                      {activeExtraZone === zona.nome ? '▲ Nascondi' : '▼ Mostra extra'}
+                      {activeExtraZone === zonaKey ? '▲ Nascondi' : '▼ Mostra extra'}
                     </button>
                   </div>
 
-                  {activeExtraZone === zona.nome && (() => {
+                  {activeExtraZone === zonaKey && (() => {
                     const extras = getHotelExtras(selectedHotel, plusDB);
 
                     if (extras.length === 0) {
@@ -366,7 +370,7 @@ function HotelSelectionPage() {
                           <div
                             key={extra.CODICE}
                             className={`${styles.extraCard} ${selectedExtras.includes(extra.CODICE) ? styles.selected : ''}`}
-                            onClick={() => handleToggleExtra(zona.nome, extra.CODICE)}
+                            onClick={() => handleToggleExtra(zonaKey, extra.CODICE)}
                           >
                             <div className={styles.extraHeader}>
                               <span className={styles.extraIcon}>{extra.ICON || '✨'}</span>
