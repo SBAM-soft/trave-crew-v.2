@@ -6,16 +6,59 @@
   margin-bottom: 2rem;
 }
 
-/* Sticky variant (50% reduction) */
+/* Sticky variant - alto come la top bar */
 .container.sticky {
   position: sticky;
-  top: 1rem;
+  top: 0;
   z-index: 10;
-  transform: scale(0.5);
-  transform-origin: top left;
-  width: 200%;
+  padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.container.sticky .header {
+  display: none;
+}
+
+.container.sticky .grid {
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.container.sticky .block {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.container.sticky .dayNumber {
+  position: static;
+  font-size: 0.625rem;
+  padding: 0.25rem 0.375rem;
+  margin-bottom: 0.25rem;
+}
+
+.container.sticky .experienceInfo {
+  gap: 0.125rem;
+}
+
+.container.sticky .experienceLabel {
+  font-size: 0.5rem;
+  padding: 0.125rem 0.25rem;
+}
+
+.container.sticky .experienceName {
+  font-size: 0.625rem;
+  -webkit-line-clamp: 1;
+}
+
+.container.sticky .checkmark {
+  width: 1rem;
+  height: 1rem;
+}
+
+.container.sticky .legend {
+  display: none;
 }
 
 /* Sticky variant for PEXP/DETEXP (30% reduction = 70% scale) */
@@ -319,6 +362,51 @@
     #f3f4f6 10px
   );
   border: 1px dashed #d1d5db;
+}
+
+.placeholder {
+  width: 2rem;
+  height: 2rem;
+  color: #d1d5db;
+}
+
+/* Bottone aggiungi giorno */
+.addDayButton {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.addDayButton:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+}
+
+.addDayButton:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.addDayIcon {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.addDayLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
 }
 
 @media (min-width: 768px) {

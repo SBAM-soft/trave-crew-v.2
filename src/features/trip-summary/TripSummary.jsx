@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import { useUser } from '../../contexts/UserContext';
 import { saveTripComplete } from '../../core/utils/tripStorage';
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard } from '../../core/utils/exportHelpers';
 import { toPrice, toInt } from '../../core/utils/typeHelpers';
+import { generateMediaForExperience } from '../../core/utils/mediaHelpers';
 import Button from '../../shared/Button';
 import Checkout from '../wallet/Checkout';
 import styles from './TripSummary.module.css';
@@ -27,6 +28,28 @@ function TripSummary() {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
+
+  // Genera immagini per il riepilogo
+  const heroImage = useMemo(() => {
+    const destinationName = wizardData.destinazioneNome || wizardData.destinazione || 'travel';
+    return `https://source.unsplash.com/featured/1200x400/?${encodeURIComponent(destinationName)},landscape&sig=hero`;
+  }, [wizardData]);
+
+  // Genera immagini per le esperienze
+  const experienceImages = useMemo(() => {
+    return filledBlocks.slice(0, 6).map((block, index) => {
+      const exp = block.experience;
+      if (!exp) return null;
+      const media = generateMediaForExperience(exp, {
+        count: 1,
+        includeVideo: false,
+        destinazione: wizardData.destinazione
+      });
+      return media[0]?.url;
+    }).filter(Boolean);
+  }, [filledBlocks, wizardData.destinazione]);
 
   // Calcola costi totali
   const calculateCosts = () => {
@@ -155,6 +178,57 @@ function TripSummary() {
     setShowCheckout(true);
   };
 
+  // Handler pubblica viaggio nella sezione esplora
+  const handlePublishTrip = async () => {
+    setPublishing(true);
+
+    try {
+      // Salva il viaggio nel localStorage per la sezione esplora
+      const EXPLORE_TRIPS_KEY = 'trave_crew_explore_trips';
+
+      const existingTrips = JSON.parse(localStorage.getItem(EXPLORE_TRIPS_KEY) || '[]');
+
+      const publishedTrip = {
+        id: crypto.randomUUID(),
+        TITOLO: `${wizardData.destinazioneNome || wizardData.destinazione} - Viaggio ${totalDays} giorni`,
+        DESCRIZIONE: `Esperienza unica con ${filledBlocks.length} attività selezionate`,
+        DESTINAZIONE: wizardData.destinazioneNome || wizardData.destinazione,
+        DURATA_GIORNI: totalDays,
+        BUDGET_CATEGORIA: wizardData.budget || 'medium',
+        COSTO_TOTALE_PP: costs.perPerson,
+        GENERE: wizardData.tipoViaggio || 'privato',
+        STATO: 'aperto',
+        NUM_PERSONE: wizardData.numeroPersone,
+        DATA_PARTENZA: wizardData.dataPartenza,
+        IMMAGINE: heroImage,
+        ESPERIENZE: filledBlocks.map(b => b.experience?.nome).filter(Boolean),
+        HOTEL: selectedHotels.map(h => h.hotel?.ZONA).filter(Boolean),
+        createdAt: new Date().toISOString(),
+        publishedBy: 'user' // In futuro collegare all'utente reale
+      };
+
+      existingTrips.push(publishedTrip);
+      localStorage.setItem(EXPLORE_TRIPS_KEY, JSON.stringify(existingTrips));
+
+      setIsPublished(true);
+
+      toast.success('🎉 Viaggio pubblicato con successo!', {
+        description: 'Il tuo viaggio è ora visibile nella sezione Esplora',
+        duration: 5000
+      });
+
+      // Opzionale: dopo 2 secondi naviga alla sezione esplora
+      setTimeout(() => {
+        navigate('/explore');
+      }, 2000);
+    } catch (error) {
+      console.error('Errore pubblicazione viaggio:', error);
+      toast.error('Errore nella pubblicazione del viaggio');
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   if (!wizardData.destinazione) {
     return (
       <div className={styles.tripSummary}>
@@ -171,23 +245,47 @@ function TripSummary() {
     <div className={styles.tripSummary}>
       <Toaster position="top-right" richColors />
 
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.phaseIndicator}>
-            <span className={styles.phaseNumber}>Fase 3/3</span>
-            <div className={styles.phaseSteps}>
-              <div className={styles.stepCompleted}>✓ Itinerario</div>
-              <div className={styles.stepCompleted}>✓ Hotel</div>
-              <div className={styles.stepActive}>📋 Riepilogo</div>
+      {/* Hero Image */}
+      <div className={styles.heroSection}>
+        <img
+          src={heroImage}
+          alt={wizardData.destinazioneNome || wizardData.destinazione}
+          className={styles.heroImage}
+        />
+        <div className={styles.heroOverlay}>
+          <div className={styles.heroContent}>
+            <div className={styles.phaseIndicator}>
+              <span className={styles.phaseNumber}>Fase 3/3</span>
+              <div className={styles.phaseSteps}>
+                <div className={styles.stepCompleted}>✓ Itinerario</div>
+                <div className={styles.stepCompleted}>✓ Hotel</div>
+                <div className={styles.stepActive}>📋 Riepilogo</div>
+              </div>
             </div>
+            <h1 className={styles.title}>🎉 Riepilogo del Viaggio</h1>
+            <p className={styles.subtitle}>
+              {wizardData.destinazioneNome || wizardData.destinazione} • {totalDays} giorni • {wizardData.numeroPersone} {wizardData.numeroPersone === 1 ? 'persona' : 'persone'}
+            </p>
           </div>
-          <h1 className={styles.title}>🎉 Riepilogo del Viaggio</h1>
-          <p className={styles.subtitle}>
-            {wizardData.destinazioneNome || wizardData.destinazione} • {totalDays} giorni • {wizardData.numeroPersone} {wizardData.numeroPersone === 1 ? 'persona' : 'persone'}
-          </p>
         </div>
       </div>
+
+      {/* Experience Images Gallery */}
+      {experienceImages.length > 0 && (
+        <div className={styles.gallerySection}>
+          <div className={styles.galleryGrid}>
+            {experienceImages.map((imgUrl, index) => (
+              <div key={index} className={styles.galleryItem}>
+                <img
+                  src={imgUrl}
+                  alt={`Esperienza ${index + 1}`}
+                  className={styles.galleryImage}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className={styles.content}>
@@ -385,6 +483,19 @@ function TripSummary() {
 
             <Button variant="outline" onClick={handleSaveTrip} disabled={saving}>
               {saving ? 'Salvataggio...' : '💾 Salva Viaggio'}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handlePublishTrip}
+              disabled={publishing || isPublished}
+              style={{
+                background: isPublished ? '#10b981' : 'transparent',
+                color: isPublished ? 'white' : '#667eea',
+                borderColor: isPublished ? '#10b981' : '#667eea'
+              }}
+            >
+              {publishing ? '⏳ Pubblicazione...' : isPublished ? '✓ Pubblicato' : '🌍 Pubblica'}
             </Button>
 
             <Button variant="primary" onClick={handleProceedToPayment} size="lg">

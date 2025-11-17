@@ -372,3 +372,145 @@
     grid-template-columns: repeat(5, 1fr);
   }
 }
+
+/* Animazione creazione itinerario */
+.creatingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.creatingContent {
+  text-align: center;
+  max-width: 500px;
+  padding: 2rem;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.creatingSpinner {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+}
+
+.spinnerRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 4px solid transparent;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.spinnerRing:nth-child(1) {
+  animation-delay: -0.45s;
+  border-top-color: #667eea;
+}
+
+.spinnerRing:nth-child(2) {
+  animation-delay: -0.3s;
+  border-top-color: #764ba2;
+}
+
+.spinnerRing:nth-child(3) {
+  animation-delay: -0.15s;
+  border-top-color: #91e154;
+}
+
+.creatingTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 1rem 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.creatingText {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 2rem 0;
+}
+
+.creatingSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.step {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  width: 100%;
+  animation: stepAppear 0.5s ease forwards;
+  opacity: 0;
+}
+
+.step:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.step:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.step:nth-child(3) {
+  animation-delay: 0.9s;
+}
+
+@keyframes stepAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
