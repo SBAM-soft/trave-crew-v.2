@@ -36,10 +36,21 @@ function MapCenterController({ center, zones }) {
   return null;
 }
 
-function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledBlocks = [] }) {
+function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledBlocks = [], scrollToExperiences }) {
   const [hoveredZone, setHoveredZone] = useState(null);
   const [mapCenter, setMapCenter] = useState([13.7563, 100.5018]); // Default Bangkok
   const [mapZoom, setMapZoom] = useState(6);
+
+  // Handler per selezione zona con scroll
+  const handleZoneSelect = (zona) => {
+    onZoneClick(zona);
+    // Scroll alla sezione esperienze dopo un breve delay
+    if (scrollToExperiences) {
+      setTimeout(() => {
+        scrollToExperiences();
+      }, 300);
+    }
+  };
 
   // Debug log
   useEffect(() => {
@@ -158,8 +169,10 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledB
         <p className={styles.mapSubtitle}>Clicca su una zona per vedere i pacchetti disponibili</p>
       </div>
 
-      {/* Mappa interattiva reale */}
-      <div className={styles.mapWrapper}>
+      {/* Contenitore mappa + zone per desktop */}
+      <div className={styles.mapContentWrapper}>
+        {/* Mappa interattiva reale */}
+        <div className={styles.mapWrapper}>
         <MapContainer
           center={mapCenter}
           zoom={mapZoom}
@@ -207,7 +220,7 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledB
                 position={[parseFloat(zona.COORDINATE_LAT), parseFloat(zona.COORDINATE_LNG)]}
                 icon={createZoneIcon(zona, isSelected, isHovered, visitOrder)}
                 eventHandlers={{
-                  click: () => onZoneClick(zona),
+                  click: () => handleZoneSelect(zona),
                   mouseover: () => setHoveredZone(zona.CODICE),
                   mouseout: () => setHoveredZone(null)
                 }}
@@ -224,7 +237,7 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledB
                     {zona.GIORNI_CONSIGLIATI && <p>📅 {zona.GIORNI_CONSIGLIATI} giorni consigliati</p>}
                     {zona.DESCRIZIONE && <p className={styles.popupDesc}>{zona.DESCRIZIONE.substring(0, 100)}...</p>}
                     <button
-                      onClick={() => onZoneClick(zona)}
+                      onClick={() => handleZoneSelect(zona)}
                       className={styles.popupButton}
                     >
                       Seleziona questa zona
@@ -235,10 +248,10 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledB
             );
           })}
         </MapContainer>
-      </div>
+        </div>
 
-      {/* Zone disponibili */}
-      <div className={styles.zonesSection}>
+        {/* Zone disponibili - affianco mappa su desktop */}
+        <div className={styles.zonesSection}>
         <h4 className={styles.zonesTitle}>Zone disponibili:</h4>
         <div className={styles.zonesGrid}>
           {zone && zone.length > 0 ? (
@@ -248,7 +261,7 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledB
                 className={`${styles.zoneCard} ${
                   selectedZone === zona.CODICE ? styles.selected : ''
                 } ${hoveredZone === zona.CODICE ? styles.hovered : ''}`}
-                onClick={() => onZoneClick(zona)}
+                onClick={() => handleZoneSelect(zona)}
                 onMouseEnter={() => setHoveredZone(zona.CODICE)}
                 onMouseLeave={() => setHoveredZone(null)}
               >
@@ -301,6 +314,7 @@ function MapInteractive({ destinazione, zone, selectedZone, onZoneClick, filledB
               <p>Nessuna zona disponibile per questa destinazione</p>
             </div>
           )}
+        </div>
         </div>
       </div>
 

@@ -132,6 +132,7 @@ function PEXPTab({
             totalDays={totalDays}
             filledBlocks={filledBlocks}
             compact={true}
+            stickyCompact={true}
           />
 
           <div className={styles.description}>

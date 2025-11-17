@@ -2,7 +2,7 @@ import { memo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './DayBlocksGrid.module.css';
 
-function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = false }) {
+function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = false, sticky = false, stickyCompact = false }) {
   // Crea array di blocchi (1 giorno = 1 blocco)
   const blocks = Array.from({ length: totalDays }, (_, i) => i + 1);
 
@@ -25,7 +25,7 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = f
   };
 
   return (
-    <div className={`${styles.container} ${compact ? styles.compact : ''}`}>
+    <div className={`${styles.container} ${compact ? styles.compact : ''} ${sticky ? styles.sticky : ''} ${stickyCompact ? styles.stickyCompact : ''}`}>
       {/* Header */}
       <div className={styles.header}>
         <h3 className={styles.title}>📅 I tuoi giorni</h3>
@@ -70,6 +70,7 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = f
               {/* Info esperienza per blocchi pieni */}
               {filled && !arrival && experience && (
                 <div className={styles.experienceInfo}>
+                  <span className={styles.experienceLabel}>✅ Confermato</span>
                   <span className={styles.experienceName}>{experience.nome}</span>
                   <div className={styles.checkmark}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -107,15 +108,15 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = f
       <div className={styles.legend}>
         <div className={styles.legendItem}>
           <div className={`${styles.legendBlock} ${styles.arrival}`} />
-          <span>Arrivo (no esperienze)</span>
+          <span>✈️ Arrivo</span>
         </div>
         <div className={styles.legendItem}>
           <div className={`${styles.legendBlock} ${styles.filled}`} />
-          <span>Giorno pianificato</span>
+          <span>✅ Esperienza confermata</span>
         </div>
         <div className={styles.legendItem}>
           <div className={`${styles.legendBlock} ${styles.empty}`} />
-          <span>Da pianificare</span>
+          <span>📝 Da completare</span>
         </div>
       </div>
     </div>
@@ -137,6 +138,8 @@ DayBlocksGrid.propTypes = {
   ),
   onBlockClick: PropTypes.func,
   compact: PropTypes.bool,
+  sticky: PropTypes.bool,
+  stickyCompact: PropTypes.bool,
 };
 
 export default memo(DayBlocksGrid);

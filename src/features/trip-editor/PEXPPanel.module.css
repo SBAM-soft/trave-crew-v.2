@@ -187,6 +187,44 @@
   width: 100%;
 }
 
+.expCardWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.likedBadge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: bounceIn 0.5s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* Empty Slot - COMPATTO */
 .emptySlot {
   background: repeating-linear-gradient(

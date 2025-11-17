@@ -121,6 +121,7 @@ function DETEXPTab({
         totalDays={totalDays}
         filledBlocks={filledBlocks}
         compact={true}
+        stickyCompact={true}
       />
 
       {/* Tags */}
@@ -138,88 +139,95 @@ function DETEXPTab({
          'Un\'esperienza unica che renderà il tuo viaggio indimenticabile.'}
       </p>
 
-      {/* Media Slider */}
-      <MediaSlider
-        videoUrl={media.video}
-        images={media.images}
-      />
+      {/* Layout a due colonne su desktop */}
+      <div className={styles.contentGrid}>
+        <div className={styles.leftColumn}>
+          {/* Media Slider */}
+          <MediaSlider
+            videoUrl={media.video}
+            images={media.images}
+          />
 
-      {/* Info Generali */}
-      {infoGenerali.length > 0 && (
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>ℹ️ Informazioni</h3>
-          <div className={styles.infoGrid}>
-            {infoGenerali.map((info, i) => (
-              <div key={i} className={styles.infoBadge}>
-                <span className={styles.infoBadgeIcon}>{info.icon}</span>
-                <div className={styles.infoBadgeContent}>
-                  <span className={styles.infoBadgeLabel}>{info.label}</span>
-                  <span className={styles.infoBadgeValue}>{info.value}</span>
-                </div>
+          {/* Info Generali */}
+          {infoGenerali.length > 0 && (
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>ℹ️ Informazioni</h3>
+              <div className={styles.infoGrid}>
+                {infoGenerali.map((info, i) => (
+                  <div key={i} className={styles.infoBadge}>
+                    <span className={styles.infoBadgeIcon}>{info.icon}</span>
+                    <div className={styles.infoBadgeContent}>
+                      <span className={styles.infoBadgeLabel}>{info.label}</span>
+                      <span className={styles.infoBadgeValue}>{info.value}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Descrizione dettagliata */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>📖 L'esperienza</h3>
+            <div className={styles.description}>
+              {formatDescription(exp.descrizione).map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Descrizione dettagliata */}
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>📖 L'esperienza</h3>
-        <div className={styles.description}>
-          {formatDescription(exp.descrizione).map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
+        <div className={styles.rightColumn}>
+          {/* Cosa include */}
+          {infoIncluse.length > 0 && (
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>✅ Cosa include</h3>
+              <ul className={styles.infoList}>
+                {infoIncluse.map((info, i) => (
+                  <li key={i}>✓ {info}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Cosa NON include */}
+          {infoNonIncluse.length > 0 && (
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>❌ Cosa NON include</h3>
+              <ul className={styles.infoList}>
+                {infoNonIncluse.map((info, i) => (
+                  <li key={i}>✗ {info}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Plus Selector */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>✨ Personalizza l'esperienza</h3>
+            <PlusSelector
+              availablePlus={disponibile_plus}
+              selectedPlus={selectedPlus}
+              onChange={handlePlusChange}
+            />
+          </div>
+
+          {/* Cost Summary */}
+          <div className={styles.section}>
+            <CostSummary
+              baseCost={exp.prezzo || 0}
+              selectedPlus={selectedPlus}
+            />
+          </div>
+
+          {/* Like/Dislike Buttons */}
+          <div className={styles.section}>
+            <LikeDislikeButtons
+              onLike={handleLike}
+              onDislike={handleDislike}
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Cosa include */}
-      {infoIncluse.length > 0 && (
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>✅ Cosa include</h3>
-          <ul className={styles.infoList}>
-            {infoIncluse.map((info, i) => (
-              <li key={i}>✓ {info}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Cosa NON include */}
-      {infoNonIncluse.length > 0 && (
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>❌ Cosa NON include</h3>
-          <ul className={styles.infoList}>
-            {infoNonIncluse.map((info, i) => (
-              <li key={i}>✗ {info}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Plus Selector */}
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>✨ Personalizza l'esperienza</h3>
-        <PlusSelector
-          availablePlus={disponibile_plus}
-          selectedPlus={selectedPlus}
-          onChange={handlePlusChange}
-        />
-      </div>
-
-      {/* Cost Summary */}
-      <div className={styles.section}>
-        <CostSummary
-          baseCost={exp.prezzo || 0}
-          selectedPlus={selectedPlus}
-        />
-      </div>
-
-      {/* Like/Dislike Buttons */}
-      <div className={styles.section}>
-        <LikeDislikeButtons
-          onLike={handleLike}
-          onDislike={handleDislike}
-        />
       </div>
     </TabView>
   );

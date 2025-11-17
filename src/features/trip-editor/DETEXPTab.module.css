@@ -185,3 +185,27 @@
     font-size: 1.43rem; /* +10% from 1.3rem */
   }
 }
+
+/* Desktop - Layout a due colonne */
+@media (min-width: 1024px) {
+  .contentGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .leftColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+  }
+
+  .rightColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+    position: sticky;
+    top: 1rem;
+  }
+}
