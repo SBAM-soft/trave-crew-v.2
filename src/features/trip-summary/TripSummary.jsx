@@ -70,11 +70,12 @@ function TripSummary() {
       }
     });
 
-    // Costo hotel (totalDays - 1 perché il primo giorno è arrivo, l'ultimo è partenza)
+    // Costo hotel - usa le notti effettive per ogni zona
     selectedHotels.forEach(item => {
       if (item.hotel && item.hotel.PREZZO) {
         const price = toPrice(item.hotel.PREZZO, 0);
-        hotelsCost += price * (totalDays - 1);
+        const notti = item.notti || 0; // Usa il numero di notti calcolato per questa zona
+        hotelsCost += price * notti;
       }
       // Extra hotel
       if (item.extras) {
