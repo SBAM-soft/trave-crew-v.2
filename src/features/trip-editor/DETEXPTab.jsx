@@ -91,11 +91,20 @@ function DETEXPTab({
   };
 
   const handleLike = () => {
+    // Chiama il callback onLike se presente (passato da PEXPTab)
+    if (exp._onLikeCallback) {
+      exp._onLikeCallback(exp);
+    }
     toast.success('Esperienza confermata!');
     onClose();
   };
 
   const handleDislike = () => {
+    // Chiama il callback onDislike se presente (passato da PEXPTab)
+    if (exp._onDislikeCallback) {
+      exp._onDislikeCallback(exp);
+    }
+
     if (onDislike) {
       // Chiama il callback del parent che gestisce la rimozione e ricerca alternative
       onDislike(exp);

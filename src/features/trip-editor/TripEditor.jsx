@@ -10,6 +10,7 @@ import PEXPTab from './PEXPTab';
 import DETEXPTab from './DETEXPTab';
 import HotelCard from './HotelCard';
 import HotelPanel from './HotelPanel';
+import ItineraryTimeline from './ItineraryTimeline';
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
 import { loadCSV } from '../../core/utils/dataLoader';
@@ -80,6 +81,9 @@ function TripEditor() {
 
   // State per animazione creazione itinerario
   const [creatingItinerary, setCreatingItinerary] = useState(false);
+
+  // State per mostrare timeline spettacolare
+  const [showTimeline, setShowTimeline] = useState(false);
 
   // State per sticky day blocks
   const [isDayBlocksSticky, setIsDayBlocksSticky] = useState(false);
@@ -272,8 +276,13 @@ function TripEditor() {
   };
 
   // Handler click esperienza → Apre TAB DETEXP fullscreen
-  const handleExpClick = (exp) => {
-    setCurrentExp(exp);
+  // Accetta anche callback onLike e onDislike opzionali da PEXPTab
+  const handleExpClick = (exp, onLike, onDislike) => {
+    setCurrentExp({
+      ...exp,
+      _onLikeCallback: onLike,
+      _onDislikeCallback: onDislike
+    });
     setActiveTab('detexp');
   };
 
@@ -614,6 +623,9 @@ function TripEditor() {
 
     setFilledBlocks([...filledBlocks, ...newBlocks]);
 
+    // Mostra la timeline spettacolare invece del toast
+    setShowTimeline(true);
+
     toast.success('Itinerario creato automaticamente!', {
       description: `${newBlocks.length} giorni pianificati con esperienze reali`,
     });
@@ -771,6 +783,27 @@ function TripEditor() {
   }
 
   const allBlocksFilled = filledBlocks.length >= totalDays - 1;
+
+  // Handler continua dalla timeline
+  const handleContinueFromTimeline = () => {
+    setShowTimeline(false);
+    // Scroll alla sezione hotel o continua con il flusso normale
+    setTimeout(() => {
+      scrollToDayBlocks();
+    }, 300);
+  };
+
+  // Se la timeline è visibile, mostrala invece del trip editor
+  if (showTimeline) {
+    return (
+      <ItineraryTimeline
+        filledBlocks={filledBlocks}
+        totalDays={totalDays}
+        wizardData={wizardData}
+        onContinue={handleContinueFromTimeline}
+      />
+    );
+  }
 
   return (
     <div className={styles.tripEditor}>
