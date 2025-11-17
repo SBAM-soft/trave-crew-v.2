@@ -5,6 +5,7 @@ import { useUser } from '../../contexts/UserContext';
 import { saveTripComplete } from '../../core/utils/tripStorage';
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard } from '../../core/utils/exportHelpers';
 import Button from '../../shared/Button';
+import Checkout from '../wallet/Checkout';
 import styles from './TripSummary.module.css';
 
 function TripSummary() {
@@ -24,6 +25,7 @@ function TripSummary() {
 
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   // Calcola costi totali
   const calculateCosts = () => {
@@ -145,11 +147,9 @@ function TripSummary() {
     }
   };
 
-  // Handler procedi pagamento (simulato)
+  // Handler procedi pagamento
   const handleProceedToPayment = () => {
-    toast.info('Funzionalità pagamento in arrivo!', {
-      description: 'Per ora puoi salvare il viaggio o esportarlo'
-    });
+    setShowCheckout(true);
   };
 
   if (!wizardData.destinazione) {
@@ -390,6 +390,21 @@ function TripSummary() {
           </div>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      {showCheckout && (
+        <Checkout
+          tripData={{
+            id: Date.now().toString(),
+            name: `${wizardData.destinazioneNome || wizardData.destinazione}`,
+            destination: wizardData.destinazioneNome || wizardData.destinazione,
+            dates: wizardData.dataPartenza ? `Dal ${new Date(wizardData.dataPartenza).toLocaleDateString('it-IT')}` : undefined,
+            participants: wizardData.numeroPersone,
+            costs
+          }}
+          onClose={() => setShowCheckout(false)}
+        />
+      )}
     </div>
   );
 }
