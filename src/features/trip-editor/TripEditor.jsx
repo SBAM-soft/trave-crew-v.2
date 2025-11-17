@@ -362,6 +362,20 @@ function TripEditor() {
       }
     }
 
+    // Validazione: controlla esperienze duplicate
+    const existingExperienceIds = filledBlocks.map(block => block.experience?.id).filter(Boolean);
+    const duplicateExperiences = validExperiences.filter(exp =>
+      existingExperienceIds.includes(exp.id)
+    );
+
+    if (duplicateExperiences.length > 0) {
+      const duplicateNames = duplicateExperiences.map(exp => exp.nome).join(', ');
+      toast.error('Esperienza già presente nel viaggio!', {
+        description: `Le seguenti esperienze sono già state aggiunte: ${duplicateNames}`,
+      });
+      return;
+    }
+
     // Riempi blocchi giorni con le esperienze
     const newBlocks = [];
     const startDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2; // Inizia dal giorno 2 (1 è arrivo)
