@@ -26,7 +26,7 @@ function TripEditor() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Recupera dati wizard (passati dalla route)
+  // Recupera dati wizard e dati viaggio (passati dalla route)
   const wizardData = location.state?.wizardData || {
     destinazione: 'Thailandia',
     stato_id: 1,
@@ -37,6 +37,19 @@ function TripEditor() {
     dataPartenza: null
   };
 
+  // Recupera dati per edit mode (quando si modifica un viaggio salvato)
+  const editMode = location.state?.editMode || false;
+  const tripId = location.state?.tripId || null;
+  const initialFilledBlocks = location.state?.filledBlocks || [];
+  const initialTotalDays = location.state?.totalDays || 7;
+
+  console.log('🔧 TripEditor caricato:', {
+    editMode,
+    tripId,
+    hasFilledBlocks: initialFilledBlocks.length > 0,
+    totalDays: initialTotalDays
+  });
+
   // State
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,8 +58,8 @@ function TripEditor() {
   const [selectedZone, setSelectedZone] = useState(null);
   const [pacchetti, setPacchetti] = useState([]);
   const [selectedPacchetto, setSelectedPacchetto] = useState(null);
-  const [filledBlocks, setFilledBlocks] = useState([]);
-  const [totalDays, setTotalDays] = useState(7); // Default 7 giorni
+  const [filledBlocks, setFilledBlocks] = useState(initialFilledBlocks);
+  const [totalDays, setTotalDays] = useState(initialTotalDays);
 
   // State per Hotel selection
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -75,6 +88,15 @@ function TripEditor() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Mostra toast quando viene caricato un viaggio in edit mode
+  useEffect(() => {
+    if (!loading && editMode && filledBlocks.length > 0) {
+      toast.success('✏️ Viaggio caricato per la modifica', {
+        description: `${filledBlocks.length} esperienze caricate su ${totalDays} giorni`
+      });
+    }
+  }, [loading, editMode, filledBlocks.length, totalDays]);
 
   const loadData = async () => {
     try {
