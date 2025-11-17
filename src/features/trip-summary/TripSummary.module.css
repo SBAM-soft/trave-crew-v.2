@@ -412,6 +412,32 @@
   color: white;
 }
 
+/* Accessories Detail */
+.accessoriesDetail {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.accessoryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.accessoryLabel {
+  font-style: italic;
+}
+
+.accessoryValue {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .costTotal .costValue {
   font-size: 1.5rem;
 }
