@@ -24,6 +24,7 @@ function CreateWizard() {
     budget,
     interessi,
     dataPartenza,
+    numeroNotti,
     currentStep,
     setDestinazione,
     setNumeroPersone,
@@ -33,6 +34,7 @@ function CreateWizard() {
     setBudget,
     setInteressi,
     setDataPartenza,
+    setNumeroNotti,
     setCurrentStep,
     getWizardData,
     resetWizard,
@@ -219,6 +221,8 @@ function CreateWizard() {
             value={dataPartenza}
             onChange={(data) => setDataPartenza(data)}
             destinazione={destinazione}
+            numeroNotti={numeroNotti}
+            onNumeroNottiChange={(notti) => setNumeroNotti(notti)}
           />
         );
 

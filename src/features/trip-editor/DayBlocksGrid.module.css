@@ -78,6 +78,24 @@
   text-align: center;
 }
 
+.warning {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* Nascondi warning in sticky mode */
+.container.sticky .warning,
+.container.stickyCompact .warning {
+  display: none;
+}
+
 .title {
   font-size: 1.5rem;
   font-weight: 700;

@@ -24,6 +24,7 @@ function PEXPTab({
   onRemove = null
 }) {
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
+  const [likedExperiences, setLikedExperiences] = useState([]);
 
   // Extract experience IDs from package
   const experienceIds = useMemo(() => {
@@ -60,6 +61,30 @@ function PEXPTab({
 
   const handleReplaceExp = (oldExpId) => {
     toast.info('Funzionalità sostituzione esperienza in arrivo!');
+  };
+
+  // Handler per like esperienza
+  const handleExpLike = (exp) => {
+    if (!likedExperiences.includes(exp.id)) {
+      setLikedExperiences([...likedExperiences, exp.id]);
+      toast.success('Esperienza confermata!');
+    }
+  };
+
+  // Handler per dislike esperienza
+  const handleExpDislike = (exp) => {
+    if (!dislikedExperiences.includes(exp.id)) {
+      setDislikedExperiences([...dislikedExperiences, exp.id]);
+    }
+    // Rimuovi dai liked se presente
+    if (likedExperiences.includes(exp.id)) {
+      setLikedExperiences(likedExperiences.filter(id => id !== exp.id));
+    }
+  };
+
+  // Modifica onExpClick per passare i callbacks
+  const handleExpClick = (exp) => {
+    onExpClick(exp, handleExpLike, handleExpDislike);
   };
 
   const handleConfirm = () => {
@@ -144,9 +169,10 @@ function PEXPTab({
             <div className={styles.expGrid}>
               {experiences.map((exp) => {
                 const isDisliked = dislikedExperiences.includes(exp.id);
+                const isLiked = likedExperiences.includes(exp.id);
 
                 return (
-                  <div key={exp.id} className={styles.expWrapper}>
+                  <div key={exp.id} className={`${styles.expWrapper} ${isLiked ? styles.liked : ''}`}>
                     {isDisliked ? (
                       <div className={styles.emptySlot}>
                         <p className={styles.emptyText}>❌ Esperienza rifiutata</p>
@@ -158,10 +184,17 @@ function PEXPTab({
                         </button>
                       </div>
                     ) : (
-                      <EXPCard
-                        exp={exp}
-                        onClick={() => onExpClick(exp)}
-                      />
+                      <>
+                        <EXPCard
+                          exp={exp}
+                          onClick={() => handleExpClick(exp)}
+                        />
+                        {isLiked && (
+                          <div className={styles.likedBadge}>
+                            <span>✓ Confermato</span>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 );

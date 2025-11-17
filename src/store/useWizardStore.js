@@ -34,6 +34,7 @@ const useWizardStore = create(
 
       // Step 5: Data Partenza
       dataPartenza: '',
+      numeroNotti: null, // Numero di notti desiderate per il viaggio
 
       // Current wizard step
       currentStep: 1,
@@ -56,6 +57,8 @@ const useWizardStore = create(
 
       setDataPartenza: (data) => set({ dataPartenza: data }),
 
+      setNumeroNotti: (notti) => set({ numeroNotti: notti }),
+
       setCurrentStep: (step) => set({ currentStep: step }),
 
       nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
@@ -74,6 +77,7 @@ const useWizardStore = create(
           budget: '',
           interessi: [],
           dataPartenza: '',
+          numeroNotti: null,
           currentStep: 1,
         }),
 
@@ -90,6 +94,7 @@ const useWizardStore = create(
           budget: state.budget,
           interessi: state.interessi,
           dataPartenza: state.dataPartenza,
+          numeroNotti: state.numeroNotti,
         };
       },
     }),
@@ -106,6 +111,7 @@ const useWizardStore = create(
         budget: state.budget,
         interessi: state.interessi,
         dataPartenza: state.dataPartenza,
+        numeroNotti: state.numeroNotti,
         currentStep: state.currentStep,
       }),
     }

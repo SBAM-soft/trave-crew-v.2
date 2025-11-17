@@ -33,11 +33,16 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, onAddDay, o
           {filledBlocks.length} di {totalDays - 1} giorni pianificati
         </p>
         <div className={styles.progressBar}>
-          <div 
+          <div
             className={styles.progress}
             style={{ width: `${((filledBlocks.length) / (totalDays - 1)) * 100}%` }}
           />
         </div>
+      </div>
+
+      {/* Avviso ordine non cronologico */}
+      <div className={styles.warning}>
+        ⚠️ I giorni rappresentati non sono considerati in ordine cronologico
       </div>
 
       {/* Griglia blocchi */}

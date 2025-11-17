@@ -16,7 +16,12 @@ function EXPCard({ exp, onClick }) {
 
   // Estrai dati esperienza
   const immagine = exp.immagine || 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400';
-  const durata = exp.durata || 'Giorno intero';
+
+  // Estrai numero di notti da SLOT o slot
+  const slot = exp.SLOT || exp.slot || 1;
+  const notti = parseInt(slot) || 1;
+  const durata = `${notti} ${notti === 1 ? 'notte' : 'notti'}`;
+
   const tags = exp.tags || [];
   const prezzo = exp.prezzo || 0;
   const difficolta = exp.difficolta || 1;
