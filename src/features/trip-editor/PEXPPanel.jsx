@@ -14,6 +14,7 @@ function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
 
   // Stati per le esperienze
   const [dislikedExperiences, setDislikedExperiences] = useState([]);
+  const [likedExperiences, setLikedExperiences] = useState([]);
 
   // Extract experience IDs from package
   const experienceIds = useMemo(() => {
@@ -60,7 +61,10 @@ function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
   };
 
   // Handler like da DETEXP
-  const handleExpLike = () => {
+  const handleExpLike = (expId) => {
+    if (!likedExperiences.includes(expId)) {
+      setLikedExperiences([...likedExperiences, expId]);
+    }
     toast.success('Esperienza confermata!');
   };
 
@@ -135,6 +139,7 @@ function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
               <div className={styles.expGrid}>
                 {experiences.map((exp) => {
                   const isDisliked = dislikedExperiences.includes(exp.id);
+                  const isLiked = likedExperiences.includes(exp.id);
 
                   return (
                     <div key={exp.id} className={styles.expWrapper}>
@@ -150,11 +155,18 @@ function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
                           </button>
                         </div>
                       ) : (
-                        // Card esperienza normale
-                        <EXPCard
-                          exp={exp}
-                          onClick={() => handleExpClick(exp)}
-                        />
+                        // Card esperienza con badge like se confermata
+                        <div className={styles.expCardWrapper}>
+                          <EXPCard
+                            exp={exp}
+                            onClick={() => handleExpClick(exp)}
+                          />
+                          {isLiked && (
+                            <div className={styles.likedBadge}>
+                              <span>✓ Confermata</span>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   );
@@ -197,7 +209,7 @@ function PEXPPanel({ panelId, pexp, onConfirm, onClose }) {
           key={panel.id}
           panelId={panel.id}
           exp={panel.data.exp}
-          onLike={handleExpLike}
+          onLike={() => handleExpLike(panel.data.exp.id)}
           onDislike={() => handleExpDislike(panel.data.exp.id)}
         />
       ))}

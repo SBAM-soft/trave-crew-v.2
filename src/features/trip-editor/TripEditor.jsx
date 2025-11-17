@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import useNavigationGuard from '../../hooks/useNavigationGuard';
@@ -76,6 +76,12 @@ function TripEditor() {
   const [itinerari, setItinerari] = useState([]);
   const [costiAccessori, setCostiAccessori] = useState([]);
   const [plus, setPlus] = useState([]);
+
+  // Ref per la sezione pacchetti (per scroll automatico)
+  const packagesRef = useRef(null);
+
+  // Ref per la sezione "i tuoi giorni"
+  const dayBlocksRef = useRef(null);
 
   // Protezione navigazione - Previene perdita dati non salvati
   const hasUnsavedChanges = filledBlocks.length > 0 && filledBlocks.length < totalDays - 1;
@@ -207,6 +213,26 @@ function TripEditor() {
     console.log(`📦 Pacchetti trovati: ${zonePacchetti.length}`);
   };
 
+  // Funzione per scrollare alla sezione esperienze
+  const scrollToExperiences = () => {
+    if (packagesRef.current) {
+      packagesRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  // Funzione per scrollare alla sezione "i tuoi giorni"
+  const scrollToDayBlocks = () => {
+    if (dayBlocksRef.current) {
+      dayBlocksRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  };
+
   // Handler click pacchetto → Apre TAB PEXP fullscreen
   const handlePacchettoClick = (pexp) => {
     setCurrentPexp(pexp);
@@ -311,6 +337,11 @@ function TripEditor() {
     toast.success(`Pacchetto "${pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome}" confermato!`, {
       description: `${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1})`,
     });
+
+    // Scroll alla sezione "i tuoi giorni" dopo un breve delay per l'animazione
+    setTimeout(() => {
+      scrollToDayBlocks();
+    }, 500);
   };
 
   // Handler rimozione blocco
@@ -611,7 +642,7 @@ function TripEditor() {
       {/* Contenuto principale */}
       <div className={styles.content}>
         {/* Blocchi giorni - SEMPRE IN ALTO */}
-        <section className={styles.section}>
+        <section ref={dayBlocksRef} className={styles.section}>
           <DayBlocksGrid
             totalDays={totalDays}
             filledBlocks={filledBlocks}
@@ -663,11 +694,13 @@ function TripEditor() {
             zone={zone}
             selectedZone={selectedZone}
             onZoneClick={handleZoneClick}
+            filledBlocks={filledBlocks}
+            scrollToExperiences={scrollToExperiences}
           />
         </section>
 
         {/* Pacchetti disponibili */}
-        <section className={styles.section}>
+        <section ref={packagesRef} className={styles.section}>
           <div className={styles.packagesHeader}>
             <h3 className={styles.sectionTitle}>
               📦 Pacchetti Esperienza Disponibili
@@ -705,7 +738,12 @@ function TripEditor() {
       </div>
 
       {/* Sonner Toaster for notifications */}
-      <Toaster position="top-right" richColors />
+      <Toaster
+        position="top-right"
+        richColors
+        duration={3000}
+        closeButton
+      />
 
       {/* PEXP Tab (fullscreen) */}
       {activeTab === 'pexp' && currentPexp && (
