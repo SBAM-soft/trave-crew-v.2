@@ -80,6 +80,9 @@ function TripEditor() {
   // State per animazione creazione itinerario
   const [creatingItinerary, setCreatingItinerary] = useState(false);
 
+  // State per sticky day blocks
+  const [isDayBlocksSticky, setIsDayBlocksSticky] = useState(false);
+
   // Ref per la sezione pacchetti (per scroll automatico)
   const packagesRef = useRef(null);
 
@@ -106,6 +109,20 @@ function TripEditor() {
       });
     }
   }, [loading, editMode, filledBlocks.length, totalDays]);
+
+  // Scroll listener per sticky day blocks
+  useEffect(() => {
+    const handleScroll = () => {
+      if (dayBlocksRef.current) {
+        const rect = dayBlocksRef.current.getBoundingClientRect();
+        // Se il blocco giorni è scrollato oltre la top (sopra il viewport), rendilo sticky
+        setIsDayBlocksSticky(rect.top <= 0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const loadData = async () => {
     try {
@@ -722,7 +739,7 @@ function TripEditor() {
 
       {/* Contenuto principale */}
       <div className={styles.content}>
-        {/* Blocchi giorni - SEMPRE IN ALTO */}
+        {/* Blocchi giorni - Diventa sticky allo scroll */}
         <section ref={dayBlocksRef} className={styles.section}>
           <DayBlocksGrid
             totalDays={totalDays}
@@ -730,6 +747,7 @@ function TripEditor() {
             onBlockClick={handleBlockClick}
             onAddDay={handleAddDay}
             onRemoveDay={handleRemoveDay}
+            sticky={isDayBlocksSticky}
           />
         </section>
 
