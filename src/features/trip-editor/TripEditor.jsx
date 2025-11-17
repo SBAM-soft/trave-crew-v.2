@@ -77,6 +77,9 @@ function TripEditor() {
   const [costiAccessori, setCostiAccessori] = useState([]);
   const [plus, setPlus] = useState([]);
 
+  // State per animazione creazione itinerario
+  const [creatingItinerary, setCreatingItinerary] = useState(false);
+
   // Ref per la sezione pacchetti (per scroll automatico)
   const packagesRef = useRef(null);
 
@@ -307,6 +310,35 @@ function TripEditor() {
     // MODALITÀ NORMALE - Aggiungi nuovi blocchi
     // Calcola giorni necessari (1 esperienza = 1 giorno)
     const experienceDays = validExperiences.length;
+    const availableDays = totalDays - 1 - filledBlocks.length; // -1 per il giorno di arrivo
+
+    // Validazione: controlla se ci sono abbastanza giorni disponibili
+    if (experienceDays > availableDays) {
+      const giornoOGiorni = experienceDays === 1 ? 'giorno' : 'giorni';
+      const giornoOGiorni2 = availableDays === 1 ? 'giorno' : 'giorni';
+
+      // Mostra alert chiedendo se vuole aggiungere giorni
+      const shouldAddDays = window.confirm(
+        `⚠️ Il pacchetto richiede ${experienceDays} ${giornoOGiorni}, ma hai solo ${availableDays} ${giornoOGiorni2} disponibili.\n\n` +
+        `Vuoi aggiungere ${experienceDays - availableDays} ${giornoOGiorni} al viaggio?`
+      );
+
+      if (shouldAddDays) {
+        // Aggiungi giorni necessari
+        const newTotalDays = totalDays + (experienceDays - availableDays);
+        setTotalDays(newTotalDays);
+
+        toast.success('Giorni aggiunti al viaggio!', {
+          description: `Il viaggio ora dura ${newTotalDays} giorni`,
+        });
+      } else {
+        // L'utente ha rifiutato, non aggiungere il pacchetto
+        toast.info('Pacchetto non aggiunto', {
+          description: 'Seleziona un pacchetto più piccolo o aggiungi giorni al viaggio',
+        });
+        return;
+      }
+    }
 
     // Riempi blocchi giorni con le esperienze
     const newBlocks = [];
@@ -368,7 +400,7 @@ function TripEditor() {
     });
   };
 
-  // Handler dislike esperienza - Rimuove e suggerisce alternative
+  // Handler dislike esperienza - Rimuove e compatta i giorni successivi
   const handleDislikeExperience = (exp) => {
     // Trova il blocco che contiene questa esperienza
     const blockToRemove = filledBlocks.find(b =>
@@ -386,8 +418,18 @@ function TripEditor() {
     const dayNumber = blockToRemove.day;
     const zonaNome = blockToRemove.zona || '';
 
-    // Rimuovi il blocco
-    const updatedBlocks = filledBlocks.filter(b => b.day !== dayNumber);
+    // Rimuovi il blocco e compatta i giorni successivi
+    const updatedBlocks = filledBlocks
+      .filter(b => b.day !== dayNumber)
+      .map(b => {
+        // Sposta indietro i giorni successivi per riempire il vuoto
+        if (b.day > dayNumber) {
+          return { ...b, day: b.day - 1 };
+        }
+        return b;
+      })
+      .sort((a, b) => a.day - b.day);
+
     setFilledBlocks(updatedBlocks);
 
     // Chiudi la tab e resetta stati
@@ -396,34 +438,11 @@ function TripEditor() {
     setCurrentPexp(null);
     setEditingBlock(null);
 
-    // Cerca alternative nella stessa zona
-    const alternativePacchetti = pacchetti.filter(p => {
-      const pZona = (p.ZONA || p.zona_nome || '').toUpperCase().trim();
-      const targetZona = zonaNome.toUpperCase().trim();
-      return pZona === targetZona && (p.NOME_PACCHETTO || p.NOME || p.nome) !== blockToRemove.packageName;
-    });
-
     // Feedback utente
-    if (alternativePacchetti.length > 0) {
-      toast.success('Esperienza rimossa', {
-        description: `Puoi scegliere tra ${alternativePacchetti.length} alternative nella zona ${zonaNome}`,
-        duration: 5000,
-      });
-
-      // Mostra la tab PEXP con le alternative per quella zona
-      const zonaObj = zone.find(z =>
-        (z.nome || z.NOME || '').toUpperCase().trim() === zonaNome.toUpperCase().trim()
-      );
-      if (zonaObj) {
-        setSelectedZone(zonaObj);
-        setActiveTab('pexp');
-      }
-    } else {
-      toast.info('Esperienza rimossa', {
-        description: 'Seleziona una nuova zona o pacchetto dalla mappa',
-        duration: 4000,
-      });
-    }
+    toast.success('Esperienza rimossa', {
+      description: `Giorno ${dayNumber} eliminato. I giorni successivi sono stati riorganizzati.`,
+      duration: 4000,
+    });
   };
 
   // Handler click blocco giorno - Permette modifica o rimozione
@@ -532,12 +551,65 @@ function TripEditor() {
     });
   };
 
-  // Handler crea itinerario (🆕 con logica zone visitate e selezione hotel)
-  const handleCreateItinerary = () => {
+  // Handler aggiungi giorno
+  const handleAddDay = () => {
+    const newTotalDays = totalDays + 1;
+    setTotalDays(newTotalDays);
+
+    toast.success('Giorno aggiunto!', {
+      description: `Il viaggio ora dura ${newTotalDays} giorni`,
+    });
+  };
+
+  // Handler rimuovi giorno
+  const handleRemoveDay = (day) => {
+    if (day === 1) {
+      toast.error('Non puoi rimuovere il giorno di arrivo');
+      return;
+    }
+
+    // Controlla se il giorno ha un'esperienza associata
+    const hasExperience = filledBlocks.some(b => b.day === day);
+
+    if (hasExperience) {
+      const shouldRemove = window.confirm(
+        `⚠️ Il giorno ${day} ha un'esperienza associata.\n\nSei sicuro di voler rimuovere questo giorno? L'esperienza verrà eliminata.`
+      );
+
+      if (!shouldRemove) {
+        return;
+      }
+    }
+
+    // Controlla se è l'ultimo giorno
+    const isLastDay = day === totalDays;
+
+    if (isLastDay) {
+      // Rimuovi l'ultimo giorno
+      const updatedBlocks = filledBlocks.filter(b => b.day !== day);
+      setFilledBlocks(updatedBlocks);
+      setTotalDays(totalDays - 1);
+
+      toast.success('Giorno rimosso!', {
+        description: `Il viaggio ora dura ${totalDays - 1} giorni`,
+      });
+    } else {
+      toast.error('Puoi rimuovere solo l\'ultimo giorno');
+    }
+  };
+
+  // Handler crea itinerario (🆕 con logica zone visitate e selezione hotel + animazione)
+  const handleCreateItinerary = async () => {
     if (filledBlocks.length < totalDays - 1) {
       toast.warning('Completa tutti i giorni prima di continuare!');
       return;
     }
+
+    // Attiva animazione
+    setCreatingItinerary(true);
+
+    // Simula elaborazione (minimo 3 secondi)
+    const startTime = Date.now();
 
     // 🆕 Estrai zone visitate usando la nuova utility
     const zoneVisitate = getZoneVisitate(filledBlocks);
@@ -545,6 +617,7 @@ function TripEditor() {
     console.log('🗺️ Zone visitate:', zoneVisitate);
 
     if (zoneVisitate.length === 0) {
+      setCreatingItinerary(false);
       toast.error('Errore: nessuna zona trovata nei pacchetti confermati');
       return;
     }
@@ -579,6 +652,12 @@ function TripEditor() {
       }
     }
 
+    // Assicura che siano passati almeno 3 secondi
+    const elapsedTime = Date.now() - startTime;
+    const remainingTime = Math.max(0, 3000 - elapsedTime);
+
+    await new Promise(resolve => setTimeout(resolve, remainingTime));
+
     // 🆕 Naviga alla selezione hotel passando le zone visitate
     navigate('/hotel-selection', {
       state: {
@@ -597,6 +676,8 @@ function TripEditor() {
     toast.success('Itinerario completato!', {
       description: 'Ora seleziona gli hotel per le zone visitate'
     });
+
+    setCreatingItinerary(false);
   };
 
   // Rendering
@@ -647,6 +728,8 @@ function TripEditor() {
             totalDays={totalDays}
             filledBlocks={filledBlocks}
             onBlockClick={handleBlockClick}
+            onAddDay={handleAddDay}
+            onRemoveDay={handleRemoveDay}
           />
         </section>
 
@@ -771,6 +854,28 @@ function TripEditor() {
           destinazione={wizardData.destinazione}
           zona={selectedZone?.nome || ''}
         />
+      )}
+
+      {/* Animazione creazione itinerario */}
+      {creatingItinerary && (
+        <div className={styles.creatingOverlay}>
+          <div className={styles.creatingContent}>
+            <div className={styles.creatingSpinner}>
+              <div className={styles.spinnerRing}></div>
+              <div className={styles.spinnerRing}></div>
+              <div className={styles.spinnerRing}></div>
+            </div>
+            <h2 className={styles.creatingTitle}>✨ Creazione itinerario in corso...</h2>
+            <p className={styles.creatingText}>
+              Stiamo ottimizzando il tuo viaggio perfetto
+            </p>
+            <div className={styles.creatingSteps}>
+              <div className={styles.step}>📍 Analisi zone visitate</div>
+              <div className={styles.step}>🏨 Ricerca hotel disponibili</div>
+              <div className={styles.step}>💰 Calcolo costi ottimali</div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

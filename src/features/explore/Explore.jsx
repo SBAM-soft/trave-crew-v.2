@@ -27,9 +27,19 @@ function Explore() {
     const fetchViaggi = async () => {
       try {
         setLoading(true);
-        const data = await loadCSV('/data/viaggi.csv');
-        setViaggi(data);
-        setViaggiFiltrati(data);
+
+        // Carica viaggi dal CSV
+        const csvData = await loadCSV('/data/viaggi.csv');
+
+        // Carica viaggi pubblicati dagli utenti dal localStorage
+        const EXPLORE_TRIPS_KEY = 'trave_crew_explore_trips';
+        const userTrips = JSON.parse(localStorage.getItem(EXPLORE_TRIPS_KEY) || '[]');
+
+        // Combina i due set di dati
+        const allTrips = [...csvData, ...userTrips];
+
+        setViaggi(allTrips);
+        setViaggiFiltrati(allTrips);
       } catch (err) {
         console.error('Errore:', err);
         setError('Impossibile caricare i viaggi');

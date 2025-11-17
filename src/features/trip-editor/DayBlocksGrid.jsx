@@ -2,7 +2,7 @@ import { memo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './DayBlocksGrid.module.css';
 
-function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = false, sticky = false, stickyCompact = false }) {
+function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, onAddDay, onRemoveDay, compact = false, sticky = false, stickyCompact = false }) {
   // Crea array di blocchi (1 giorno = 1 blocco)
   const blocks = Array.from({ length: totalDays }, (_, i) => i + 1);
 
@@ -102,6 +102,24 @@ function DayBlocksGrid({ totalDays, filledBlocks = [], onBlockClick, compact = f
             </div>
           );
         })}
+
+        {/* Bottone + per aggiungere giorno */}
+        {!compact && !sticky && !stickyCompact && onAddDay && (
+          <button
+            className={styles.addDayButton}
+            onClick={onAddDay}
+            title="Aggiungi un giorno"
+          >
+            <div className={styles.addDayIcon}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+              </svg>
+            </div>
+            <span className={styles.addDayLabel}>Aggiungi giorno</span>
+          </button>
+        )}
       </div>
 
       {/* Legenda */}
@@ -137,6 +155,8 @@ DayBlocksGrid.propTypes = {
     ])
   ),
   onBlockClick: PropTypes.func,
+  onAddDay: PropTypes.func,
+  onRemoveDay: PropTypes.func,
   compact: PropTypes.bool,
   sticky: PropTypes.bool,
   stickyCompact: PropTypes.bool,
