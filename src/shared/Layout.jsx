@@ -37,6 +37,14 @@ function Layout({ children }) {
                   I miei viaggi
                 </Link>
               )}
+              {isLoggedIn && (
+                <Link
+                  to="/wallet"
+                  className={location.pathname === '/wallet' ? styles.active : ''}
+                >
+                  💼 Wallet
+                </Link>
+              )}
               <Link
                 to="/create"
                 className={`${styles.btnCreate} ${location.pathname === '/create' ? styles.active : ''}`}

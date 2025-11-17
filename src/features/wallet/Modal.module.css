@@ -1,0 +1,351 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid var(--border-color, #f0f0f0);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color, #1a1a1a);
+  margin: 0;
+}
+
+.closeBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-secondary, #f8f9fa);
+  border: none;
+  color: var(--text-secondary, #666);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn:hover {
+  background: var(--bg-hover, #e9ecef);
+  color: var(--text-color, #1a1a1a);
+  transform: rotate(90deg);
+}
+
+form {
+  padding: 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: var(--bg-secondary, #f8f9fa);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color, #667eea);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-tertiary, #999);
+}
+
+.buttonGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.typeBtn,
+.presetBtn {
+  padding: 0.875rem 1rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  background: white;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary, #666);
+}
+
+.typeBtn:hover,
+.presetBtn:hover {
+  border-color: var(--primary-color, #667eea);
+  color: var(--primary-color, #667eea);
+  transform: translateY(-2px);
+}
+
+.typeBtn.active,
+.presetBtn.active {
+  background: var(--primary-color, #667eea);
+  border-color: var(--primary-color, #667eea);
+  color: white;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.amountInput {
+  position: relative;
+}
+
+.currency {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  color: var(--text-secondary, #666);
+  font-size: 1.125rem;
+}
+
+.amountInput .input {
+  padding-left: 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.paymentMethodsList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.paymentMethodOption {
+  display: block;
+  padding: 1rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.paymentMethodOption:hover {
+  border-color: var(--primary-color, #667eea);
+  background: rgba(102, 126, 234, 0.02);
+}
+
+.paymentMethodOption.selected {
+  border-color: var(--primary-color, #667eea);
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.radio {
+  display: none;
+}
+
+.methodContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.methodIcon {
+  font-size: 2rem;
+}
+
+.methodDetails {
+  flex: 1;
+}
+
+.methodName {
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+  margin-bottom: 0.25rem;
+}
+
+.methodInfo {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+}
+
+.defaultBadge {
+  background: var(--primary-color, #667eea);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.warningBox {
+  padding: 1rem;
+  background: rgba(255, 152, 0, 0.1);
+  border: 2px solid rgba(255, 152, 0, 0.3);
+  border-radius: 12px;
+  color: #ff9800;
+  font-weight: 600;
+  text-align: center;
+}
+
+.summary {
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  color: var(--text-secondary, #666);
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+}
+
+.summaryDivider {
+  height: 2px;
+  background: var(--border-color, #e0e0e0);
+  margin: 0.5rem 0;
+}
+
+.summaryLabel {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--text-color, #1a1a1a);
+}
+
+.summaryTotal {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: var(--primary-color, #667eea);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cancelBtn,
+.submitBtn {
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.cancelBtn {
+  background: var(--bg-secondary, #f8f9fa);
+  color: var(--text-secondary, #666);
+}
+
+.cancelBtn:hover {
+  background: var(--bg-hover, #e9ecef);
+  color: var(--text-color, #1a1a1a);
+}
+
+.submitBtn {
+  background: var(--primary-color, #667eea);
+  color: white;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--primary-dark, #5568d3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.submitBtn:disabled {
+  background: var(--bg-secondary, #e0e0e0);
+  color: var(--text-tertiary, #999);
+  cursor: not-allowed;
+}
+
+.securityNote {
+  padding: 1rem 1.5rem;
+  background: rgba(76, 175, 80, 0.05);
+  border-top: 2px solid rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .modal {
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    margin-top: auto;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
