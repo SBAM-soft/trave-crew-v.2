@@ -23,7 +23,12 @@ function TripSummary() {
     totalDays = 7,
     selectedHotels = [],
     zoneVisitate = [],
-    timeline = []
+    timeline = [],
+    needsHotelSelection = false,
+    itinerario = null,
+    costiAccessori = [],
+    extraSuggeriti = [],
+    plus = []
   } = tripData;
 
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -192,6 +197,22 @@ function TripSummary() {
   // Handler procedi pagamento
   const handleProceedToPayment = () => {
     setShowCheckout(true);
+  };
+
+  // Handler procedi alla selezione hotel
+  const handleProceedToHotelSelection = () => {
+    navigate('/hotel-selection', {
+      state: {
+        wizardData,
+        filledBlocks,
+        totalDays,
+        zoneVisitate,
+        itinerario,
+        costiAccessori,
+        extraSuggeriti,
+        plus
+      }
+    });
   };
 
   // Handler pubblica viaggio nella sezione esplora
@@ -495,48 +516,57 @@ function TripSummary() {
               ← Indietro
             </Button>
 
-            <div className={styles.exportButtonWrapper}>
-              <Button variant="outline" onClick={() => setShowExportMenu(!showExportMenu)}>
-                📤 Esporta
+            {/* Se l'utente deve ancora selezionare gli hotel, mostra solo il pulsante per la selezione hotel */}
+            {needsHotelSelection ? (
+              <Button variant="primary" onClick={handleProceedToHotelSelection} size="lg">
+                🏨 Continua alla Selezione Hotel
               </Button>
-              {showExportMenu && (
-                <div className={styles.exportMenu}>
-                  <button className={styles.exportOption} onClick={() => handleExport('text')}>
-                    📄 Scarica Testo
-                  </button>
-                  <button className={styles.exportOption} onClick={() => handleExport('json')}>
-                    📋 Esporta JSON
-                  </button>
-                  <button className={styles.exportOption} onClick={() => handleExport('clipboard')}>
-                    📋 Copia Clipboard
-                  </button>
-                  <button className={styles.exportOption} onClick={() => handleExport('pdf')}>
-                    📕 Scarica PDF
-                  </button>
+            ) : (
+              <>
+                <div className={styles.exportButtonWrapper}>
+                  <Button variant="outline" onClick={() => setShowExportMenu(!showExportMenu)}>
+                    📤 Esporta
+                  </Button>
+                  {showExportMenu && (
+                    <div className={styles.exportMenu}>
+                      <button className={styles.exportOption} onClick={() => handleExport('text')}>
+                        📄 Scarica Testo
+                      </button>
+                      <button className={styles.exportOption} onClick={() => handleExport('json')}>
+                        📋 Esporta JSON
+                      </button>
+                      <button className={styles.exportOption} onClick={() => handleExport('clipboard')}>
+                        📋 Copia Clipboard
+                      </button>
+                      <button className={styles.exportOption} onClick={() => handleExport('pdf')}>
+                        📕 Scarica PDF
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <Button variant="outline" onClick={handleSaveTrip} disabled={saving}>
-              {saving ? 'Salvataggio...' : '💾 Salva Viaggio'}
-            </Button>
+                <Button variant="outline" onClick={handleSaveTrip} disabled={saving}>
+                  {saving ? 'Salvataggio...' : '💾 Salva Viaggio'}
+                </Button>
 
-            <Button
-              variant="outline"
-              onClick={handlePublishTrip}
-              disabled={publishing || isPublished}
-              style={{
-                background: isPublished ? '#10b981' : 'transparent',
-                color: isPublished ? 'white' : '#667eea',
-                borderColor: isPublished ? '#10b981' : '#667eea'
-              }}
-            >
-              {publishing ? '⏳ Pubblicazione...' : isPublished ? '✓ Pubblicato' : '🌍 Pubblica'}
-            </Button>
+                <Button
+                  variant="outline"
+                  onClick={handlePublishTrip}
+                  disabled={publishing || isPublished}
+                  style={{
+                    background: isPublished ? '#10b981' : 'transparent',
+                    color: isPublished ? 'white' : '#667eea',
+                    borderColor: isPublished ? '#10b981' : '#667eea'
+                  }}
+                >
+                  {publishing ? '⏳ Pubblicazione...' : isPublished ? '✓ Pubblicato' : '🌍 Pubblica'}
+                </Button>
 
-            <Button variant="primary" onClick={handleProceedToPayment} size="lg">
-              💳 Procedi al Pagamento
-            </Button>
+                <Button variant="primary" onClick={handleProceedToPayment} size="lg">
+                  💳 Procedi al Pagamento
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

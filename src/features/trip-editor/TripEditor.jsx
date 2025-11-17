@@ -678,7 +678,7 @@ function TripEditor() {
     }
   };
 
-  // Handler crea itinerario (🆕 con logica zone visitate e selezione hotel + animazione)
+  // Handler crea itinerario (🆕 con logica zone visitate e mostra Trip Summary dopo l'animazione)
   const handleCreateItinerary = async () => {
     if (filledBlocks.length < totalDays - 1) {
       toast.warning('Completa tutti i giorni prima di continuare!');
@@ -738,8 +738,8 @@ function TripEditor() {
 
     await new Promise(resolve => setTimeout(resolve, remainingTime));
 
-    // 🆕 Naviga alla selezione hotel passando le zone visitate
-    navigate('/hotel-selection', {
+    // 🆕 Naviga a Trip Summary DOPO l'animazione (non più a hotel-selection)
+    navigate('/trip-summary', {
       state: {
         wizardData,
         filledBlocks,
@@ -749,12 +749,14 @@ function TripEditor() {
         itinerario: itinerarioMatch,
         costiAccessori: costiAccessoriItinerario,
         extraSuggeriti: extraSuggeriti,
-        plus: plus // Passa il database plus per gli extra hotel
+        plus: plus, // Passa il database plus per gli extra hotel
+        // Flag per indicare che l'utente deve ancora selezionare gli hotel
+        needsHotelSelection: true
       }
     });
 
     toast.success('Itinerario completato!', {
-      description: 'Ora seleziona gli hotel per le zone visitate'
+      description: 'Vedi il bellissimo riassunto del tuo viaggio'
     });
 
     setCreatingItinerary(false);
