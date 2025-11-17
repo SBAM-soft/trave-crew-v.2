@@ -26,7 +26,7 @@ function TripSummary() {
     timeline = [],
     needsHotelSelection = false,
     itinerario = null,
-    costiAccessori = [],
+    costiAccessori: costiAccessoriItinerario = [],
     extraSuggeriti = [],
     plus = []
   } = tripData;
@@ -208,7 +208,7 @@ function TripSummary() {
         totalDays,
         zoneVisitate,
         itinerario,
-        costiAccessori,
+        costiAccessori: costiAccessoriItinerario,
         extraSuggeriti,
         plus
       }
