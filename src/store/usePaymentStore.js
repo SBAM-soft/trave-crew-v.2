@@ -22,7 +22,7 @@ const usePaymentStore = create(
         transactions: [
           ...state.transactions,
           {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             type: 'deposit',
             amount: amount,
             date: new Date().toISOString(),
@@ -41,7 +41,7 @@ const usePaymentStore = create(
           transactions: [
             ...state.transactions,
             {
-              id: Date.now().toString(),
+              id: crypto.randomUUID(),
               type: 'withdrawal',
               amount: amount,
               date: new Date().toISOString(),
@@ -58,7 +58,7 @@ const usePaymentStore = create(
           ...state.paymentMethods,
           {
             ...method,
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             addedAt: new Date().toISOString()
           }
         ]
@@ -81,7 +81,7 @@ const usePaymentStore = create(
           ...state.transactions,
           {
             ...transaction,
-            id: transaction.id || Date.now().toString(),
+            id: transaction.id || crypto.randomUUID(),
             date: transaction.date || new Date().toISOString(),
             status: transaction.status || 'completed'
           }
@@ -100,46 +100,36 @@ const usePaymentStore = create(
 
       // ================ PAYMENTS ================
       processPayment: (paymentData) => {
+        // Validazione saldo wallet se pagamento da wallet
         const state = get();
+        if (paymentData.paymentMethod === 'wallet' && state.walletBalance < paymentData.amount) {
+          throw new Error('Saldo wallet insufficiente');
+        }
 
-        // Simula elaborazione pagamento
+        const transactionId = crypto.randomUUID();
         const transaction = {
-          id: Date.now().toString(),
+          id: transactionId,
           type: 'payment',
           amount: paymentData.amount,
           tripId: paymentData.tripId,
           tripName: paymentData.tripName,
           date: new Date().toISOString(),
-          status: 'processing',
+          status: 'completed',
+          completedAt: new Date().toISOString(),
           description: paymentData.description || `Pagamento viaggio ${paymentData.tripName}`,
           paymentMethod: paymentData.paymentMethod,
           splitDetails: paymentData.splitDetails
         };
 
+        // Update atomico senza race condition
         set((state) => ({
-          pendingPayments: [...state.pendingPayments, transaction]
+          transactions: [...state.transactions, transaction],
+          walletBalance: paymentData.paymentMethod === 'wallet'
+            ? state.walletBalance - paymentData.amount
+            : state.walletBalance
         }));
 
-        // Simula ritardo elaborazione
-        setTimeout(() => {
-          set((state) => {
-            const updatedTransaction = {
-              ...transaction,
-              status: 'completed',
-              completedAt: new Date().toISOString()
-            };
-
-            return {
-              pendingPayments: state.pendingPayments.filter(p => p.id !== transaction.id),
-              transactions: [...state.transactions, updatedTransaction],
-              walletBalance: paymentData.paymentMethod === 'wallet'
-                ? state.walletBalance - paymentData.amount
-                : state.walletBalance
-            };
-          });
-        }, 2000);
-
-        return transaction.id;
+        return transactionId;
       },
 
       // ================ SPLIT PAYMENTS ================
@@ -194,36 +184,28 @@ const usePaymentStore = create(
           throw new Error('Transazione non trovata');
         }
 
+        const refundTransactionId = crypto.randomUUID();
         const refundTransaction = {
-          id: Date.now().toString(),
+          id: refundTransactionId,
           type: 'refund',
           amount: transaction.amount,
           originalTransactionId: transactionId,
           tripId: transaction.tripId,
           tripName: transaction.tripName,
           date: new Date().toISOString(),
-          status: 'pending',
+          status: 'completed',
+          completedAt: new Date().toISOString(),
           description: `Rimborso: ${transaction.description}`,
           reason
         };
 
+        // Update atomico senza race condition
         set((state) => ({
-          transactions: [...state.transactions, refundTransaction]
+          transactions: [...state.transactions, refundTransaction],
+          walletBalance: state.walletBalance + transaction.amount
         }));
 
-        // Simula elaborazione rimborso
-        setTimeout(() => {
-          set((state) => ({
-            transactions: state.transactions.map(t =>
-              t.id === refundTransaction.id
-                ? { ...t, status: 'completed', completedAt: new Date().toISOString() }
-                : t
-            ),
-            walletBalance: state.walletBalance + transaction.amount
-          }));
-        }, 3000);
-
-        return refundTransaction.id;
+        return refundTransactionId;
       },
 
       // ================ UTILITIES ================

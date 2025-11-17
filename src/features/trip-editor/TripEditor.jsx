@@ -337,6 +337,64 @@ function TripEditor() {
     });
   };
 
+  // Handler dislike esperienza - Rimuove e suggerisce alternative
+  const handleDislikeExperience = (exp) => {
+    // Trova il blocco che contiene questa esperienza
+    const blockToRemove = filledBlocks.find(b =>
+      b.experience?.nome === exp.nome ||
+      b.experience?.NOME === exp.NOME ||
+      b.experience?.codice === exp.codice
+    );
+
+    if (!blockToRemove) {
+      toast.error('Esperienza non trovata nel viaggio');
+      handleCloseDetexpTab();
+      return;
+    }
+
+    const dayNumber = blockToRemove.day;
+    const zonaNome = blockToRemove.zona || '';
+
+    // Rimuovi il blocco
+    const updatedBlocks = filledBlocks.filter(b => b.day !== dayNumber);
+    setFilledBlocks(updatedBlocks);
+
+    // Chiudi la tab e resetta stati
+    setActiveTab(null);
+    setCurrentExp(null);
+    setCurrentPexp(null);
+    setEditingBlock(null);
+
+    // Cerca alternative nella stessa zona
+    const alternativePacchetti = pacchetti.filter(p => {
+      const pZona = (p.ZONA || p.zona_nome || '').toUpperCase().trim();
+      const targetZona = zonaNome.toUpperCase().trim();
+      return pZona === targetZona && (p.NOME_PACCHETTO || p.NOME || p.nome) !== blockToRemove.packageName;
+    });
+
+    // Feedback utente
+    if (alternativePacchetti.length > 0) {
+      toast.success('Esperienza rimossa', {
+        description: `Puoi scegliere tra ${alternativePacchetti.length} alternative nella zona ${zonaNome}`,
+        duration: 5000,
+      });
+
+      // Mostra la tab PEXP con le alternative per quella zona
+      const zonaObj = zone.find(z =>
+        (z.nome || z.NOME || '').toUpperCase().trim() === zonaNome.toUpperCase().trim()
+      );
+      if (zonaObj) {
+        setSelectedZone(zonaObj);
+        setActiveTab('pexp');
+      }
+    } else {
+      toast.info('Esperienza rimossa', {
+        description: 'Seleziona una nuova zona o pacchetto dalla mappa',
+        duration: 4000,
+      });
+    }
+  };
+
   // Handler click blocco giorno - Permette modifica o rimozione
   const handleBlockClick = (day) => {
     // Trova il blocco corrispondente
@@ -669,8 +727,11 @@ function TripEditor() {
         <DETEXPTab
           exp={currentExp}
           onClose={handleCloseDetexpTab}
+          onDislike={handleDislikeExperience}
           totalDays={totalDays}
           filledBlocks={filledBlocks}
+          destinazione={wizardData.destinazione}
+          zona={selectedZone?.nome || ''}
         />
       )}
     </div>

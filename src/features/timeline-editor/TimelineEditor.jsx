@@ -5,6 +5,7 @@ import Button from '../../shared/Button';
 import DayTimeline from './DayTimeline';
 import AnimazioneAI from '../trip-editor/AnimazioneAI';
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard, generateShareLink } from '../../core/utils/exportHelpers';
+import { toPrice } from '../../core/utils/typeHelpers';
 import styles from './TimelineEditor.module.css';
 
 function TimelineEditor() {
@@ -89,7 +90,7 @@ function TimelineEditor() {
     timeline.forEach(day => {
       if (day.experiences && day.experiences.length > 0) {
         day.experiences.forEach(exp => {
-          total += exp.prezzo || 0;
+          total += toPrice(exp.prezzo, 0);
         });
       }
     });

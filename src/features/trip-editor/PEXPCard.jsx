@@ -2,6 +2,7 @@ import { memo } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../shared/Button';
 import Card from '../../shared/Card';
+import { toInt, toPrice } from '../../core/utils/typeHelpers';
 import styles from './PEXPCard.module.css';
 
 function PEXPCard({ pexp, onClick, isSelected = false }) {
@@ -17,12 +18,12 @@ function PEXPCard({ pexp, onClick, isSelected = false }) {
   }
 
   // Compatibilità CSV: estrai valori da struttura CSV o mock
-  const notti = pexp.MIN_NOTTI || pexp.notti || 2;
+  const notti = toInt(pexp.MIN_NOTTI || pexp.notti, 2);
   const giorniTotali = notti + 1;
   const nome = pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome || 'Pacchetto esperienza';
   const descrizione = pexp.DESCRIZIONE || pexp.storytelling?.intro || 'Scopri questo fantastico pacchetto di esperienze';
   const zona = pexp.ZONA || pexp.zona_nome || 'Zona non specificata';
-  const prezzo = pexp.PRX_PAX || pexp.prezzo_base || 0;
+  const prezzo = toPrice(pexp.PRX_PAX || pexp.prezzo_base, 0);
 
   // Conta esperienze dal CSV (campi DAY*_ESPERIENZA_STD)
   const countExperiences = () => {

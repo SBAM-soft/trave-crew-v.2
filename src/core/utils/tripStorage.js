@@ -22,7 +22,7 @@ export const saveTrip = (tripData, category = 'saved') => {
     const trips = getAllTrips();
 
     const newTrip = {
-      id: Date.now(), // ID univoco basato su timestamp
+      id: crypto.randomUUID(), // ID univoco garantito
       ...tripData,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -214,7 +214,7 @@ export const saveTripComplete = (tripData, category = 'saved') => {
     const zoneVisitate = tripData.zoneVisitate?.map(z => z.nome).join(', ') || '';
 
     const newTrip = {
-      id: tripData.id || Date.now(),
+      id: tripData.id || crypto.randomUUID(),
       destinazione: tripData.wizardData?.destinazione || 'Destinazione',
       zona: zoneVisitate,
       dataPartenza: tripData.wizardData?.dataPartenza || null,

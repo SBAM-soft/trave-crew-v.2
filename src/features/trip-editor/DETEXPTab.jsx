@@ -18,6 +18,7 @@ import styles from './DETEXPTab.module.css';
 function DETEXPTab({
   exp,
   onClose,
+  onDislike,
   totalDays = 7,
   filledBlocks = [],
   destinazione = '',
@@ -90,8 +91,14 @@ function DETEXPTab({
   };
 
   const handleDislike = () => {
-    toast.info('Esperienza rifiutata');
-    onClose();
+    if (onDislike) {
+      // Chiama il callback del parent che gestisce la rimozione e ricerca alternative
+      onDislike(exp);
+    } else {
+      // Fallback se onDislike non è fornito
+      toast.info('Esperienza rifiutata');
+      onClose();
+    }
   };
 
   return (
@@ -231,6 +238,7 @@ DETEXPTab.propTypes = {
     prezzo: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,
   onClose: PropTypes.func.isRequired,
+  onDislike: PropTypes.func,
   totalDays: PropTypes.number,
   filledBlocks: PropTypes.array,
   destinazione: PropTypes.string,
