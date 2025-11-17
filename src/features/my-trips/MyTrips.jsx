@@ -72,6 +72,21 @@ function MyTrips() {
     }
   };
 
+  // Handler pagamento viaggio
+  const handlePaymentTrip = (trip) => {
+    // Naviga al trip summary con i dati del viaggio per procedere al pagamento
+    navigate('/trip-summary', {
+      state: {
+        wizardData: trip.wizardData,
+        filledBlocks: trip.filledBlocks,
+        totalDays: trip.giorni,
+        selectedHotels: trip.selectedHotels || [],
+        zoneVisitate: trip.zoneVisitate || [],
+        timeline: trip.timeline || []
+      }
+    });
+  };
+
   // Handler esporta viaggio
   const handleExportTrip = (tripId) => {
     const success = exportTripAsJSON(tripId);
@@ -362,6 +377,13 @@ function MyTrips() {
                             onClick={() => handleEditTrip(trip)}
                           >
                             ✏️ Modifica
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handlePaymentTrip(trip)}
+                          >
+                            💳 Paga
                           </Button>
                           <Button
                             variant="primary"

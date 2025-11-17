@@ -76,6 +76,7 @@ function TripEditor() {
   const [itinerari, setItinerari] = useState([]);
   const [costiAccessori, setCostiAccessori] = useState([]);
   const [plus, setPlus] = useState([]);
+  const [esperienze, setEsperienze] = useState([]);
 
   // State per animazione creazione itinerario
   const [creatingItinerary, setCreatingItinerary] = useState(false);
@@ -130,21 +131,23 @@ function TripEditor() {
 
       console.log('📥 Caricamento CSV in corso...');
 
-      // Carica tutti i CSV necessari (🆕 aggiunti itinerario, plus, costi_accessori)
+      // Carica tutti i CSV necessari (🆕 aggiunti itinerario, plus, costi_accessori, esperienze)
       const [
         destinazioniData,
         zoneData,
         pacchettiData,
         itinerariData,
         plusData,
-        costiAccessoriData
+        costiAccessoriData,
+        esperienzeData
       ] = await Promise.all([
         loadCSV('destinazioni.csv').catch(e => { console.error('❌ Errore destinazioni.csv:', e); return []; }),
         loadCSV('zone.csv').catch(e => { console.error('❌ Errore zone.csv:', e); return []; }),
         loadCSV('pacchetti.csv').catch(e => { console.error('❌ Errore pacchetti.csv:', e); return []; }),
         loadCSV('itinerario.csv').catch(e => { console.error('❌ Errore itinerario.csv:', e); return []; }),
         loadCSV('plus.csv').catch(e => { console.error('❌ Errore plus.csv:', e); return []; }),
-        loadCSV('costi_accessori.csv').catch(e => { console.error('❌ Errore costi_accessori.csv:', e); return []; })
+        loadCSV('costi_accessori.csv').catch(e => { console.error('❌ Errore costi_accessori.csv:', e); return []; }),
+        loadCSV('esperienze.csv').catch(e => { console.error('❌ Errore esperienze.csv:', e); return []; })
       ]);
 
       console.log('✅ CSV caricati:', {
@@ -153,7 +156,8 @@ function TripEditor() {
         pacchetti: pacchettiData.length,
         itinerari: itinerariData.length,
         plus: plusData.length,
-        costiAccessori: costiAccessoriData.length
+        costiAccessori: costiAccessoriData.length,
+        esperienze: esperienzeData.length
       });
 
       // Trova destinazione selezionata (case-insensitive + trim)
@@ -196,10 +200,11 @@ function TripEditor() {
       console.log('📦 Pacchetti caricati:', destPacchetti.length, destPacchetti);
       setPacchetti(destPacchetti);
 
-      // Salva database itinerari, plus e costi accessori (🆕)
+      // Salva database itinerari, plus, costi accessori e esperienze (🆕)
       setItinerari(itinerariData);
       setPlus(plusData);
       setCostiAccessori(costiAccessoriData);
+      setEsperienze(esperienzeData);
 
       setLoading(false);
     } catch (err) {
@@ -357,6 +362,20 @@ function TripEditor() {
       }
     }
 
+    // Validazione: controlla esperienze duplicate
+    const existingExperienceIds = filledBlocks.map(block => block.experience?.id).filter(Boolean);
+    const duplicateExperiences = validExperiences.filter(exp =>
+      existingExperienceIds.includes(exp.id)
+    );
+
+    if (duplicateExperiences.length > 0) {
+      const duplicateNames = duplicateExperiences.map(exp => exp.nome).join(', ');
+      toast.error('Esperienza già presente nel viaggio!', {
+        description: `Le seguenti esperienze sono già state aggiunte: ${duplicateNames}`,
+      });
+      return;
+    }
+
     // Riempi blocchi giorni con le esperienze
     const newBlocks = [];
     const startDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2; // Inizia dal giorno 2 (1 è arrivo)
@@ -498,10 +517,15 @@ function TripEditor() {
     toast.info('Hotel selection coming soon!');
   };
 
-  // Handler crea automatico - Riempie tutti i blocchi con pacchetti random
+  // Handler crea automatico - Riempie tutti i blocchi con pacchetti random e dati reali
   const handleAutoFill = () => {
     if (pacchetti.length === 0) {
       toast.error('Nessun pacchetto disponibile per questa destinazione!');
+      return;
+    }
+
+    if (esperienze.length === 0) {
+      toast.error('Errore: database esperienze non caricato!');
       return;
     }
 
@@ -521,9 +545,8 @@ function TripEditor() {
     while (remainingDays > 0 && pacchetti.length > 0) {
       // Seleziona un pacchetto random
       const randomPexp = pacchetti[Math.floor(Math.random() * pacchetti.length)];
-      const pexpDays = randomPexp.MIN_NOTTI || 3;
 
-      // Estrai esperienze dal pacchetto
+      // Estrai codici esperienze dal pacchetto
       const experienceIds = [];
       ['DAY2_ESPERIENZA_STD', 'DAY3_ESPERIENZA_STD', 'DAY4_ESPERIENZA_STD',
        'DAY5_ESPERIENZA_STD', 'DAY6_ESPERIENZA_STD', 'DAY7_ESPERIENZA_STD',
@@ -539,23 +562,51 @@ function TripEditor() {
       );
       const codiceZona = zonaObj?.CODICE || null;
 
-      // Aggiungi blocchi per questo pacchetto
+      // Aggiungi blocchi per questo pacchetto con dati reali delle esperienze
       const daysForThisPackage = Math.min(experienceIds.length, remainingDays);
 
       for (let i = 0; i < daysForThisPackage; i++) {
-        newBlocks.push({
-          day: currentDay,
-          experience: {
-            id: experienceIds[i],
-            nome: `Esperienza ${experienceIds[i]}`,
-            descrizione: 'Auto-generata',
-            durata: '1 giorno',
-            prezzo: 0
-          },
-          packageName: randomPexp.NOME_PACCHETTO || randomPexp.nome,
-          zona: randomPexp.ZONA,
-          codiceZona: codiceZona
-        });
+        const expCodice = experienceIds[i];
+
+        // Trova l'esperienza reale dal database
+        const expData = esperienze.find(exp => exp.CODICE === expCodice);
+
+        if (expData) {
+          newBlocks.push({
+            day: currentDay,
+            experience: {
+              id: expData.CODICE,
+              nome: expData.ESPERIENZE || `Esperienza ${expData.CODICE}`,
+              descrizione: expData.DESCRIZIONE || '',
+              durata: `${expData.SLOT || 1} ${expData.SLOT === 1 ? 'giorno' : 'giorni'}`,
+              prezzo: parseFloat(expData.PRX_PAX) || 0,
+              difficolta: expData.DIFFICOLTA || 1,
+              slot: expData.SLOT || 1,
+              // Dati completi esperienza
+              ...expData
+            },
+            packageName: randomPexp.NOME_PACCHETTO || randomPexp.nome,
+            zona: randomPexp.ZONA,
+            codiceZona: codiceZona
+          });
+        } else {
+          // Fallback se l'esperienza non viene trovata
+          console.warn(`⚠️ Esperienza ${expCodice} non trovata nel database`);
+          newBlocks.push({
+            day: currentDay,
+            experience: {
+              id: expCodice,
+              nome: `Esperienza ${expCodice}`,
+              descrizione: 'Dati non disponibili',
+              durata: '1 giorno',
+              prezzo: 0
+            },
+            packageName: randomPexp.NOME_PACCHETTO || randomPexp.nome,
+            zona: randomPexp.ZONA,
+            codiceZona: codiceZona
+          });
+        }
+
         currentDay++;
         remainingDays--;
       }
@@ -564,7 +615,7 @@ function TripEditor() {
     setFilledBlocks([...filledBlocks, ...newBlocks]);
 
     toast.success('Itinerario creato automaticamente!', {
-      description: `${newBlocks.length} giorni pianificati con pacchetti selezionati`,
+      description: `${newBlocks.length} giorni pianificati con esperienze reali`,
     });
   };
 

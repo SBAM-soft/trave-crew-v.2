@@ -6,6 +6,7 @@ import { saveTripComplete } from '../../core/utils/tripStorage';
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard } from '../../core/utils/exportHelpers';
 import { toPrice, toInt } from '../../core/utils/typeHelpers';
 import { generateMediaForExperience } from '../../core/utils/mediaHelpers';
+import { useCostiAccessori, calcolaCostiApplicabili } from '../../hooks/useCostiAccessori';
 import Button from '../../shared/Button';
 import Checkout from '../wallet/Checkout';
 import styles from './TripSummary.module.css';
@@ -30,6 +31,9 @@ function TripSummary() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
+
+  // Carica costi accessori per la destinazione
+  const { costiAccessori } = useCostiAccessori(wizardData.destinazione || wizardData.destinazioneNome);
 
   // Genera immagini per il riepilogo
   const heroImage = useMemo(() => {
@@ -82,12 +86,23 @@ function TripSummary() {
       }
     });
 
-    const total = experiencesCost + hotelsCost + extrasCost;
+    // Costi accessori (assicurazione, documenti, voli interni)
+    const numeroPersone = toInt(wizardData.numeroPersone, 1);
+    const costiAccessoriApplicabili = calcolaCostiApplicabili(
+      costiAccessori,
+      numeroPersone,
+      zoneVisitate
+    );
+    const accessoriesCost = costiAccessoriApplicabili.totale;
+
+    const total = experiencesCost + hotelsCost + extrasCost + accessoriesCost;
 
     return {
       experiences: experiencesCost,
       hotels: hotelsCost,
       extras: extrasCost,
+      accessories: accessoriesCost,
+      accessoriesItems: costiAccessoriApplicabili.items,
       total: total,
       perPerson: total
     };
@@ -432,6 +447,26 @@ function TripSummary() {
                 <div className={styles.costRow}>
                   <span>Extra</span>
                   <span className={styles.costValue}>€{costs.extras.toFixed(2)}</span>
+                </div>
+              )}
+              {costs.accessories > 0 && (
+                <div className={styles.costRow}>
+                  <span>Costi Accessori</span>
+                  <span className={styles.costValue}>€{costs.accessories.toFixed(2)}</span>
+                </div>
+              )}
+              {costs.accessoriesItems && costs.accessoriesItems.length > 0 && (
+                <div className={styles.accessoriesDetail}>
+                  {costs.accessoriesItems.map((item, idx) => (
+                    <div key={idx} className={styles.accessoryItem}>
+                      <span className={styles.accessoryLabel}>
+                        • {item.tipo}: {item.descrizione}
+                      </span>
+                      <span className={styles.accessoryValue}>
+                        €{item.costo.toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
               <div className={styles.costDivider}></div>
