@@ -35,9 +35,16 @@ function CreateWizard() {
     setDataPartenza,
     setCurrentStep,
     getWizardData,
+    resetWizard,
   } = useWizardStore();
 
   const [errors, setErrors] = useState({});
+
+  // Reset wizard all'inizio per creare un nuovo viaggio da zero
+  useEffect(() => {
+    console.log('🔄 Reset wizard per nuovo viaggio');
+    resetWizard();
+  }, []); // Esegue solo al mount
 
   // Scroll to top quando cambia step
   useEffect(() => {
