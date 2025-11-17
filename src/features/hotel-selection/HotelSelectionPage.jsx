@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import { loadCSV } from '../../core/utils/dataLoader';
-import { groupHotelsByZoneAndBudget, getHotelExtras } from '../../core/utils/itinerarioHelpers';
+import { groupHotelsByZoneAndBudget, getHotelExtras, calcolaNottiPerZona } from '../../core/utils/itinerarioHelpers';
 import { saveTripComplete } from '../../core/utils/tripStorage';
 import HotelCard from '../trip-editor/HotelCard';
 import Button from '../../shared/Button';
@@ -30,11 +30,14 @@ function HotelSelectionPage() {
   const [plusDB, setPlusDB] = useState(plus);
 
   // State per selezioni hotel (un hotel per zona)
-  // { zonaNome: { hotel: {...}, extras: [codiceExtra1, codiceExtra2...] } }
+  // { zonaNome: { hotel: {...}, extras: [codiceExtra1, codiceExtra2...], notti: number } }
   const [selections, setSelections] = useState({});
 
   // State per extra panel aperto
   const [activeExtraZone, setActiveExtraZone] = useState(null);
+
+  // Calcola notti per zona dai blocchi
+  const nottiPerZona = calcolaNottiPerZona(filledBlocks, zoneVisitate);
 
   // Carica dati hotel
   useEffect(() => {
@@ -62,13 +65,17 @@ function HotelSelectionPage() {
 
         setGroupedHotels(grouped);
 
+        // Calcola notti per zona
+        const nottiPerZona = calcolaNottiPerZona(filledBlocks, zoneVisitate);
+
         // Inizializza selezioni vuote per ogni zona (usa UPPERCASE come chiave)
         const initialSelections = {};
         zoneVisitate.forEach(zona => {
           const zonaKey = zona.nome.toUpperCase().trim();
           initialSelections[zonaKey] = {
             hotel: null,
-            extras: []
+            extras: [],
+            notti: nottiPerZona[zonaKey] || 0
           };
         });
         setSelections(initialSelections);
@@ -141,7 +148,8 @@ function HotelSelectionPage() {
       hotel: data.hotel,
       extras: data.extras.map(extraCode => {
         return plusDB.find(p => p.CODICE === extraCode);
-      }).filter(e => e !== undefined)
+      }).filter(e => e !== undefined),
+      notti: data.notti || 0 // Numero di notti in questa zona
     }));
 
     // Naviga al riepilogo finale con tutti i dati
@@ -172,7 +180,8 @@ function HotelSelectionPage() {
         hotel: data.hotel,
         extras: data.extras.map(extraCode => {
           return plusDB.find(p => p.CODICE === extraCode);
-        }).filter(e => e !== undefined)
+        }).filter(e => e !== undefined),
+        notti: data.notti || 0 // Numero di notti in questa zona
       }));
 
     // Prepara i dati del viaggio
@@ -268,7 +277,7 @@ function HotelSelectionPage() {
                   {index + 1}. {zona.nome}
                 </h2>
                 <p className={styles.zoneSubtitle}>
-                  Seleziona un hotel tra le 3 opzioni disponibili
+                  Seleziona un hotel tra le 3 opzioni disponibili • {nottiPerZona[zonaKey] || 0} {nottiPerZona[zonaKey] === 1 ? 'notte' : 'notti'}
                 </p>
               </div>
 

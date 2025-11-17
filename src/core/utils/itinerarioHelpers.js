@@ -442,3 +442,48 @@ export const sortPacchettiByRelevance = (pacchetti, interessi = [], currentPEXP 
     return scoreB - scoreA; // Decrescente
   });
 };
+
+/**
+ * Calcola il numero di notti per ogni zona dai blocchi confermati
+ * @param {Array} filledBlocks - Array di blocchi giorno confermati
+ * @param {Array} zoneVisitate - Array di zone visitate { codice, nome }
+ * @returns {Object} - { zonaNome: numNotti }
+ */
+export const calcolaNottiPerZona = (filledBlocks, zoneVisitate) => {
+  if (!filledBlocks || filledBlocks.length === 0 || !zoneVisitate) {
+    return {};
+  }
+
+  const nottiPerZona = {};
+
+  // Inizializza contatori per ogni zona
+  zoneVisitate.forEach(zona => {
+    const zonaKey = zona.nome.toUpperCase().trim();
+    nottiPerZona[zonaKey] = 0;
+  });
+
+  // Crea una mappa delle zone per codice (per lookup veloce)
+  const zoneMap = new Map();
+  zoneVisitate.forEach(zona => {
+    zoneMap.set(zona.codice, zona.nome.toUpperCase().trim());
+  });
+
+  // Conta i giorni per zona
+  // Ogni blocco con un'esperienza in una zona conta come un giorno in quella zona
+  filledBlocks.forEach(block => {
+    if (block.codiceZona && block.zona) {
+      const zonaKey = block.zona.toUpperCase().trim();
+
+      // Verifica se la zona è nelle zone visitate
+      if (nottiPerZona.hasOwnProperty(zonaKey)) {
+        // Se il blocco ha un'esperienza, conta come 1 notte
+        // (assumendo che se visiti una zona in un giorno, dormi lì quella notte)
+        if (block.experience) {
+          nottiPerZona[zonaKey] += 1;
+        }
+      }
+    }
+  });
+
+  return nottiPerZona;
+};
