@@ -410,9 +410,11 @@ function TripSummary() {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.cardTitle}>🏨 Hotel Selezionati</h2>
-            <button className={styles.editBtn} onClick={() => handleEdit('hotels')}>
-              ✏️ Modifica
-            </button>
+            {!needsHotelSelection && (
+              <button className={styles.editBtn} onClick={() => handleEdit('hotels')}>
+                ✏️ Modifica
+              </button>
+            )}
           </div>
           <div className={styles.cardBody}>
             {selectedHotels.length > 0 ? (
@@ -445,7 +447,11 @@ function TripSummary() {
                 })}
               </div>
             ) : (
-              <p className={styles.emptyState}>Nessun hotel selezionato</p>
+              <p className={styles.emptyState}>
+                {needsHotelSelection
+                  ? 'Seleziona gli hotel nella prossima fase del viaggio'
+                  : 'Nessun hotel selezionato'}
+              </p>
             )}
           </div>
         </div>
@@ -463,7 +469,9 @@ function TripSummary() {
               </div>
               <div className={styles.costRow}>
                 <span>Hotel ({totalDays} notti)</span>
-                <span className={styles.costValue}>€{costs.hotels.toFixed(2)}</span>
+                <span className={styles.costValue}>
+                  {needsHotelSelection ? 'Da definire' : `€${costs.hotels.toFixed(2)}`}
+                </span>
               </div>
               {costs.extras > 0 && (
                 <div className={styles.costRow}>
@@ -493,7 +501,7 @@ function TripSummary() {
               )}
               <div className={styles.costDivider}></div>
               <div className={styles.costRow + ' ' + styles.costTotal}>
-                <span>Totale</span>
+                <span>{needsHotelSelection ? 'Totale Parziale' : 'Totale'}</span>
                 <span className={styles.costValue}>€{costs.total.toFixed(2)}</span>
               </div>
               <div className={styles.costRow}>
@@ -502,7 +510,9 @@ function TripSummary() {
               </div>
             </div>
             <p className={styles.costNote}>
-              ℹ️ I prezzi sono indicativi e non includono voli internazionali
+              ℹ️ {needsHotelSelection
+                ? 'Il costo hotel verrà aggiunto dopo la selezione. I prezzi sono indicativi e non includono voli internazionali'
+                : 'I prezzi sono indicativi e non includono voli internazionali'}
             </p>
           </div>
         </div>

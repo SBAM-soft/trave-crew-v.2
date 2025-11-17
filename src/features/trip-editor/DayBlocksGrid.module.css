@@ -90,17 +90,15 @@
 
 .container.sticky .experienceInfo {
   gap: 0.125rem;
-  display: none; /* Nascondi info esperienza in sticky mode per risparmiare spazio */
+  /* Non nascondere completamente, ma nascondi solo label e nome */
 }
 
 .container.sticky .experienceLabel {
-  font-size: 0.5rem;
-  padding: 0.125rem 0.25rem;
+  display: none; /* Nascondi label in sticky mode */
 }
 
 .container.sticky .experienceName {
-  font-size: 0.625rem;
-  -webkit-line-clamp: 1;
+  display: none; /* Nascondi nome in sticky mode */
 }
 
 .container.sticky .checkmark {
