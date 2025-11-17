@@ -9,6 +9,7 @@ import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
 import CostSummary from './CostSummary';
 import { usePlusSuggeriti } from '../../hooks/usePlus';
+import { useExperienceExtras } from '../../hooks/useExperienceExtras';
 import { generateMediaForExperience } from '../../core/utils/mediaHelpers';
 import styles from './DETEXPTab.module.css';
 
@@ -61,7 +62,10 @@ function DETEXPTab({
   if (exp.durata) infoGenerali.push({ icon: '⏱️', label: 'Durata', value: exp.durata });
   if (exp.difficolta) infoGenerali.push({ icon: '🚶', label: 'Difficoltà', value: `${exp.difficolta}/3` });
 
-  // Carica plus suggeriti dal CSV in base all'esperienza
+  // Carica extra specifici dell'esperienza da extra.csv usando i codici EXTRA_1-9
+  const { extras: experienceExtras, isLoading: loadingExtras, hasExtras } = useExperienceExtras(exp);
+
+  // Carica plus generici suggeriti (come fallback se non ci sono extra specifici)
   const experienceType = exp.nome || '';
   const { plusSuggeriti, isLoading: loadingPlus } = usePlusSuggeriti(
     experienceType,
@@ -79,7 +83,8 @@ function DETEXPTab({
     [exp, destinazione]
   );
 
-  const disponibile_plus = plusSuggeriti;
+  // Usa gli extra specifici se disponibili, altrimenti usa i plus suggeriti
+  const disponibile_plus = hasExtras ? experienceExtras : plusSuggeriti;
 
   const handlePlusChange = (newSelectedPlus) => {
     setSelectedPlus(newSelectedPlus);
