@@ -1,13 +1,14 @@
 import { memo } from 'react';
 import PropTypes from 'prop-types';
+import { toPrice } from '../../core/utils/typeHelpers';
 import styles from './CostSummary.module.css';
 
 function CostSummary({ baseCost, selectedPlus = [] }) {
-  // Calcolo costo plus totale
-  const plusTotal = selectedPlus.reduce((sum, plus) => sum + plus.prezzo, 0);
-  
-  // Costo finale
-  const totalCost = baseCost + plusTotal;
+  // Calcolo costo plus totale (con conversione sicura)
+  const plusTotal = selectedPlus.reduce((sum, plus) => sum + toPrice(plus.prezzo, 0), 0);
+
+  // Costo finale (con conversione sicura)
+  const totalCost = toPrice(baseCost, 0) + plusTotal;
 
   return (
     <div className={styles.container}>

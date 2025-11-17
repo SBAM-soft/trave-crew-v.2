@@ -4,6 +4,7 @@ import { toast, Toaster } from 'sonner';
 import { useUser } from '../../contexts/UserContext';
 import { saveTripComplete } from '../../core/utils/tripStorage';
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard } from '../../core/utils/exportHelpers';
+import { toPrice, toInt } from '../../core/utils/typeHelpers';
 import Button from '../../shared/Button';
 import Checkout from '../wallet/Checkout';
 import styles from './TripSummary.module.css';
@@ -36,22 +37,24 @@ function TripSummary() {
     // Costo esperienze
     filledBlocks.forEach(block => {
       if (block.experience && block.experience.prezzo) {
-        const price = parseFloat(block.experience.prezzo) || 0;
-        experiencesCost += price * wizardData.numeroPersone;
+        const price = toPrice(block.experience.prezzo, 0);
+        const numPersone = toInt(wizardData.numeroPersone, 1);
+        experiencesCost += price * numPersone;
       }
     });
 
-    // Costo hotel
+    // Costo hotel (totalDays - 1 perché il primo giorno è arrivo, l'ultimo è partenza)
     selectedHotels.forEach(item => {
       if (item.hotel && item.hotel.PREZZO) {
-        const price = parseFloat(item.hotel.PREZZO) || 0;
-        hotelsCost += price * totalDays;
+        const price = toPrice(item.hotel.PREZZO, 0);
+        hotelsCost += price * (totalDays - 1);
       }
       // Extra hotel
       if (item.extras) {
         item.extras.forEach(extra => {
-          const price = parseFloat(extra.PRZ_PAX_GEN || extra.PRZ_PAX_FEB || 0);
-          extrasCost += price * wizardData.numeroPersone;
+          const price = toPrice(extra.PRZ_PAX_GEN || extra.PRZ_PAX_FEB, 0);
+          const numPersone = toInt(wizardData.numeroPersone, 1);
+          extrasCost += price * numPersone;
         });
       }
     });
