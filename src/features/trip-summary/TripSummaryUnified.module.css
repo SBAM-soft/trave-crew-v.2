@@ -850,3 +850,193 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============ INTEGRATED TIMELINE SECTION ============ */
+.timelineSection {
+  margin: 3rem 0;
+  background: white;
+  border-radius: 1.5rem;
+  padding: 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+.timelineSection .timeline {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  padding-left: 0;
+}
+
+.timelineSection .timelineItem {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  align-items: flex-start;
+}
+
+.timelineSection .timelineItem:last-child {
+  margin-bottom: 0;
+}
+
+.timelineSection .timelineItem::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 60px;
+  bottom: -25px;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    #e5e7eb 0%,
+    #f3f4f6 100%
+  );
+}
+
+.timelineSection .timelineItem:last-child::before {
+  display: none;
+}
+
+.timelineDot {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 3px solid white;
+  position: relative;
+  z-index: 2;
+}
+
+.dayIcon {
+  font-size: 1.75rem;
+}
+
+.timelineContent {
+  flex: 1;
+  background: #f9fafb;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.timelineContent:hover {
+  background: #f3f4f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.timelineDay {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.timelineContent .timelineTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.timelineContent .timelineSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem 0;
+}
+
+.timelineDescription {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0.75rem 0 0 0;
+}
+
+.timelineMeta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.timelineMeta span {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Hotel CTA Button */
+.hotelCTA {
+  text-align: center;
+  margin: 3rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 1.5rem;
+}
+
+.hotelCTA button {
+  font-size: 1.125rem;
+  padding: 1rem 3rem;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.hotelCTA button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+}
+
+/* Hotel Section Expandable */
+.hotelSection {
+  overflow: hidden;
+  margin: 2rem 0;
+}
+
+/* Responsive adjustments for integrated timeline */
+@media (max-width: 768px) {
+  .timelineSection {
+    padding: 2rem 1.5rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+
+  .timelineDot {
+    width: 48px;
+    height: 48px;
+  }
+
+  .dayIcon {
+    font-size: 1.5rem;
+  }
+
+  .timelineContent .timelineTitle {
+    font-size: 1.125rem;
+  }
+
+  .timelineSection .timelineItem::before {
+    left: 23px;
+  }
+
+  .timelineMeta {
+    gap: 0.5rem;
+  }
+}
