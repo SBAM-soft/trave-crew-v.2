@@ -41,7 +41,7 @@ const useTripEditorChatStore = create(
         clearMessages: () => set({ messages: [] }),
 
         // ===== FLOW CONTROL =====
-        currentStepId: 'welcome',
+        currentStepId: null, // Inizia null, viene settato dopo il caricamento wizardData
         stepHistory: [],
 
         goToStep: (stepId) => set((state) => ({
@@ -257,7 +257,7 @@ const useTripEditorChatStore = create(
         reset: () => set({
           messages: [],
           isTyping: false,
-          currentStepId: 'welcome',
+          currentStepId: null, // Inizia da null per permettere riattivazione
           stepHistory: [],
           wizardData: {},
           availableCounter: 1,
@@ -273,10 +273,10 @@ const useTripEditorChatStore = create(
       {
         name: 'trip-editor-chat-storage',
         partialize: (state) => ({
-          // Salva solo dati essenziali, non messaggi
+          // Salva solo dati essenziali, non messaggi né step corrente
+          // currentStepId non viene salvato perché vogliamo sempre ripartire dall'inizio
           wizardData: state.wizardData,
           tripData: state.tripData,
-          currentStepId: state.currentStepId,
           availableCounter: state.availableCounter
         })
       }

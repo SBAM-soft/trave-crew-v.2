@@ -15,7 +15,7 @@ function TripEditorChat() {
   const { messages, isTyping, setWizardData, reset } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
 
-  // Carica dati wizard da navigation state
+  // Carica dati wizard da navigation state e inizializza conversazione
   useEffect(() => {
     const wizardData = location.state?.wizardData;
 
@@ -26,14 +26,18 @@ function TripEditorChat() {
 
     console.log('📥 Wizard data ricevuto:', wizardData);
 
-    // Salva wizard data nello store
+    // Reset completo (pulisce tutto)
+    reset();
+
+    // Setta wizard data
     setWizardData(wizardData);
 
-    // Reset conversazione (rimuove messaggi vecchi)
-    // Ma mantiene wizardData appena settato
-    const currentWizardData = wizardData;
-    reset();
-    setWizardData(currentWizardData);
+    // IMPORTANTE: Forza riavvio del flow facendo un cambio di step
+    // Vai temporaneamente a null e poi torna a welcome per far scattare l'useEffect
+    setTimeout(() => {
+      const store = useTripEditorChatStore.getState();
+      store.goToStep('welcome');
+    }, 100);
   }, [location.state, setWizardData, reset]);
 
   // Handler selezione opzione
