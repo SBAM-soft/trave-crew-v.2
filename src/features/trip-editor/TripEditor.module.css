@@ -514,3 +514,61 @@
     transform: translateX(0);
   }
 }
+
+/* Info Message - Aeroporti di arrivo */
+.infoMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.infoIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.infoText {
+  flex: 1;
+}
+
+.infoText strong {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 0.5rem;
+}
+
+.infoText p {
+  font-size: 0.9375rem;
+  color: #1e3a8a;
+  margin: 0;
+  line-height: 1.5;
+}

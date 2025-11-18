@@ -79,6 +79,10 @@ function TripEditor() {
   const [plus, setPlus] = useState([]);
   const [esperienze, setEsperienze] = useState([]);
 
+  // State per logica contatore zone (🆕 - aeroporti di arrivo)
+  const [availableCounter, setAvailableCounter] = useState(1); // Inizia con contatore 1 (aeroporti di arrivo)
+  const [availableZones, setAvailableZones] = useState([]); // Zone disponibili in base al contatore
+
   // State per animazione creazione itinerario
   const [creatingItinerary, setCreatingItinerary] = useState(false);
 
@@ -108,6 +112,33 @@ function TripEditor() {
       });
     }
   }, [loading, editMode, filledBlocks.length, totalDays]);
+
+  // 🆕 Filtra zone disponibili in base al contatore (logica aeroporti di arrivo)
+  useEffect(() => {
+    if (itinerari.length === 0 || zone.length === 0) return;
+
+    // Trova itinerari con CONTATORE_ZONA uguale al contatore corrente
+    const itinerariDisponibili = itinerari.filter(it => {
+      const contatore = parseInt(it.CONTATORE_ZONA);
+      return contatore === availableCounter;
+    });
+
+    // Estrai codici zone da questi itinerari (ZONA_1, ZONA_2, etc.)
+    const codiciZoneDisponibili = new Set();
+    itinerariDisponibili.forEach(it => {
+      ['ZONA_1', 'ZONA_2', 'ZONA_3', 'ZONA_4'].forEach(campo => {
+        if (it[campo]) {
+          codiciZoneDisponibili.add(it[campo]);
+        }
+      });
+    });
+
+    // Filtra zone per mostrare solo quelle disponibili
+    const zoneDisponibili = zone.filter(z => codiciZoneDisponibili.has(z.CODICE));
+
+    console.log(`🔓 Contatore ${availableCounter}: ${zoneDisponibili.length} zone disponibili`, zoneDisponibili);
+    setAvailableZones(zoneDisponibili);
+  }, [availableCounter, itinerari, zone]);
 
 
   const loadData = async () => {
@@ -217,6 +248,16 @@ function TripEditor() {
       setSelectedPacchetto(zonePacchetti[0]);
     } else {
       setSelectedPacchetto(null);
+    }
+
+    // 🆕 Incrementa il contatore disponibile per sbloccare le zone successive
+    // Solo se non siamo già all'ultimo contatore possibile
+    const maxContatore = Math.max(...itinerari.map(it => parseInt(it.CONTATORE_ZONA) || 0));
+    if (availableCounter < maxContatore) {
+      setAvailableCounter(prev => prev + 1);
+      toast.info(`🔓 Nuove zone sbloccate!`, {
+        description: 'Puoi ora selezionare altre destinazioni'
+      });
     }
 
     console.log(`🗺️ Zona selezionata: ${zona.ZONA} (${zona.CODICE})`);
@@ -837,9 +878,20 @@ function TripEditor() {
 
         {/* Mappa interattiva */}
         <section className={styles.section}>
+          {/* 🆕 Messaggio info contatore aeroporti */}
+          {availableCounter === 1 && (
+            <div className={styles.infoMessage}>
+              <span className={styles.infoIcon}>✈️</span>
+              <div className={styles.infoText}>
+                <strong>Seleziona l'aeroporto di arrivo</strong>
+                <p>Scegli da quale città vuoi iniziare il tuo viaggio. Altre zone si sbloccheranno successivamente.</p>
+              </div>
+            </div>
+          )}
+
           <MapInteractive
             destinazione={destinazioneData}
-            zone={zone}
+            zone={availableZones}
             selectedZone={selectedZone}
             onZoneClick={handleZoneClick}
             filledBlocks={filledBlocks}

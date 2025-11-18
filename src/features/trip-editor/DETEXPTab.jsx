@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import TabView from '../../shared/TabView';
 import Breadcrumb from '../../shared/Breadcrumb';
-import DayBlocksGrid from './DayBlocksGrid';
+import DayStatusBar from '../../shared/DayStatusBar';
 import MediaSlider from './MediaSlider';
 import PlusSelector from './PlusSelector';
 import LikeDislikeButtons from './LikeDislikeButtons';
@@ -131,11 +131,10 @@ function DETEXPTab({
         ]}
       />
 
-      <DayBlocksGrid
+      <DayStatusBar
         totalDays={totalDays}
         filledBlocks={filledBlocks}
         compact={true}
-        stickyCompact={true}
       />
 
       {/* Tags */}

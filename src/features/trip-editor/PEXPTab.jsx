@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import TabView from '../../shared/TabView';
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
-import DayBlocksGrid from './DayBlocksGrid';
+import DayStatusBar from '../../shared/DayStatusBar';
 import EXPCard from './EXPCard';
 import { useExperiences } from '../../hooks/useExperiences';
 import styles from './PEXPTab.module.css';
@@ -153,16 +153,21 @@ function PEXPTab({
             ]}
           />
 
-          <DayBlocksGrid
+          <DayStatusBar
             totalDays={totalDays}
             filledBlocks={filledBlocks}
             compact={true}
-            stickyCompact={true}
           />
 
-          <div className={styles.description}>
-            <p>{pexp.DESCRIZIONE || 'Pacchetto esperienza completo'}</p>
-          </div>
+          {pexp.DESCRIZIONE && (
+            <div className={styles.packageInfo}>
+              <div className={styles.packageIcon}>📦</div>
+              <div className={styles.packageText}>
+                <h4>Descrizione Pacchetto</h4>
+                <p>{pexp.DESCRIZIONE}</p>
+              </div>
+            </div>
+          )}
 
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>🎯 Esperienze incluse</h3>
