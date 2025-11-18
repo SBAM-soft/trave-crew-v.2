@@ -1,0 +1,219 @@
+name: Excel to CSV Converter
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'TravelCrew_Database.xlsx'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas openpyxl
+
+      - name: Convert Excel to CSV
+        run: |
+          python << 'EOF'
+          import pandas as pd
+          import os
+          from pathlib import Path
+
+          # Array dei 14 fogli da convertire
+          SHEETS = [
+              "destinazioni_tech",
+              "destinazioni_copy",
+              "zone_tech",
+              "zone_copy",
+              "esperienze_tech",
+              "esperienze_copy",
+              "pacchetti_tech",
+              "pacchetti_copy",
+              "hotel_tech",
+              "hotel_copy",
+              "voli_tech",
+              "itinerario_tech",
+              "costi_accessori_tech",
+              "extra_tech"
+          ]
+
+          EXCEL_FILE = "TravelCrew_Database.xlsx"
+          OUTPUT_DIR = "public/data"
+
+          def fill_placeholders(df):
+              """Riempie celle vuote con placeholder appropriati basati sul nome colonna"""
+              for col in df.columns:
+                  col_lower = col.lower()
+
+                  # Applica placeholder basati sul tipo di colonna
+                  if any(keyword in col_lower for keyword in ['prezzo', 'costo', 'budget', 'importo']):
+                      df[col] = df[col].replace('', '0')
+                  elif any(keyword in col_lower for keyword in ['url', 'immagine', 'link', 'foto']):
+                      df[col] = df[col].replace('', 'https://placeholder.com/image.jpg')
+                  elif any(keyword in col_lower for keyword in ['emoji', 'icona', 'icon']):
+                      df[col] = df[col].replace('', '📍')
+                  elif 'coordinate' in col_lower or col_lower in ['lat', 'lng', 'latitude', 'longitude']:
+                      df[col] = df[col].replace('', '0')
+                  elif 'codice' in col_lower and 'collegat' in col_lower:
+                      df[col] = df[col].replace('', 'PENDING')
+                  elif any(keyword in col_lower for keyword in ['visto', 'obbligator', 'richiesto']):
+                      df[col] = df[col].replace('', 'no')
+                  elif any(keyword in col_lower for keyword in ['durata', 'giorni', 'notti']):
+                      df[col] = df[col].replace('', '0')
+                  else:
+                      # Default per colonne testuali
+                      df[col] = df[col].replace('', 'TBD')
+
+              return df
+
+          # Verifica esistenza file Excel
+          if not os.path.exists(EXCEL_FILE):
+              print(f"❌ ERRORE: File {EXCEL_FILE} non trovato nella root del progetto!")
+              exit(1)
+
+          # Crea directory output se non esiste
+          Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+
+          print(f"📊 Inizio conversione Excel → CSV")
+          print(f"📁 File Excel: {EXCEL_FILE}")
+          print(f"📂 Directory output: {OUTPUT_DIR}")
+          print(f"📋 Fogli da convertire: {len(SHEETS)}\n")
+
+          # Statistiche
+          total_rows = 0
+          total_cols = 0
+          converted_sheets = 0
+          failed_sheets = []
+
+          # Converti ogni foglio
+          for sheet_name in SHEETS:
+              try:
+                  print(f"🔄 Conversione foglio: {sheet_name}")
+
+                  # Leggi foglio Excel
+                  df = pd.read_excel(
+                      EXCEL_FILE,
+                      sheet_name=sheet_name,
+                      dtype=str,
+                      na_filter=False
+                  )
+
+                  # Rimuovi righe completamente vuote
+                  df = df.dropna(how='all')
+
+                  # Rimuovi colonne completamente vuote
+                  df = df.dropna(axis=1, how='all')
+
+                  # Riempi celle vuote con placeholder
+                  df = fill_placeholders(df)
+
+                  # Nome file CSV
+                  csv_filename = f"{sheet_name}.csv"
+                  csv_path = os.path.join(OUTPUT_DIR, csv_filename)
+
+                  # Salva CSV
+                  df.to_csv(
+                      csv_path,
+                      index=False,
+                      encoding='utf-8',
+                      lineterminator='\n'
+                  )
+
+                  rows, cols = df.shape
+                  total_rows += rows
+                  total_cols += cols
+                  converted_sheets += 1
+
+                  print(f"   ✅ {csv_filename}: {rows} righe × {cols} colonne")
+
+              except Exception as e:
+                  failed_sheets.append(sheet_name)
+                  print(f"   ❌ Errore nella conversione di {sheet_name}: {str(e)}")
+
+          # Summary finale
+          print(f"\n{'='*60}")
+          print(f"📊 SUMMARY CONVERSIONE")
+          print(f"{'='*60}")
+          print(f"✅ Fogli convertiti con successo: {converted_sheets}/{len(SHEETS)}")
+
+          if failed_sheets:
+              print(f"❌ Fogli falliti: {', '.join(failed_sheets)}")
+
+          print(f"📈 Totale righe processate: {total_rows}")
+          print(f"📊 Media colonne per foglio: {total_cols // len(SHEETS) if converted_sheets > 0 else 0}")
+          print(f"{'='*60}")
+
+          # Se ci sono errori, esci con codice errore
+          if failed_sheets:
+              exit(1)
+
+          print(f"\n🎉 Conversione completata con successo!")
+          EOF
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Commit and Push CSV files
+        run: |
+          git add public/data/*.csv
+
+          if git diff --staged --quiet; then
+            echo "✨ Nessuna modifica ai CSV - tutto già aggiornato"
+          else
+            git commit -m "🤖 Auto-update CSV files from Excel database
+
+            Updated by GitHub Actions from TravelCrew_Database.xlsx
+            Converted 14 sheets to CSV format with automatic placeholders"
+
+            git push
+            echo "✅ CSV files committati e pushati con successo"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📊 Excel to CSV Conversion Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Excel File**: \`TravelCrew_Database.xlsx\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Output Directory**: \`public/data/\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Sheets Converted**: 14" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated CSV Files:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ destinazioni_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ destinazioni_copy.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ zone_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ zone_copy.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ esperienze_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ esperienze_copy.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ pacchetti_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ pacchetti_copy.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ hotel_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ hotel_copy.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ voli_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ itinerario_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ costi_accessori_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ extra_tech.csv" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ Obsolete Files (not updated):" >> $GITHUB_STEP_SUMMARY
+          echo "- plus.csv (replaced by extra_tech.csv)" >> $GITHUB_STEP_SUMMARY
+          echo "- viaggi.csv (no longer used)" >> $GITHUB_STEP_SUMMARY

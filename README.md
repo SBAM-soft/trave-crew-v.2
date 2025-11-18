@@ -17,23 +17,81 @@ Versione finale con tutte le correzioni applicate.
 
 ```
 travel-crew-v2-final/
-├── PROJECT.md              ← Leggi questo per capire progetto
-├── CODE_REFERENCE.md       ← Riferimento per codice
+├── TravelCrew_Database.xlsx    ← DATABASE EXCEL centralizzato 🗄️
+├── .github/
+│   └── workflows/
+│       └── excel-to-csv.yml    ← Conversione automatica ⚙️
+├── PROJECT.md                  ← Leggi questo per capire progetto
+├── CODE_REFERENCE.md           ← Riferimento per codice
+├── public/
+│   └── data/                   → 14 CSV auto-generati da Excel ✅
 ├── src/
 │   ├── core/
-│   │   ├── data/           → 9 CSV ✅
-│   │   └── utils/          → dataLoader, helpers ✅
+│   │   ├── data/               → Backup CSV (deprecato)
+│   │   └── utils/              → dataLoader, helpers ✅
 │   ├── features/
-│   │   ├── home/           → Landing ✅
-│   │   ├── explore/        → Browse viaggi ✅
-│   │   ├── wizard/         → 4/5 step (manca date) ⚠️
-│   │   ├── trip-editor/    → DA COSTRUIRE 🎯
-│   │   ├── wallet/         → TODO
-│   │   ├── documentation/  → TODO
-│   │   ├── profile/        → TODO
-│   │   └── chat/           → TODO
-│   └── shared/             → Button, Card, Layout ✅
+│   │   ├── home/               → Landing ✅
+│   │   ├── explore/            → Browse viaggi ✅
+│   │   ├── wizard/             → 4/5 step (manca date) ⚠️
+│   │   ├── trip-editor/        → DA COSTRUIRE 🎯
+│   │   ├── wallet/             → TODO
+│   │   ├── documentation/      → TODO
+│   │   ├── profile/            → TODO
+│   │   └── chat/               → TODO
+│   └── shared/                 → Button, Card, Layout ✅
 ```
+
+---
+
+## 🗄️ DATABASE EXCEL → CSV AUTOMATICO
+
+Il progetto usa un file Excel centralizzato per gestire tutti i dati del database.
+
+### Come funziona
+
+**File Excel**: `TravelCrew_Database.xlsx` (nella root del progetto)
+
+**Struttura**: 14 fogli divisi in due tipologie:
+- **Fogli `*_tech`**: Dati tecnici (prezzi, coordinate, codici, logica)
+- **Fogli `*_copy`**: Contenuti testuali (descrizioni, emoji, storytelling)
+
+**Fogli disponibili**:
+- `destinazioni_tech` / `destinazioni_copy`
+- `zone_tech` / `zone_copy`
+- `esperienze_tech` / `esperienze_copy`
+- `pacchetti_tech` / `pacchetti_copy`
+- `hotel_tech` / `hotel_copy`
+- `voli_tech` (solo tech)
+- `itinerario_tech` (solo tech)
+- `costi_accessori_tech` (solo tech)
+- `extra_tech` (solo tech, sostituisce plus.csv)
+
+### Workflow automatico
+
+1. Modifica il file `TravelCrew_Database.xlsx` in locale
+2. Committa e pusha su GitHub:
+   ```bash
+   git add TravelCrew_Database.xlsx
+   git commit -m "Update database"
+   git push
+   ```
+3. GitHub Actions converte automaticamente Excel → CSV
+4. Dopo 1-2 minuti: 14 CSV aggiornati in `public/data/`
+
+### Caratteristiche
+
+- Conversione automatica tramite GitHub Actions
+- Rimozione automatica righe/colonne vuote
+- Placeholder automatici per celle vuote (TBD, 0, URL placeholder, ecc.)
+- Log dettagliati per debugging
+- Gestione errori robusta
+
+### Note importanti
+
+- Colonna **CODICE** presente in ogni foglio (chiave primaria)
+- Stesso CODICE collega dati tech ↔ copy
+- File `plus.csv` e `viaggi.csv` sono **OBSOLETI** (non più aggiornati)
+- `extra_tech.csv` sostituisce `plus.csv`
 
 ---
 
