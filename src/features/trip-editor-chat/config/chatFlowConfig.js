@@ -113,7 +113,7 @@ export const CHAT_FLOW_CONFIG = {
       addBotMessage(message.text, 'bot_message_with_card', { card: message.card });
 
       // Carica dati necessari in cache se non già caricati
-      const cachedData = store.getState().cachedData;
+      const cachedData = store.cachedData;
 
       if (cachedData.zone.length === 0 || cachedData.pacchetti.length === 0) {
         console.log('📥 Caricamento database per destinazione...');
@@ -143,13 +143,13 @@ export const CHAT_FLOW_CONFIG = {
           );
 
           // Salva in cache
-          store.getState().setCachedData('zone', destZone);
-          store.getState().setCachedData('pacchetti', destPacchetti);
-          store.getState().setCachedData('esperienze', esperienze);
-          store.getState().setCachedData('hotel', destHotel);
-          store.getState().setCachedData('itinerario', itinerario);
-          store.getState().setCachedData('extra', extra);
-          store.getState().setCachedData('costi_accessori', costi_accessori);
+          store.setCachedData('zone', destZone);
+          store.setCachedData('pacchetti', destPacchetti);
+          store.setCachedData('esperienze', esperienze);
+          store.setCachedData('hotel', destHotel);
+          store.setCachedData('itinerario', itinerario);
+          store.setCachedData('extra', extra);
+          store.setCachedData('costi_accessori', costi_accessori);
 
           console.log('✅ Database caricato:', {
             zone: destZone.length,
@@ -266,8 +266,8 @@ export const CHAT_FLOW_CONFIG = {
     },
 
     onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store }) => {
-      const availableCounter = store.getState().availableCounter;
-      const cachedData = store.getState().cachedData;
+      const availableCounter = store.availableCounter;
+      const cachedData = store.cachedData;
 
       addBotMessage(getMessage({ wizardData, tripData, availableCounter }));
 
@@ -304,7 +304,7 @@ export const CHAT_FLOW_CONFIG = {
     },
 
     onResponse: ({ value, addUserMessage, addBotMessage, addZone, goToStep, tripData, store }) => {
-      const availableCounter = store.getState().availableCounter;
+      const availableCounter = store.availableCounter;
 
       if (value.action === 'add') {
         addZone(value.zone);
@@ -395,7 +395,7 @@ export const CHAT_FLOW_CONFIG = {
       addBotMessage(getMessage({ tripData }));
 
       // Carica pacchetti per zona
-      const cachedData = store.getState().cachedData;
+      const cachedData = store.cachedData;
       const pacchetti = cachedData.pacchetti;
 
       const zonePacchetti = pacchetti
@@ -443,7 +443,7 @@ export const CHAT_FLOW_CONFIG = {
     onResponse: async ({ value, addUserMessage, addBotMessage, addPackage, goToStep, tripData, store, incrementCounter }) => {
       // value può essere: { action: 'select', packageId, zoneCode }
       if (value.action === 'select') {
-        const cachedData = store.getState().cachedData;
+        const cachedData = store.cachedData;
         const pacchetti = cachedData.pacchetti;
         const esperienze = cachedData.esperienze;
 
@@ -608,7 +608,7 @@ export const CHAT_FLOW_CONFIG = {
       addBotMessage(getMessage({ tripData }));
 
       // Carica hotel per zona
-      const cachedData = store.getState().cachedData;
+      const cachedData = store.cachedData;
       const hotel = cachedData.hotel;
       const extra = cachedData.extra;
 
