@@ -54,35 +54,118 @@ export const loadCSV = (filePath) => {
   });
 };
 
+/**
+ * Unisce dati tech e copy tramite colonna CODICE
+ * @param {Array} techData - Array di oggetti dal CSV tech
+ * @param {Array} copyData - Array di oggetti dal CSV copy
+ * @returns {Array} - Array di oggetti uniti
+ */
+const mergeByCode = (techData, copyData) => {
+  console.log('🔀 Merging tech + copy data by CODICE...');
+
+  // Crea una mappa dei dati copy per CODICE
+  const copyMap = new Map();
+  copyData.forEach(item => {
+    if (item.CODICE) {
+      copyMap.set(item.CODICE, item);
+    }
+  });
+
+  // Unisci tech con copy
+  const merged = techData.map(techItem => {
+    const copyItem = copyMap.get(techItem.CODICE) || {};
+
+    // Merge: tech ha priorità, ma aggiungiamo tutte le proprietà copy che non sono in tech
+    // Rimuoviamo duplicati di CODICE e TIPO
+    const { CODICE: copyCode, TIPO: copyTipo, ...restCopyData } = copyItem;
+
+    return {
+      ...techItem,
+      ...restCopyData
+    };
+  });
+
+  console.log(`   ✅ Merged ${merged.length} items (tech: ${techData.length}, copy: ${copyData.length})`);
+
+  return merged;
+};
+
+/**
+ * Carica dati di un'entità con separazione tech/copy
+ * @param {string} entityName - Nome dell'entità (es: 'destinazioni')
+ * @param {boolean} hasCopy - Se l'entità ha anche foglio copy (default: true)
+ * @returns {Promise<Array>} - Array di oggetti uniti
+ */
+const loadEntityData = async (entityName, hasCopy = true) => {
+  const techFile = `${entityName}_tech.csv`;
+
+  if (!hasCopy) {
+    // Solo tech (voli, itinerario, costi_accessori, extra)
+    console.log(`📋 Loading ${entityName} (tech only)...`);
+    return await loadCSV(techFile);
+  }
+
+  // Tech + Copy
+  console.log(`📋 Loading ${entityName} (tech + copy)...`);
+  const copyFile = `${entityName}_copy.csv`;
+
+  const [techData, copyData] = await Promise.all([
+    loadCSV(techFile),
+    loadCSV(copyFile)
+  ]);
+
+  return mergeByCode(techData, copyData);
+};
+
 export const loadAllData = async () => {
   try {
-    const [destinazioni, zone, esperienze, pacchetti, itinerario, hotel, voli, plus, costi_accessori, viaggi] = await Promise.all([
-      loadCSV('destinazioni.csv'),
-      loadCSV('zone.csv'),
-      loadCSV('esperienze.csv'),
-      loadCSV('pacchetti.csv'),
-      loadCSV('itinerario.csv'),
-      loadCSV('hotel.csv'),
-      loadCSV('voli.csv'),
-      loadCSV('plus.csv'),
-      loadCSV('costi_accessori.csv'),
-      loadCSV('viaggi.csv')
+    console.log('🚀 Loading all database entities...');
+
+    // Carica tutte le entità in parallelo
+    const [
+      destinazioni,
+      zone,
+      esperienze,
+      pacchetti,
+      hotel,
+      voli,
+      itinerario,
+      costi_accessori,
+      extra
+    ] = await Promise.all([
+      // Entità con tech + copy (merge automatico)
+      loadEntityData('destinazioni', true),
+      loadEntityData('zone', true),
+      loadEntityData('esperienze', true),
+      loadEntityData('pacchetti', true),
+      loadEntityData('hotel', true),
+
+      // Entità solo tech (no copy)
+      loadEntityData('voli', false),
+      loadEntityData('itinerario', false),
+      loadEntityData('costi_accessori', false),
+      loadEntityData('extra', false)
     ]);
+
+    console.log('✅ All database entities loaded successfully!');
 
     return {
       destinazioni,
       zone,
       esperienze,
       pacchetti,
-      itinerario,
       hotel,
       voli,
-      plus,
+      itinerario,
       costi_accessori,
-      viaggi
+      extra, // Sostituisce plus
+
+      // Backward compatibility (deprecato)
+      plus: extra, // Alias per compatibilità con codice esistente
+      viaggi: [] // Vuoto, entità obsoleta
     };
   } catch (error) {
-    console.error('Errore nel caricamento dei dati:', error);
+    console.error('❌ Errore nel caricamento dei dati:', error);
     throw error;
   }
 };
