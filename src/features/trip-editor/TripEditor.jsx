@@ -90,6 +90,9 @@ function TripEditor() {
   // State per mostrare timeline spettacolare
   const [showTimeline, setShowTimeline] = useState(false);
 
+  // State per ridimensionamento Day Block allo scroll
+  const [isScrolled, setIsScrolled] = useState(false);
+
   // Ref per la sezione pacchetti (per scroll automatico)
   const packagesRef = useRef(null);
 
@@ -99,6 +102,17 @@ function TripEditor() {
     hasUnsavedChanges,
     'Sei sicuro di voler uscire dal Trip Editor? Il viaggio non è stato completato e le modifiche andranno perse.'
   );
+
+  // Scroll listener per ridimensionare Day Block
+  useEffect(() => {
+    const handleScroll = () => {
+      // Ridimensiona al 70% quando scrolla oltre 100px
+      setIsScrolled(window.scrollY > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Carica dati iniziali
   useEffect(() => {
@@ -116,13 +130,22 @@ function TripEditor() {
 
   // 🆕 Filtra zone disponibili in base al contatore (logica aeroporti di arrivo)
   useEffect(() => {
-    if (itinerari.length === 0 || zone.length === 0) return;
+    if (zone.length === 0) return;
+
+    // Se non ci sono itinerari o il campo CONTATORE_ZONA non esiste, mostra tutte le zone
+    if (itinerari.length === 0 || !itinerari[0].CONTATORE_ZONA) {
+      console.log('⚠️ Nessun itinerario con CONTATORE_ZONA trovato, mostro tutte le zone');
+      setAvailableZones(zone);
+      return;
+    }
 
     // Trova itinerari con CONTATORE_ZONA <= contatore corrente (progressivo)
     const itinerariDisponibili = itinerari.filter(it => {
       const contatore = parseInt(it.CONTATORE_ZONA);
-      return contatore <= availableCounter;
+      return !isNaN(contatore) && contatore <= availableCounter;
     });
+
+    console.log(`📊 Itinerari disponibili con contatore <= ${availableCounter}:`, itinerariDisponibili.length);
 
     // Estrai codici zone da questi itinerari (ZONA_1, ZONA_2, etc.)
     const codiciZoneDisponibili = new Set();
@@ -134,11 +157,19 @@ function TripEditor() {
       });
     });
 
+    console.log(`📍 Codici zone disponibili:`, Array.from(codiciZoneDisponibili));
+
     // Filtra zone per mostrare solo quelle disponibili
     const zoneDisponibili = zone.filter(z => codiciZoneDisponibili.has(z.CODICE));
 
-    console.log(`🔓 Contatore ${availableCounter}: ${zoneDisponibili.length} zone disponibili (cumulative)`, zoneDisponibili.map(z => z.ZONA));
-    setAvailableZones(zoneDisponibili);
+    // Se non troviamo zone disponibili, mostra tutte (fallback)
+    if (zoneDisponibili.length === 0) {
+      console.log('⚠️ Nessuna zona trovata con i criteri, mostro tutte le zone come fallback');
+      setAvailableZones(zone);
+    } else {
+      console.log(`🔓 Contatore ${availableCounter}: ${zoneDisponibili.length} zone disponibili (cumulative)`, zoneDisponibili.map(z => z.ZONA));
+      setAvailableZones(zoneDisponibili);
+    }
   }, [availableCounter, itinerari, zone]);
 
 
@@ -895,7 +926,8 @@ function TripEditor() {
         onBlockClick={handleBlockClick}
         onAddDay={handleAddDay}
         onRemoveDay={handleRemoveDay}
-        stickyCompact={true}
+        sticky={true}
+        compact={isScrolled}
       />
 
       {/* Contenuto principale */}

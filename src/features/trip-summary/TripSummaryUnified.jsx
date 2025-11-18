@@ -464,7 +464,7 @@ function TripSummaryUnified() {
 
   // ============ UNIFIED SUMMARY VIEW ============
   return (
-    <div className={styles.tripSummary}>
+    <div className={`${styles.tripSummary} ${styles.darkTheme}`}>
       <Toaster position="top-right" richColors />
 
       {/* Hero Section con Statistiche Animate */}
