@@ -141,7 +141,7 @@ function CreateWizard() {
     if (currentStep === 5) {
       const wizardData = getWizardData();
       console.log('✅ Wizard completato:', wizardData);
-      navigate('/trip-editor', { state: { wizardData } });
+      navigate('/trip-editor-chat', { state: { wizardData } });
       return;
     }
 
