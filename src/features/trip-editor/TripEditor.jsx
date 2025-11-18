@@ -5,6 +5,7 @@ import useNavigationGuard from '../../hooks/useNavigationGuard';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
 import DayStatusBar from '../../shared/DayStatusBar';
+import DayBlocksGrid from './DayBlocksGrid';
 import PEXPCard from './PEXPCard';
 import PEXPTab from './PEXPTab';
 import DETEXPTab from './DETEXPTab';
@@ -117,10 +118,10 @@ function TripEditor() {
   useEffect(() => {
     if (itinerari.length === 0 || zone.length === 0) return;
 
-    // Trova itinerari con CONTATORE_ZONA uguale al contatore corrente
+    // Trova itinerari con CONTATORE_ZONA <= contatore corrente (progressivo)
     const itinerariDisponibili = itinerari.filter(it => {
       const contatore = parseInt(it.CONTATORE_ZONA);
-      return contatore === availableCounter;
+      return contatore <= availableCounter;
     });
 
     // Estrai codici zone da questi itinerari (ZONA_1, ZONA_2, etc.)
@@ -136,7 +137,7 @@ function TripEditor() {
     // Filtra zone per mostrare solo quelle disponibili
     const zoneDisponibili = zone.filter(z => codiciZoneDisponibili.has(z.CODICE));
 
-    console.log(`🔓 Contatore ${availableCounter}: ${zoneDisponibili.length} zone disponibili`, zoneDisponibili);
+    console.log(`🔓 Contatore ${availableCounter}: ${zoneDisponibili.length} zone disponibili (cumulative)`, zoneDisponibili.map(z => z.ZONA));
     setAvailableZones(zoneDisponibili);
   }, [availableCounter, itinerari, zone]);
 
@@ -250,16 +251,6 @@ function TripEditor() {
       setSelectedPacchetto(null);
     }
 
-    // 🆕 Incrementa il contatore disponibile per sbloccare le zone successive
-    // Solo se non siamo già all'ultimo contatore possibile
-    const maxContatore = Math.max(...itinerari.map(it => parseInt(it.CONTATORE_ZONA) || 0));
-    if (availableCounter < maxContatore) {
-      setAvailableCounter(prev => prev + 1);
-      toast.info(`🔓 Nuove zone sbloccate!`, {
-        description: 'Puoi ora selezionare altre destinazioni'
-      });
-    }
-
     console.log(`🗺️ Zona selezionata: ${zona.ZONA} (${zona.CODICE})`);
     console.log(`📦 Pacchetti trovati: ${zonePacchetti.length}`);
   };
@@ -352,24 +343,46 @@ function TripEditor() {
     }
 
     // MODALITÀ NORMALE - Aggiungi nuovi blocchi
-    // Calcola giorni necessari (1 esperienza = 1 giorno)
+
+    // 🆕 Calcolo giorni necessari con logica avanzata:
+    // - 1 esperienza = 1 giorno attività
+    // - Aggiungi 1 giorno logistico di arrivo nella zona
+    // - Se cambi zona, aggiungi 1 giorno di spostamento
+
     const experienceDays = validExperiences.length;
-    const availableDays = totalDays - 1 - filledBlocks.length; // -1 per il giorno di arrivo
+    let totalDaysNeeded = experienceDays + 1; // +1 giorno logistico arrivo
+
+    // Verifica se c'è cambio zona rispetto all'ultima zona visitata
+    const lastBlock = filledBlocks.length > 0 ? filledBlocks[filledBlocks.length - 1] : null;
+    const isZoneChange = lastBlock && lastBlock.codiceZona !== codiceZona;
+
+    if (isZoneChange) {
+      totalDaysNeeded += 1; // +1 giorno spostamento tra zone
+      console.log(`🚗 Cambio zona rilevato: ${lastBlock.zona} → ${pexp.ZONA}. Aggiunto 1 giorno di spostamento`);
+    }
+
+    const availableDays = totalDays - 1 - filledBlocks.length; // -1 per il giorno di arrivo iniziale
 
     // Validazione: controlla se ci sono abbastanza giorni disponibili
-    if (experienceDays > availableDays) {
-      const giornoOGiorni = experienceDays === 1 ? 'giorno' : 'giorni';
+    if (totalDaysNeeded > availableDays) {
+      const giornoOGiorni = totalDaysNeeded === 1 ? 'giorno' : 'giorni';
       const giornoOGiorni2 = availableDays === 1 ? 'giorno' : 'giorni';
+
+      // Mostra dettaglio giorni necessari
+      let dettaglio = `${experienceDays} ${experienceDays === 1 ? 'giorno' : 'giorni'} di esperienze + 1 giorno logistico`;
+      if (isZoneChange) {
+        dettaglio += ' + 1 giorno spostamento';
+      }
 
       // Mostra alert chiedendo se vuole aggiungere giorni
       const shouldAddDays = window.confirm(
-        `⚠️ Il pacchetto richiede ${experienceDays} ${giornoOGiorni}, ma hai solo ${availableDays} ${giornoOGiorni2} disponibili.\n\n` +
-        `Vuoi aggiungere ${experienceDays - availableDays} ${giornoOGiorni} al viaggio?`
+        `⚠️ Il pacchetto richiede ${totalDaysNeeded} ${giornoOGiorni} (${dettaglio}), ma hai solo ${availableDays} ${giornoOGiorni2} disponibili.\n\n` +
+        `Vuoi aggiungere ${totalDaysNeeded - availableDays} ${giornoOGiorni} al viaggio?`
       );
 
       if (shouldAddDays) {
         // Aggiungi giorni necessari
-        const newTotalDays = totalDays + (experienceDays - availableDays);
+        const newTotalDays = totalDays + (totalDaysNeeded - availableDays);
         setTotalDays(newTotalDays);
 
         toast.success('Giorni aggiunti al viaggio!', {
@@ -400,23 +413,67 @@ function TripEditor() {
 
     // Riempi blocchi giorni con le esperienze
     const newBlocks = [];
-    const startDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2; // Inizia dal giorno 2 (1 è arrivo)
+    let currentDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2; // Inizia dal giorno 2 (1 è arrivo)
 
+    // 🆕 Se c'è cambio zona, aggiungi giorno di spostamento
+    if (isZoneChange) {
+      newBlocks.push({
+        day: currentDay,
+        type: 'transfer',
+        zona: pexp.ZONA,
+        codiceZona: codiceZona,
+        packageName: null,
+        experience: {
+          nome: `Spostamento verso ${pexp.ZONA}`,
+          descrizione: `Giorno dedicato al trasferimento da ${lastBlock.zona} a ${pexp.ZONA}`,
+          type: 'transfer'
+        }
+      });
+      currentDay++;
+    }
+
+    // 🆕 Aggiungi giorno logistico di arrivo nella zona
+    newBlocks.push({
+      day: currentDay,
+      type: 'logistics',
+      zona: pexp.ZONA,
+      codiceZona: codiceZona,
+      packageName: pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome,
+      experience: {
+        nome: `Arrivo e sistemazione a ${pexp.ZONA}`,
+        descrizione: `Giorno logistico per check-in hotel e orientamento`,
+        type: 'logistics'
+      }
+    });
+    currentDay++;
+
+    // Aggiungi le esperienze
     for (let i = 0; i < experienceDays; i++) {
-      const dayNum = startDay + i;
-      if (dayNum <= totalDays) {
+      if (currentDay <= totalDays) {
         newBlocks.push({
-          day: dayNum,
+          day: currentDay,
+          type: 'experience',
           experience: validExperiences[i],
           packageName: pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome,
-          zona: pexp.ZONA, // 🆕 Traccia zona del pacchetto
-          codiceZona: codiceZona // 🆕 Codice zona (es: ZTHBA01)
+          zona: pexp.ZONA,
+          codiceZona: codiceZona
         });
+        currentDay++;
       }
     }
 
     // Aggiungi i nuovi blocchi
     setFilledBlocks([...filledBlocks, ...newBlocks]);
+
+    // 🆕 Incrementa il contatore disponibile per sbloccare le zone successive
+    // Solo quando viene confermato un pacchetto, non alla selezione della zona
+    const maxContatore = Math.max(...itinerari.map(it => parseInt(it.CONTATORE_ZONA) || 0));
+    if (availableCounter < maxContatore) {
+      setAvailableCounter(prev => prev + 1);
+      toast.info(`🔓 Nuove zone sbloccate!`, {
+        description: 'Puoi ora esplorare altre destinazioni'
+      });
+    }
 
     // Chiudi tutte le tab
     setActiveTab(null);
@@ -829,15 +886,18 @@ function TripEditor() {
       {/* Header con riepilogo wizard */}
       <HeaderWizardSummary wizardData={wizardData} />
 
+      {/* Day Block Sticky - Discreto e sempre visibile */}
+      <DayBlocksGrid
+        totalDays={totalDays}
+        filledBlocks={filledBlocks}
+        onBlockClick={handleBlockClick}
+        onAddDay={handleAddDay}
+        onRemoveDay={handleRemoveDay}
+        stickyCompact={true}
+      />
+
       {/* Contenuto principale */}
       <div className={styles.content}>
-        {/* Barra di stato giorni - Compatta e user-friendly */}
-        <section className={styles.section}>
-          <DayStatusBar
-            totalDays={totalDays}
-            filledBlocks={filledBlocks}
-          />
-        </section>
 
         {/* Azioni principali - SEMPRE IN ALTO */}
         <section className={styles.actionsSection}>
