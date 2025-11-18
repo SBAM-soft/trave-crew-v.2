@@ -108,8 +108,8 @@ export const CHAT_FLOW_CONFIG = {
       }
     }),
 
-    onEnter: async ({ addBotMessage, getMessage, tripData, store }) => {
-      const message = getMessage({ wizardData: tripData.wizardData });
+    onEnter: async ({ addBotMessage, getMessage, wizardData, store }) => {
+      const message = getMessage({ wizardData });
       addBotMessage(message.text, 'bot_message_with_card', { card: message.card });
 
       // Carica dati necessari in cache se non già caricati
@@ -130,7 +130,7 @@ export const CHAT_FLOW_CONFIG = {
           ]);
 
           // Filtra per destinazione (Thailandia)
-          const destName = tripData.wizardData.destinazioneNome?.toLowerCase() || 'thailandia';
+          const destName = wizardData.destinazioneNome?.toLowerCase() || 'thailandia';
 
           const destZone = zone.filter(z =>
             z.DESTINAZIONE?.toLowerCase().includes(destName)
