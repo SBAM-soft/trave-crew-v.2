@@ -481,8 +481,10 @@ function TripEditor() {
     setCurrentExp(null);
 
     // Feedback utente con toast
+    const startDay = newBlocks.length > 0 ? newBlocks[0].day : 0;
+    const endDay = newBlocks.length > 0 ? newBlocks[newBlocks.length - 1].day : 0;
     toast.success(`Pacchetto "${pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome}" confermato!`, {
-      description: `${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1})`,
+      description: `${newBlocks.length} blocchi aggiunti al viaggio (giorni ${startDay}-${endDay})`,
     });
 
   };

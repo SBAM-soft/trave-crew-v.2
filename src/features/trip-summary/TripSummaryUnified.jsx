@@ -155,7 +155,9 @@ function TripSummaryUnified() {
   }, [wizardData]);
 
   const experienceImages = useMemo(() => {
-    return filledBlocks.slice(0, 6).map((block, index) => {
+    // Filtra solo blocchi di tipo 'experience' per le immagini
+    const realExperiences = filledBlocks.filter(b => b.type === 'experience');
+    return realExperiences.slice(0, 6).map((block, index) => {
       const exp = block.experience;
       if (!exp) return null;
       const media = generateMediaForExperience(exp, {
@@ -173,9 +175,9 @@ function TripSummaryUnified() {
     let hotelsCost = 0;
     let extrasCost = 0;
 
-    // Costo esperienze
+    // Costo esperienze (solo blocchi tipo 'experience', non transfer/logistics)
     filledBlocks.forEach(block => {
-      if (block.experience && block.experience.prezzo) {
+      if (block.type === 'experience' && block.experience && block.experience.prezzo) {
         const price = toPrice(block.experience.prezzo, 0);
         const numPersone = toInt(wizardData.numeroPersone, 1);
         experiencesCost += price * numPersone;
@@ -505,7 +507,7 @@ function TripSummaryUnified() {
               </div>
               <div className={styles.statItem}>
                 <span className={styles.statIcon}>🎯</span>
-                <span className={styles.statValue}>{filledBlocks.length}</span>
+                <span className={styles.statValue}>{filledBlocks.filter(b => b.type === 'experience').length}</span>
                 <span className={styles.statLabel}>Esperienze</span>
               </div>
               <div className={styles.statItem}>
