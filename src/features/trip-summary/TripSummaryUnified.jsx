@@ -70,26 +70,10 @@ function TripSummaryUnified() {
 
   // ============ TIMELINE ANIMATION ============
   useEffect(() => {
-    if (showTimeline && currentIndex < totalDays) {
-      const timer = setTimeout(() => {
-        setVisibleDays(prev => [...prev, currentIndex + 1]);
-        setCurrentIndex(prev => prev + 1);
-      }, 300); // 300ms tra un giorno e l'altro
-
-      return () => clearTimeout(timer);
-    } else if (showTimeline && currentIndex >= totalDays) {
-      // Timeline completata - attendi 2 secondi e poi espandi automaticamente
-      const expandTimer = setTimeout(() => {
-        setTimelineComplete(true);
-        setShowTimeline(false);
-        toast.success('✨ Itinerario completo!', {
-          description: 'Ecco il riepilogo del tuo viaggio perfetto'
-        });
-      }, 2000);
-
-      return () => clearTimeout(expandTimer);
-    }
-  }, [currentIndex, totalDays, showTimeline]);
+    // Mostra tutto subito senza animazione timeline separata
+    setShowTimeline(false);
+    setTimelineComplete(true);
+  }, []);
 
   // Costruisce i dati della timeline
   const timelineData = useMemo(() => {
@@ -110,6 +94,32 @@ function TripSummaryUnified() {
       const block = filledBlocks.find(b => b.day === day);
 
       if (block && block.experience) {
+        // Gestisci diversi tipi di blocchi
+        if (block.type === 'transfer') {
+          return {
+            day,
+            type: 'transfer',
+            title: block.experience.nome || 'Spostamento',
+            subtitle: block.zona || '',
+            description: block.experience.descrizione || '',
+            icon: '🚗',
+            color: '#f59e0b'
+          };
+        }
+
+        if (block.type === 'logistics') {
+          return {
+            day,
+            type: 'logistics',
+            title: block.experience.nome || 'Giorno logistico',
+            subtitle: block.zona || '',
+            description: block.experience.descrizione || '',
+            icon: '🏨',
+            color: '#8b5cf6'
+          };
+        }
+
+        // Esperienza normale
         return {
           day,
           type: 'experience',
@@ -450,170 +460,12 @@ function TripSummaryUnified() {
     );
   }
 
-  // ============ TIMELINE VIEW ============
-  if (showTimeline) {
-    return (
-      <div className={styles.timelineContainer}>
-        <Toaster position="top-right" richColors />
-
-        <div className={styles.timelineHeader}>
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className={styles.timelineTitle}>
-              Il Tuo Itinerario di {totalDays} Giorni
-            </h1>
-            <p className={styles.timelineSubtitle}>
-              Un viaggio indimenticabile ti aspetta in {wizardData.destinazioneNome || wizardData.destinazione}
-            </p>
-          </motion.div>
-
-          <motion.div
-            className={styles.stats}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            <div className={styles.statItem}>
-              <span className={styles.statIcon}>🗓️</span>
-              <span className={styles.statValue}>{totalDays}</span>
-              <span className={styles.statLabel}>Giorni</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statIcon}>🎯</span>
-              <span className={styles.statValue}>{filledBlocks.length}</span>
-              <span className={styles.statLabel}>Esperienze</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statIcon}>👥</span>
-              <span className={styles.statValue}>{wizardData.numeroPersone}</span>
-              <span className={styles.statLabel}>Persone</span>
-            </div>
-          </motion.div>
-        </div>
-
-        <div className={styles.timeline}>
-          <AnimatePresence>
-            {timelineData.map((item, index) => {
-              const isVisible = visibleDays.includes(item.day);
-              if (!isVisible) return null;
-
-              return (
-                <motion.div
-                  key={item.day}
-                  className={`${styles.timelineItem} ${styles[item.type]}`}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    type: "spring",
-                    stiffness: 100
-                  }}
-                >
-                  {index < timelineData.length - 1 && (
-                    <motion.div
-                      className={styles.connector}
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: 1 }}
-                      transition={{ delay: 0.3, duration: 0.4 }}
-                    />
-                  )}
-
-                  <motion.div
-                    className={styles.marker}
-                    style={{ backgroundColor: item.color }}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{
-                      delay: 0.2,
-                      type: "spring",
-                      stiffness: 200
-                    }}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <span className={styles.markerIcon}>{item.icon}</span>
-                    <span className={styles.markerDay}>Giorno {item.day}</span>
-                  </motion.div>
-
-                  <motion.div
-                    className={styles.card}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3, duration: 0.5 }}
-                    whileHover={{
-                      y: -5,
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
-                    }}
-                  >
-                    <div className={styles.cardContent}>
-                      <h3 className={styles.cardTitle}>{item.title}</h3>
-                      <p className={styles.cardSubtitle}>📍 {item.subtitle}</p>
-
-                      {item.description && (
-                        <p className={styles.cardDescription}>
-                          {item.description.length > 100
-                            ? `${item.description.substring(0, 100)}...`
-                            : item.description}
-                        </p>
-                      )}
-
-                      {item.type === 'experience' && (
-                        <div className={styles.cardMeta}>
-                          {item.duration && (
-                            <span className={styles.metaBadge}>
-                              ⏱️ {item.duration}
-                            </span>
-                          )}
-                          {item.difficulty && (
-                            <span className={styles.metaBadge}>
-                              🚶 Difficoltà {item.difficulty}/3
-                            </span>
-                          )}
-                          {item.price && (
-                            <span className={styles.metaBadge}>
-                              💰 €{item.price}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-
-        <motion.div
-          className={styles.progressIndicator}
-          initial={{ width: 0 }}
-          animate={{ width: `${(currentIndex / totalDays) * 100}%` }}
-          transition={{ duration: 0.3 }}
-        />
-      </div>
-    );
-  }
-
-  // ============ FULL SUMMARY VIEW ============
+  // ============ UNIFIED SUMMARY VIEW ============
   return (
     <div className={styles.tripSummary}>
       <Toaster position="top-right" richColors />
 
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumbContainer}>
-        <Breadcrumb
-          items={[
-            { label: 'Home', href: '/' },
-            { label: 'Crea Viaggio', href: '/create' },
-            { label: 'Trip Editor', href: '/trip-editor' },
-            { label: 'Riepilogo Viaggio' }
-          ]}
-        />
-      </div>
-
-      {/* Hero Image */}
+      {/* Hero Section con Statistiche Animate */}
       <motion.div
         className={styles.heroSection}
         initial={{ opacity: 0 }}
@@ -627,52 +479,93 @@ function TripSummaryUnified() {
         />
         <div className={styles.heroOverlay}>
           <div className={styles.heroContent}>
-            <div className={styles.phaseIndicator}>
-              <span className={styles.phaseNumber}>Fase 3/3</span>
-              <div className={styles.phaseSteps}>
-                <div className={styles.stepCompleted}>✓ Itinerario</div>
-                <div className={styles.stepCompleted}>✓ Hotel</div>
-                <div className={styles.stepActive}>📋 Riepilogo</div>
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className={styles.title}>
+                ✨ Il Tuo Viaggio Perfetto
+              </h1>
+              <p className={styles.subtitle}>
+                {wizardData.destinazioneNome || wizardData.destinazione} • {totalDays} Giorni Indimenticabili
+              </p>
+            </motion.div>
+
+            <motion.div
+              className={styles.stats}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <div className={styles.statItem}>
+                <span className={styles.statIcon}>🗓️</span>
+                <span className={styles.statValue}>{totalDays}</span>
+                <span className={styles.statLabel}>Giorni</span>
               </div>
-            </div>
-            <h1 className={styles.title}>🎉 Riepilogo del Viaggio</h1>
-            <p className={styles.subtitle}>
-              {wizardData.destinazioneNome || wizardData.destinazione} • {totalDays} giorni • {wizardData.numeroPersone} {wizardData.numeroPersone === 1 ? 'persona' : 'persone'}
-            </p>
+              <div className={styles.statItem}>
+                <span className={styles.statIcon}>🎯</span>
+                <span className={styles.statValue}>{filledBlocks.length}</span>
+                <span className={styles.statLabel}>Esperienze</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statIcon}>👥</span>
+                <span className={styles.statValue}>{wizardData.numeroPersone}</span>
+                <span className={styles.statLabel}>Persone</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statIcon}>💰</span>
+                <span className={styles.statValue}>€{costs.total.toFixed(0)}</span>
+                <span className={styles.statLabel}>Totale</span>
+              </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>
 
-      {/* Experience Images Gallery */}
-      {experienceImages.length > 0 && (
+      {/* Timeline Giornaliera Integrata */}
+      <div className={styles.content}>
         <motion.div
-          className={styles.gallerySection}
+          className={styles.timelineSection}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
         >
-          <div className={styles.galleryGrid}>
-            {experienceImages.map((imgUrl, index) => (
+          <h2 className={styles.sectionTitle}>🗓️ Il Tuo Itinerario Giorno per Giorno</h2>
+          <div className={styles.timeline}>
+            {timelineData.map((item, index) => (
               <motion.div
-                key={index}
-                className={styles.galleryItem}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                key={item.day}
+                className={`${styles.timelineItem} ${styles[item.type]}`}
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  delay: 0.5 + index * 0.1,
+                  duration: 0.4
+                }}
               >
-                <img
-                  src={imgUrl}
-                  alt={`Esperienza ${index + 1}`}
-                  className={styles.galleryImage}
-                />
+                <div className={styles.timelineDot} style={{ backgroundColor: item.color }}>
+                  <span className={styles.dayIcon}>{item.icon}</span>
+                </div>
+                <div className={styles.timelineContent}>
+                  <div className={styles.timelineDay}>Giorno {item.day}</div>
+                  <h3 className={styles.timelineTitle}>{item.title}</h3>
+                  <p className={styles.timelineSubtitle}>📍 {item.subtitle}</p>
+                  {item.description && (
+                    <p className={styles.timelineDescription}>{item.description}</p>
+                  )}
+                  {item.type === 'experience' && (
+                    <div className={styles.timelineMeta}>
+                      {item.duration && <span>⏱️ {item.duration}</span>}
+                      {item.difficulty && <span>🚶 Difficoltà {item.difficulty}/3</span>}
+                      {item.price && <span>💰 €{item.price}</span>}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
         </motion.div>
-      )}
-
-      {/* Content */}
-      <div className={styles.content}>
         {/* Card Informazioni Viaggio */}
         <motion.div
           className={styles.card}
@@ -720,173 +613,6 @@ function TripSummaryUnified() {
                 </div>
               )}
             </div>
-          </div>
-        </motion.div>
-
-        {/* Card Esperienze */}
-        <motion.div
-          className={styles.card}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>🎯 Esperienze Selezionate</h2>
-            <button className={styles.editBtn} onClick={() => handleEdit('experiences')}>
-              ✏️ Modifica
-            </button>
-          </div>
-          <div className={styles.cardBody}>
-            {filledBlocks.length > 0 ? (
-              <div className={styles.experiencesList}>
-                {filledBlocks.map((block, index) => {
-                  if (!block.experience) return null;
-                  const exp = block.experience;
-                  return (
-                    <div key={index} className={styles.experienceItem}>
-                      <div className={styles.expIcon}>🎯</div>
-                      <div className={styles.expInfo}>
-                        <h3 className={styles.expName}>{exp.nome || exp.NOME}</h3>
-                        <p className={styles.expDay}>Giorno {block.day}</p>
-                        {exp.durata && <p className={styles.expDuration}>⏱️ {exp.durata}</p>}
-                      </div>
-                      <div className={styles.expPrice}>
-                        €{(parseFloat(exp.prezzo) || 0).toFixed(2)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className={styles.emptyState}>Nessuna esperienza selezionata</p>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Card Hotel - Espandibile */}
-        <motion.div
-          className={styles.card}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-        >
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>🏨 Hotel</h2>
-            {needsHotelSelection && selectedHotels.length === 0 && (
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setShowHotelSelection(!showHotelSelection);
-                  if (!showHotelSelection) loadHotelData();
-                }}
-              >
-                {showHotelSelection ? '🔼 Chiudi' : '🏨 Seleziona Hotel'}
-              </Button>
-            )}
-          </div>
-          <div className={styles.cardBody}>
-            {selectedHotels.length > 0 ? (
-              <div className={styles.hotelsList}>
-                {selectedHotels.map((item, index) => {
-                  if (!item.hotel) return null;
-                  const hotel = item.hotel;
-                  return (
-                    <div key={index} className={styles.hotelItem}>
-                      <div className={styles.hotelIcon}>🏨</div>
-                      <div className={styles.hotelInfo}>
-                        <h3 className={styles.hotelName}>{hotel.ZONA}</h3>
-                        <p className={styles.hotelZone}>{item.zona}</p>
-                        <p className={styles.hotelType}>
-                          {hotel.TIPO === 'LOW' && '€ Budget'}
-                          {hotel.TIPO === 'MEDIUM' && '€€ Medio'}
-                          {hotel.TIPO === 'HIGH' && '€€€ Lusso'}
-                        </p>
-                        {item.extras && item.extras.length > 0 && (
-                          <p className={styles.hotelExtras}>
-                            + {item.extras.length} extra
-                          </p>
-                        )}
-                      </div>
-                      <div className={styles.hotelPrice}>
-                        €{(parseFloat(hotel.PREZZO) || 0).toFixed(2)} / notte
-                        <br />
-                        <span className={styles.hotelNights}>× {item.notti} notti</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : needsHotelSelection ? (
-              <p className={styles.emptyState}>
-                Clicca su "Seleziona Hotel" per scegliere gli hotel per ogni zona
-              </p>
-            ) : (
-              <p className={styles.emptyState}>Nessun hotel selezionato</p>
-            )}
-
-            {/* Hotel Selection Expandable Section */}
-            <AnimatePresence>
-              {showHotelSelection && (
-                <motion.div
-                  className={styles.hotelSelectionSection}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {loadingHotels ? (
-                    <div className={styles.loading}>
-                      <div className={styles.spinner}></div>
-                      <p>Caricamento hotel disponibili...</p>
-                    </div>
-                  ) : (
-                    <div className={styles.hotelZones}>
-                      {zoneVisitate.map((zona, idx) => {
-                        const zonaKey = zona.nome.toUpperCase().trim();
-                        const hotelsByBudget = groupedHotels[zonaKey] || {};
-                        const userBudget = wizardData.budget || 'medium';
-                        const budgetMap = { low: 'LOW', medium: 'MEDIUM', high: 'HIGH' };
-                        const availableHotels = hotelsByBudget[budgetMap[userBudget]] || [];
-                        const selectedHotel = hotelSelections[zonaKey]?.hotel;
-                        const notti = hotelSelections[zonaKey]?.notti || 0;
-
-                        return (
-                          <div key={idx} className={styles.zoneSection}>
-                            <h3 className={styles.zoneName}>
-                              📍 {zona.nome} ({notti} {notti === 1 ? 'notte' : 'notti'})
-                            </h3>
-                            <div className={styles.hotelsGrid}>
-                              {availableHotels.length > 0 ? (
-                                availableHotels.map((hotel, hotelIdx) => (
-                                  <HotelCard
-                                    key={hotelIdx}
-                                    hotel={hotel}
-                                    isSelected={selectedHotel?.CODICE === hotel.CODICE}
-                                    onClick={() => handleSelectHotel(zonaKey, hotel)}
-                                  />
-                                ))
-                              ) : (
-                                <p className={styles.noHotels}>Nessun hotel disponibile per questa zona e budget</p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                      <div className={styles.confirmSection}>
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          onClick={handleConfirmHotels}
-                        >
-                          ✅ Conferma Hotel
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         </motion.div>
 
@@ -955,6 +681,153 @@ function TripSummaryUnified() {
             </p>
           </div>
         </motion.div>
+
+        {/* Pulsante Scegli Hotel - Espandibile */}
+        {needsHotelSelection && selectedHotels.length === 0 && (
+          <motion.div
+            className={styles.hotelCTA}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+          >
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                setShowHotelSelection(!showHotelSelection);
+                if (!showHotelSelection) loadHotelData();
+              }}
+            >
+              {showHotelSelection ? '🔼 Chiudi Selezione Hotel' : '🏨 Scegli Hotel'}
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Sezione Hotel Espandibile */}
+        <AnimatePresence>
+          {showHotelSelection && (
+            <motion.div
+              className={styles.hotelSection}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.cardTitle}>🏨 Seleziona i Tuoi Hotel</h2>
+                </div>
+                <div className={styles.cardBody}>
+                  {loadingHotels ? (
+                    <div className={styles.loading}>
+                      <div className={styles.spinner}></div>
+                      <p>Caricamento hotel disponibili...</p>
+                    </div>
+                  ) : (
+                    <div className={styles.hotelZones}>
+                      {zoneVisitate.map((zona, idx) => {
+                        const zonaKey = zona.nome.toUpperCase().trim();
+                        const hotelsByBudget = groupedHotels[zonaKey] || {};
+                        const userBudget = wizardData.budget || 'medium';
+                        const budgetMap = { low: 'LOW', medium: 'MEDIUM', high: 'HIGH' };
+                        const availableHotels = hotelsByBudget[budgetMap[userBudget]] || [];
+                        const selectedHotel = hotelSelections[zonaKey]?.hotel;
+                        const notti = hotelSelections[zonaKey]?.notti || 0;
+
+                        return (
+                          <div key={idx} className={styles.zoneSection}>
+                            <h3 className={styles.zoneName}>
+                              📍 {zona.nome} ({notti} {notti === 1 ? 'notte' : 'notti'})
+                            </h3>
+                            <div className={styles.hotelsGrid}>
+                              {availableHotels.length > 0 ? (
+                                availableHotels.map((hotel, hotelIdx) => (
+                                  <HotelCard
+                                    key={hotelIdx}
+                                    hotel={hotel}
+                                    isSelected={selectedHotel?.CODICE === hotel.CODICE}
+                                    onClick={() => handleSelectHotel(zonaKey, hotel)}
+                                  />
+                                ))
+                              ) : (
+                                <p className={styles.noHotels}>Nessun hotel disponibile per questa zona e budget</p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      <div className={styles.confirmSection}>
+                        <Button
+                          variant="primary"
+                          size="lg"
+                          onClick={handleConfirmHotels}
+                        >
+                          ✅ Conferma Hotel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Hotel Selezionati */}
+        {selectedHotels.length > 0 && (
+          <motion.div
+            className={styles.card}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>🏨 I Tuoi Hotel</h2>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowHotelSelection(true);
+                  loadHotelData();
+                }}
+              >
+                ✏️ Modifica
+              </Button>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.hotelsList}>
+                {selectedHotels.map((item, index) => {
+                  if (!item.hotel) return null;
+                  const hotel = item.hotel;
+                  return (
+                    <div key={index} className={styles.hotelItem}>
+                      <div className={styles.hotelIcon}>🏨</div>
+                      <div className={styles.hotelInfo}>
+                        <h3 className={styles.hotelName}>{hotel.ZONA}</h3>
+                        <p className={styles.hotelZone}>{item.zona}</p>
+                        <p className={styles.hotelType}>
+                          {hotel.TIPO === 'LOW' && '€ Budget'}
+                          {hotel.TIPO === 'MEDIUM' && '€€ Medio'}
+                          {hotel.TIPO === 'HIGH' && '€€€ Lusso'}
+                        </p>
+                        {item.extras && item.extras.length > 0 && (
+                          <p className={styles.hotelExtras}>
+                            + {item.extras.length} extra
+                          </p>
+                        )}
+                      </div>
+                      <div className={styles.hotelPrice}>
+                        €{(parseFloat(hotel.PREZZO) || 0).toFixed(2)} / notte
+                        <br />
+                        <span className={styles.hotelNights}>× {item.notti} notti</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Footer Actions */}
