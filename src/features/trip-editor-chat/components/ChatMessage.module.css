@@ -79,9 +79,24 @@
   font-weight: 600;
 }
 
-.cardsContainer,
+.cardsContainer {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  max-width: 100%;
+}
+
 .mapContainer {
   margin-top: 16px;
+  width: 100%;
+  max-width: 800px;
+}
+
+@media (max-width: 640px) {
+  .cardsContainer {
+    grid-template-columns: 1fr;
+  }
 }
 
 .placeholder {

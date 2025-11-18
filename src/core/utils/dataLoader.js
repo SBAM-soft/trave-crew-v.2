@@ -96,7 +96,7 @@ const mergeByCode = (techData, copyData) => {
  * @param {boolean} hasCopy - Se l'entità ha anche foglio copy (default: true)
  * @returns {Promise<Array>} - Array di oggetti uniti
  */
-const loadEntityData = async (entityName, hasCopy = true) => {
+export const loadEntityData = async (entityName, hasCopy = true) => {
   const techFile = `${entityName}_tech.csv`;
 
   if (!hasCopy) {

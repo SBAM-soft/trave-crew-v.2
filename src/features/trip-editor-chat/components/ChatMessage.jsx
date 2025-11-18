@@ -1,5 +1,8 @@
 import PropTypes from 'prop-types';
 import ChatOptions from './ChatOptions';
+import ChatCard from './ChatCard';
+import ChatMap from './ChatMap';
+import ChatHotelSelector from './ChatHotelSelector';
 import styles from './ChatMessage.module.css';
 
 /**
@@ -77,12 +80,14 @@ function ChatMessage({ message, onOptionSelect, onCardSelect }) {
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           <div className={styles.cardsContainer}>
-            {/* Le card verranno renderizzate dal componente ChatCard */}
-            {data?.cards && (
-              <p className={styles.placeholder}>
-                [Componente ChatCard - da implementare]
-              </p>
-            )}
+            {data?.cards && data.cards.map(card => (
+              <ChatCard
+                key={card.id}
+                card={{ ...card, zoneCode: data.zone?.code }}
+                onSelect={onCardSelect}
+                onDetails={onCardSelect}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -97,13 +102,37 @@ function ChatMessage({ message, onOptionSelect, onCardSelect }) {
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           <div className={styles.mapContainer}>
-            {/* Mappa verrà renderizzata dal componente ChatMap */}
             {data?.zones && (
-              <p className={styles.placeholder}>
-                [Componente ChatMap - da implementare]
-              </p>
+              <ChatMap
+                zones={data.zones}
+                selectedZones={[]}
+                onZoneSelect={onOptionSelect}
+                multiSelect={data.multiSelect}
+                daysAvailable={data.daysAvailable}
+              />
             )}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Messaggio bot con hotel selector
+  if (type === 'bot_hotel_selector') {
+    return (
+      <div className={`${styles.message} ${styles.bot}`}>
+        <div className={styles.avatar}>🤖</div>
+        <div className={styles.bubble}>
+          <p className={styles.text}>{content}</p>
+          {data && (
+            <ChatHotelSelector
+              zona={data.zona}
+              notti={data.notti}
+              tiers={data.tiers}
+              extras={data.extras}
+              onSelect={onOptionSelect}
+            />
+          )}
         </div>
       </div>
     );
