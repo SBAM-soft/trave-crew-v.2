@@ -100,8 +100,8 @@ export const CHAT_FLOW_CONFIG = {
     id: 'welcome',
     type: 'bot_message_with_card',
 
-    getMessage: ({ wizardData }) => ({
-      text: `Ciao! Vedo che vuoi organizzare un viaggio in ${wizardData.destinazioneNome || wizardData.destinazione} per ${wizardData.numeroPersone} persone con budget ${wizardData.budget}.\n\nTi aiuterò a costruire l'itinerario perfetto! 🎒`,
+    getMessage: ({ wizardData = {} }) => ({
+      text: `Ciao! Vedo che vuoi organizzare un viaggio in ${wizardData.destinazioneNome || wizardData.destinazione || 'una destinazione fantastica'} per ${wizardData.numeroPersone || 2} persone con budget ${wizardData.budget || 'medio'}.\n\nTi aiuterò a costruire l'itinerario perfetto! 🎒`,
       card: {
         type: 'wizard_summary',
         data: wizardData
@@ -130,7 +130,7 @@ export const CHAT_FLOW_CONFIG = {
           ]);
 
           // Filtra per destinazione (Thailandia)
-          const destName = wizardData.destinazioneNome?.toLowerCase() || 'thailandia';
+          const destName = wizardData?.destinazioneNome?.toLowerCase() || wizardData?.destinazione?.toLowerCase() || 'thailandia';
 
           const destZone = zone.filter(z =>
             z.DESTINAZIONE?.toLowerCase().includes(destName)
@@ -255,11 +255,11 @@ export const CHAT_FLOW_CONFIG = {
     id: 'zones',
     type: 'bot_map',
 
-    getMessage: ({ wizardData, tripData, availableCounter }) => {
+    getMessage: ({ wizardData = {}, tripData, availableCounter }) => {
       const daysAvailable = tripData.totalDays - 2;
 
       if (availableCounter === 1) {
-        return `Iniziamo con la zona di arrivo! ✈️\n\nSeleziona l'aeroporto dove vuoi iniziare il tuo viaggio in ${wizardData.destinazioneNome || wizardData.destinazione}.\n\n💡 Altre zone si sbloccheranno dopo la selezione del primo pacchetto.`;
+        return `Iniziamo con la zona di arrivo! ✈️\n\nSeleziona l'aeroporto dove vuoi iniziare il tuo viaggio in ${wizardData.destinazioneNome || wizardData.destinazione || 'questa destinazione'}.\n\n💡 Altre zone si sbloccheranno dopo la selezione del primo pacchetto.`;
       }
 
       return `Ora scegli quali zone visitare durante il tuo viaggio.\n\n💡 Consiglio: 2-3 zone per ${tripData.totalDays} giorni è l'ideale!\n\nHai ${daysAvailable} giorni disponibili per le esperienze.`;
