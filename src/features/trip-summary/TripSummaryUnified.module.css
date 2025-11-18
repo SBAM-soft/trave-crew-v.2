@@ -211,6 +211,20 @@
   padding-bottom: 2rem;
 }
 
+/* Dark theme variant */
+.tripSummary.darkTheme {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Ensure cards are visible in dark theme */
+.tripSummary.darkTheme .card {
+  background: white;
+}
+
+.tripSummary.darkTheme .timelineSection {
+  background: white;
+}
+
 .breadcrumbContainer {
   max-width: 1200px;
   margin: 0 auto;

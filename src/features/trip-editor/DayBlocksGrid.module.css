@@ -127,6 +127,14 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Sticky + Compact combination for scroll effect */
+.container.sticky.compact {
+  transform: scale(0.7);
+  transform-origin: top left;
+  width: 142.86%; /* 100 / 0.7 */
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
 .header {
   margin-bottom: 1.5rem;
   text-align: center;
