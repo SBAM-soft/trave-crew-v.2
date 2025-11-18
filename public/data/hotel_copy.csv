@@ -1,0 +1,70 @@
+CODICE,TIPO,DESTINAZIONE,ZONA,QUARTIERE,BUDGET,SERVIZI_MINIMI
+HTHBALO,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HTHBAME,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHBAHI,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHCHLO,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HTHCHME,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHCHHI,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHPHLO,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HTHPHME,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHPHHI,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHKOLO,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HTHKOME,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHKOHI,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGRATLO,H,GRECIA,ATENE,PLAKA | MONASTIRAKI | SYNTAGMA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HGRATME,H,GRECIA,ATENE,PLAKA | MONASTIRAKI | SYNTAGMA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGRATHI,H,GRECIA,ATENE,PLAKA | MONASTIRAKI | SYNTAGMA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGRSALO,H,GRECIA,SANTORINI,FIRA | OIA | KAMARI,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HGRSAME,H,GRECIA,SANTORINI,FIRA | OIA | KAMARI,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGRSAHI,H,GRECIA,SANTORINI,FIRA | OIA | KAMARI,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGRCRLO,H,GRECIA,CRETA,HERAKLION | CHANIA | RETHYMNO,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HGRCRME,H,GRECIA,CRETA,HERAKLION | CHANIA | RETHYMNO,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGRCRHI,H,GRECIA,CRETA,HERAKLION | CHANIA | RETHYMNO,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUHALO,H,CUBA,L'AVANA,HAVANA VIEJA | VEDADO | MIRAMAR,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HCUHAME,H,CUBA,L'AVANA,HAVANA VIEJA | VEDADO | MIRAMAR,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUHAHI,H,CUBA,L'AVANA,HAVANA VIEJA | VEDADO | MIRAMAR,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUVILO,H,CUBA,VIÑALES,CENTRO | VALLE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HCUVIME,H,CUBA,VIÑALES,CENTRO | VALLE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUVIHI,H,CUBA,VIÑALES,CENTRO | VALLE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUTRLO,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HCUTRME,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUTRHI,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HMAMALO,H,MAROCCO,MARRAKECH,MEDINA | GUELIZ | HIVERNAGE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HMAMAME,H,MAROCCO,MARRAKECH,MEDINA | GUELIZ | HIVERNAGE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HMAMAHI,H,MAROCCO,MARRAKECH,MEDINA | GUELIZ | HIVERNAGE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HMASALO,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,LOW,Campo berbero | Tenda condivisa | Bagno comune | Cena e colazione incluse
+HMASAME,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,MEDIUM,Campo berbero | Tenda privata | Bagno privato | Cena e colazione incluse
+HMASAHI,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,HIGH,Campo luxury | Suite tenda | Bagno privato | Cena e colazione incluse
+HMAESLO,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HMAESME,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HMAESHI,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPBALO,H,SPAGNA,BARCELLONA,GOTHIC QUARTER | EIXAMPLE | GRACIA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HSPBAME,H,SPAGNA,BARCELLONA,GOTHIC QUARTER | EIXAMPLE | GRACIA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPBAHI,H,SPAGNA,BARCELLONA,GOTHIC QUARTER | EIXAMPLE | GRACIA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPMALO,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÑA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HSPMAME,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÑA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPMAHI,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÑA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPANLO,H,SPAGNA,ANDALUSIA,GRANADA | SEVILLA | CORDOBA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HSPANME,H,SPAGNA,ANDALUSIA,GRANADA | SEVILLA | CORDOBA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPANHI,H,SPAGNA,ANDALUSIA,GRANADA | SEVILLA | CORDOBA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGITOLO,H,GIAPPONE,TOKYO,SHIBUYA | SHINJUKU | ASAKUSA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HGITOME,H,GIAPPONE,TOKYO,SHIBUYA | SHINJUKU | ASAKUSA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGITOHI,H,GIAPPONE,TOKYO,SHIBUYA | SHINJUKU | ASAKUSA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGIKYLO,H,GIAPPONE,KYOTO,GION | ARASHIYAMA | STAZIONE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HGIKYME,H,GIAPPONE,KYOTO,GION | ARASHIYAMA | STAZIONE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGIKYHI,H,GIAPPONE,KYOTO,GION | ARASHIYAMA | STAZIONE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGIOSLO,H,GIAPPONE,OSAKA,DOTONBORI | NAMBA | UMEDA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HGIOSME,H,GIAPPONE,OSAKA,DOTONBORI | NAMBA | UMEDA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HGIOSHI,H,GIAPPONE,OSAKA,DOTONBORI | NAMBA | UMEDA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHALO,H,VIETNAM,HANOI,OLD QUARTER | HOAN KIEM | FRENCH QUARTER,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HVIHAME,H,VIETNAM,HANOI,OLD QUARTER | HOAN KIEM | FRENCH QUARTER,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHAHI,H,VIETNAM,HANOI,OLD QUARTER | HOAN KIEM | FRENCH QUARTER,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHLLO,H,VIETNAM,HA LONG BAY,BAI CHAY | TU LONG | BAIA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HVIHLME,H,VIETNAM,HA LONG BAY,BAI CHAY | TU LONG | BAIA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHLHI,H,VIETNAM,HA LONG BAY,BAI CHAY | TU LONG | BAIA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHOLO,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HVIHOME,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHOHI,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVISGLO,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HVISGME,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVISGH I,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
