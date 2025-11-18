@@ -1,0 +1,189 @@
+.statusBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transition: all 0.3s ease;
+}
+
+.statusBar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.25);
+}
+
+.statusBar.compact {
+  padding: 0.625rem 1rem;
+  gap: 1rem;
+  border-radius: 8px;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.statusBar.compact .icon {
+  font-size: 1.25rem;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusBar.compact .label {
+  font-size: 0.688rem;
+}
+
+.value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusBar.compact .value {
+  font-size: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  background: rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  border-radius: 12px;
+  font-size: 0.688rem;
+  font-weight: 600;
+  color: #10b981;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    background: rgba(16, 185, 129, 0.5);
+    border-color: rgba(16, 185, 129, 0.8);
+  }
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  max-width: 400px;
+}
+
+.statusBar.compact .progressContainer {
+  gap: 0.5rem;
+  max-width: 250px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.statusBar.compact .progressBar {
+  height: 8px;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress.complete {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.percentage {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  min-width: 45px;
+  text-align: right;
+}
+
+.statusBar.compact .percentage {
+  font-size: 0.75rem;
+  min-width: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .statusBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.875rem;
+  }
+
+  .progressContainer {
+    max-width: 100%;
+  }
+
+  .info {
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,852 @@
+/* ============ TIMELINE VIEW ============ */
+.timelineContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 4rem 2rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.timelineHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.timelineTitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.timelineSubtitle {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 3rem 0;
+  font-weight: 300;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem 2.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+  font-size: 2.5rem;
+}
+
+.statValue {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* Timeline */
+.timeline {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timelineItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+  align-items: flex-start;
+}
+
+.connector {
+  position: absolute;
+  left: 90px;
+  top: 80px;
+  bottom: -60px;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  transform-origin: top;
+}
+
+.marker {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+}
+
+.markerIcon {
+  font-size: 2.5rem;
+}
+
+.markerDay {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card {
+  background: white;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.cardContent {
+  padding: 2rem;
+}
+
+.cardTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.cardSubtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.cardDescription {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.cardMeta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.metaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.arrival .marker {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.experience .marker {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.free .marker {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.progressIndicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.5);
+}
+
+/* ============ FULL SUMMARY VIEW ============ */
+.tripSummary {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  padding-bottom: 2rem;
+}
+
+.breadcrumbContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+}
+
+/* Hero Section */
+.heroSection {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroContent {
+  max-width: 1200px;
+  padding: 2rem;
+  text-align: center;
+  color: white;
+}
+
+.heroContent .phaseIndicator {
+  margin-bottom: 1rem;
+}
+
+.heroContent .phaseNumber {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.heroContent .phaseSteps {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+.heroContent .stepCompleted,
+.heroContent .stepActive,
+.heroContent .stepPending {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  color: white;
+}
+
+.heroContent .stepActive {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.heroContent .title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  background: none;
+  -webkit-text-fill-color: white;
+}
+
+.heroContent .subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Gallery Section */
+.gallerySection {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  padding: 0 2rem;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.galleryItem {
+  aspect-ratio: 4/3;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.galleryItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.galleryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.galleryItem:hover .galleryImage {
+  transform: scale(1.05);
+}
+
+/* Content */
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tripSummary .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tripSummary .cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.editBtn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editBtn:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.cardBody {
+  padding: 1.5rem;
+}
+
+/* Info Grid */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.infoValue {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Experiences & Hotels List */
+.experiencesList,
+.hotelsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.experienceItem,
+.hotelItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.experienceItem:hover,
+.hotelItem:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.expIcon,
+.hotelIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.expInfo,
+.hotelInfo {
+  flex: 1;
+}
+
+.expName,
+.hotelName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.expDay,
+.hotelZone,
+.hotelType,
+.hotelExtras {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.125rem 0;
+}
+
+.expDuration {
+  font-size: 0.875rem;
+  color: #667eea;
+  margin: 0.25rem 0 0 0;
+}
+
+.expPrice,
+.hotelPrice {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #667eea;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.hotelNights {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.hotelExtras {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.emptyState {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
+  font-size: 0.875rem;
+}
+
+/* Hotel Selection Section */
+.hotelSelectionSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.hotelZones {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.zoneSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.zoneName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.hotelsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.noHotels {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
+  font-size: 0.875rem;
+  grid-column: 1 / -1;
+}
+
+.confirmSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Cost Breakdown */
+.costCard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.costCard .cardHeader {
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.costCard .cardTitle {
+  color: white;
+}
+
+.costBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.costRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.costValue {
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.costDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0.5rem 0;
+}
+
+.costTotal {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+}
+
+.costTotal .costValue {
+  font-size: 1.5rem;
+}
+
+.accessoriesDetail {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.accessoryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.accessoryLabel {
+  font-style: italic;
+}
+
+.accessoryValue {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.costNote {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
+/* Footer */
+.footer {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 2rem;
+  margin-top: 2rem;
+  z-index: 10;
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footerActions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Export Menu */
+.exportButtonWrapper {
+  position: relative;
+}
+
+.exportMenu {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  min-width: 200px;
+  z-index: 100;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.exportOption {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.exportOption:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* Error State */
+.error {
+  max-width: 600px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 2rem;
+}
+
+.error h2 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.error p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timelineContainer {
+    padding: 2rem 1rem;
+  }
+
+  .timelineTitle {
+    font-size: 2.5rem;
+  }
+
+  .timelineSubtitle {
+    font-size: 1.25rem;
+  }
+
+  .stats {
+    gap: 1rem;
+  }
+
+  .statItem {
+    padding: 1rem 1.5rem;
+  }
+
+  .timelineItem {
+    grid-template-columns: 100px 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .marker {
+    width: 80px;
+    height: 80px;
+  }
+
+  .markerIcon {
+    font-size: 1.75rem;
+  }
+
+  .markerDay {
+    font-size: 0.625rem;
+  }
+
+  .connector {
+    left: 50px;
+    top: 60px;
+  }
+
+  .cardTitle {
+    font-size: 1.5rem;
+  }
+
+  .breadcrumbContainer,
+  .content,
+  .footer {
+    padding: 1.5rem 1rem;
+  }
+
+  .heroContent .title {
+    font-size: 1.75rem;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .footerActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .footerActions button {
+    width: 100%;
+  }
+
+  .heroContent .phaseSteps {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .hotelsGrid {
+    grid-template-columns: 1fr;
+  }
+}
