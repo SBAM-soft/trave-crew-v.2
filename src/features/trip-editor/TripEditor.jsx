@@ -4,7 +4,7 @@ import { toast, Toaster } from 'sonner';
 import useNavigationGuard from '../../hooks/useNavigationGuard';
 import HeaderWizardSummary from './HeaderWizardSummary';
 import MapInteractive from './MapInteractive';
-import DayBlocksGrid from './DayBlocksGrid';
+import DayStatusBar from '../../shared/DayStatusBar';
 import PEXPCard from './PEXPCard';
 import PEXPTab from './PEXPTab';
 import DETEXPTab from './DETEXPTab';
@@ -85,14 +85,8 @@ function TripEditor() {
   // State per mostrare timeline spettacolare
   const [showTimeline, setShowTimeline] = useState(false);
 
-  // State per sticky day blocks
-  const [isDayBlocksSticky, setIsDayBlocksSticky] = useState(false);
-
   // Ref per la sezione pacchetti (per scroll automatico)
   const packagesRef = useRef(null);
-
-  // Ref per la sezione "i tuoi giorni"
-  const dayBlocksRef = useRef(null);
 
   // Protezione navigazione - Previene perdita dati non salvati
   const hasUnsavedChanges = filledBlocks.length > 0 && filledBlocks.length < totalDays - 1;
@@ -115,19 +109,6 @@ function TripEditor() {
     }
   }, [loading, editMode, filledBlocks.length, totalDays]);
 
-  // Scroll listener per sticky day blocks
-  useEffect(() => {
-    const handleScroll = () => {
-      if (dayBlocksRef.current) {
-        const rect = dayBlocksRef.current.getBoundingClientRect();
-        // Se il blocco giorni è scrollato oltre la top (sopra il viewport), rendilo sticky
-        setIsDayBlocksSticky(rect.top <= 0);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const loadData = async () => {
     try {
@@ -252,15 +233,6 @@ function TripEditor() {
     }
   };
 
-  // Funzione per scrollare alla sezione "i tuoi giorni"
-  const scrollToDayBlocks = () => {
-    if (dayBlocksRef.current) {
-      dayBlocksRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
-  };
 
   // Handler click pacchetto → Apre TAB PEXP fullscreen
   const handlePacchettoClick = (pexp) => {
@@ -415,10 +387,6 @@ function TripEditor() {
       description: `${newBlocks.length} esperienze aggiunte al viaggio (giorni ${startDay}-${startDay + newBlocks.length - 1})`,
     });
 
-    // Scroll alla sezione "i tuoi giorni" dopo un breve delay per l'animazione
-    setTimeout(() => {
-      scrollToDayBlocks();
-    }, 500);
   };
 
   // Handler rimozione blocco
@@ -738,7 +706,7 @@ function TripEditor() {
 
     await new Promise(resolve => setTimeout(resolve, remainingTime));
 
-    // 🆕 Naviga a Trip Summary DOPO l'animazione (non più a hotel-selection)
+    // 🆕 Naviga al Trip Summary Unificato DOPO l'animazione
     navigate('/trip-summary', {
       state: {
         wizardData,
@@ -751,7 +719,8 @@ function TripEditor() {
         extraSuggeriti: extraSuggeriti,
         plus: plus, // Passa il database plus per gli extra hotel
         // Flag per indicare che l'utente deve ancora selezionare gli hotel
-        needsHotelSelection: true
+        needsHotelSelection: true,
+        selectedHotels: [] // Inizialmente vuoto
       }
     });
 
@@ -789,10 +758,6 @@ function TripEditor() {
   // Handler continua dalla timeline
   const handleContinueFromTimeline = () => {
     setShowTimeline(false);
-    // Scroll alla sezione hotel o continua con il flusso normale
-    setTimeout(() => {
-      scrollToDayBlocks();
-    }, 300);
   };
 
   // Se la timeline è visibile, mostrala invece del trip editor
@@ -825,15 +790,11 @@ function TripEditor() {
 
       {/* Contenuto principale */}
       <div className={styles.content}>
-        {/* Blocchi giorni - Diventa sticky allo scroll */}
-        <section ref={dayBlocksRef} className={styles.section}>
-          <DayBlocksGrid
+        {/* Barra di stato giorni - Compatta e user-friendly */}
+        <section className={styles.section}>
+          <DayStatusBar
             totalDays={totalDays}
             filledBlocks={filledBlocks}
-            onBlockClick={handleBlockClick}
-            onAddDay={handleAddDay}
-            onRemoveDay={handleRemoveDay}
-            sticky={isDayBlocksSticky}
           />
         </section>
 
