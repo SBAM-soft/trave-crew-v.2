@@ -193,8 +193,8 @@ const useTripEditorChatStore = create(
 
           // Costi esperienze
           const experiencesCost = filledBlocks.reduce((sum, block) => {
-            const expCost = parseFloat(block.experience.PRX_PAX || block.experience.prezzo || 0);
-            const extrasCost = block.extras.reduce((s, e) =>
+            const expCost = parseFloat(block.experience?.PRX_PAX || block.experience?.prezzo || 0);
+            const extrasCost = (block.extras || []).reduce((s, e) =>
               s + (parseFloat(e.PREZZO_PP || e.prezzo || 0)), 0
             );
             return sum + expCost + extrasCost;
@@ -208,7 +208,7 @@ const useTripEditorChatStore = create(
 
           // Extra hotel
           const hotelExtrasCost = hotels.reduce((sum, hotel) => {
-            return sum + hotel.extras.reduce((s, e) =>
+            return sum + (hotel.extras || []).reduce((s, e) =>
               s + (parseFloat(e.PREZZO_PP || e.prezzo || 0) * hotel.notti * numeroPersone), 0
             );
           }, 0);

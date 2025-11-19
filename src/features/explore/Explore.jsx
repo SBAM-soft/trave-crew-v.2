@@ -1,6 +1,5 @@
 // src/components/explore/Explore.jsx
 import { useState, useEffect } from 'react';
-import { loadCSV } from '../../core/utils/dataLoader';
 import { filterByField, filterByTextSearch, sortByField } from '../../core/utils/filterHelpers';
 import { storageService } from '../../core/services/storageService';
 import SearchBar from './SearchBar';
@@ -30,17 +29,12 @@ function Explore() {
       try {
         setLoading(true);
 
-        // Carica viaggi dal CSV
-        const csvData = await loadCSV('/data/viaggi.csv');
-
         // Carica viaggi pubblicati dagli utenti dallo storage
+        // Note: viaggi.csv è obsoleto, usiamo solo i viaggi salvati dagli utenti
         const userTrips = storageService.getExploreTrips();
 
-        // Combina i due set di dati
-        const allTrips = [...csvData, ...userTrips];
-
-        setViaggi(allTrips);
-        setViaggiFiltrati(allTrips);
+        setViaggi(userTrips);
+        setViaggiFiltrati(userTrips);
       } catch (err) {
         console.error('Errore:', err);
         setError('Impossibile caricare i viaggi');

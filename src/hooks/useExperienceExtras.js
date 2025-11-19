@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { useCSVQuery } from './useCSVQuery';
+import { useEntityQuery } from './useEntityQuery';
 
 /**
  * Hook per caricare gli extra specifici di un'esperienza
- * Carica extra.csv e filtra in base ai codici EXTRA_1-9 dell'esperienza
+ * Carica extra_tech.csv e filtra in base ai codici EXTRA_1-9 dell'esperienza
  */
 export function useExperienceExtras(experience) {
-  const { data: allExtras = [], isLoading, error } = useCSVQuery('extra.csv');
+  const { data: allExtras = [], isLoading, error } = useEntityQuery('extra', false);
 
   // Estrai i codici extra dall'esperienza (EXTRA_1, EXTRA_2, ..., EXTRA_9)
   const extraCodes = useMemo(() => {

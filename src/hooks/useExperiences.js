@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useCSVQuery } from './useCSVQuery';
+import { useEntityQuery } from './useEntityQuery';
 
 /**
  * Custom hook for loading experiences with optional filtering
@@ -12,7 +12,7 @@ export function useExperiences(filters = {}) {
   const { experienceIds } = filters;
 
   // Load experiences with caching
-  const { data: experiences = [], isLoading, error } = useCSVQuery('esperienze.csv');
+  const { data: experiences = [], isLoading, error } = useEntityQuery('esperienze', true);
 
   // Filter experiences if IDs provided
   const filteredExperiences = useMemo(() => {
