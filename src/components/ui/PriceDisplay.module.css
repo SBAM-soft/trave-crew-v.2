@@ -1,0 +1,60 @@
+/* Price container */
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Size variants */
+.price--sm .priceLabel,
+.price--sm .priceSuffix {
+  font-size: 0.75rem;
+}
+
+.price--sm .priceAmount {
+  font-size: 1rem;
+}
+
+.price--md .priceLabel,
+.price--md .priceSuffix {
+  font-size: 0.875rem;
+}
+
+.price--md .priceAmount {
+  font-size: 1.5rem;
+}
+
+.price--lg .priceLabel,
+.price--lg .priceSuffix {
+  font-size: 1rem;
+}
+
+.price--lg .priceAmount {
+  font-size: 2rem;
+}
+
+/* Labels and suffixes */
+.priceLabel,
+.priceSuffix {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Amount styles */
+.priceAmount {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Variant styles */
+.price--primary .priceAmount {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.price--secondary .priceAmount {
+  color: #4b5563;
+}

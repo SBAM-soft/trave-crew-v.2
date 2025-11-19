@@ -1,0 +1,61 @@
+/* Metadata row container */
+.metadataRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: #6b7280;
+}
+
+/* Metadata group (icon + label + value + separator) */
+.metadataGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Icon */
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Label */
+.label {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+/* Value */
+.value {
+  font-weight: 400;
+}
+
+/* Separator */
+.separator {
+  margin: 0 4px;
+  color: #d1d5db;
+}
+
+/* Size variants */
+.metadata--sm {
+  font-size: 0.75rem;
+  gap: 6px;
+}
+
+.metadata--sm .metadataGroup {
+  gap: 3px;
+}
+
+.metadata--md {
+  font-size: 0.875rem;
+}
+
+.metadata--lg {
+  font-size: 1rem;
+  gap: 10px;
+}
+
+.metadata--lg .metadataGroup {
+  gap: 5px;
+}

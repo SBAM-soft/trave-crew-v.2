@@ -1,0 +1,39 @@
+/* Timeline section */
+.timelineSection {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+  animation: slideDown 0.3s ease-out;
+}
+
+.timelineTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 20px 0;
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .timelineSection {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+
+  .timelineTitle {
+    font-size: 1rem;
+    margin-bottom: 16px;
+  }
+}

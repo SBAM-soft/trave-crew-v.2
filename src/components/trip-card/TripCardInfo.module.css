@@ -1,0 +1,36 @@
+/* Info container */
+.info {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+
+.infoLabel {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.infoValue {
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .info {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .infoItem {
+    font-size: 0.8rem;
+  }
+}
