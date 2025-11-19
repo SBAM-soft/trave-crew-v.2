@@ -188,7 +188,7 @@ function TripSummary() {
   // Handler modifica
   const handleEdit = (section) => {
     if (section === 'experiences') {
-      navigate('/trip-editor', { state: { wizardData } });
+      navigate('/trip-editor-chat', { state: { wizardData } });
     } else if (section === 'hotels') {
       navigate('/hotel-selection', { state: tripData });
     }
