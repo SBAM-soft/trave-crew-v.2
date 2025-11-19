@@ -57,7 +57,11 @@ function useChatFlow() {
       goToStep: store.goToStep,
       setTotalDays: store.setTotalDays,
       addZone: store.addZone,
-      removeZone: store.removeZone
+      removeZone: store.removeZone,
+      addPackage: store.addPackage,
+      selectHotel: store.selectHotel,
+      calculateCosts: store.calculateCosts,
+      incrementCounter: store.incrementCounter
     };
 
     // Esegui onEnter
