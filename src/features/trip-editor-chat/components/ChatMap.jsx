@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import MapInteractive from '../../trip-editor/MapInteractive';
+import MapInteractive from './MapInteractive';
 import styles from './ChatMap.module.css';
 
 /**

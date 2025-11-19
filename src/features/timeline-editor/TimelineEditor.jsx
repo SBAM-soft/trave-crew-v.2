@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import Button from '../../shared/Button';
 import DayTimeline from './DayTimeline';
-import AnimazioneAI from '../trip-editor/AnimazioneAI';
+// import AnimazioneAI from '../trip-editor/AnimazioneAI'; // DEPRECATED - moved to archive
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard, generateShareLink } from '../../core/utils/exportHelpers';
 import { toPrice } from '../../core/utils/typeHelpers';
 import styles from './TimelineEditor.module.css';
@@ -111,7 +111,9 @@ function TimelineEditor() {
 
   // Handler procedi alla Fase 2 (con animazione AI)
   const handleProceedToHotelSelection = () => {
-    setShowAIAnimation(true);
+    // Temporarily disabled AI animation - navigate directly
+    navigate('/hotel-selection', { state: tripData });
+    // setShowAIAnimation(true); // DEPRECATED
   };
 
   // Handler completamento animazione AI
@@ -335,13 +337,14 @@ function TimelineEditor() {
         </div>
       </div>
 
-      {/* Animazione AI per ottimizzazione */}
+      {/* Animazione AI per ottimizzazione - DEPRECATED
       {showAIAnimation && (
         <AnimazioneAI
           onComplete={handleAIComplete}
           tripData={tripData}
         />
       )}
+      */}
 
       <Toaster position="top-right" richColors />
     </div>

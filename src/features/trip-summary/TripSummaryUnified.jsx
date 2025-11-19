@@ -13,7 +13,7 @@ import { groupHotelsByZoneAndBudget, getHotelExtras, calcolaNottiPerZona } from 
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
 import Checkout from '../wallet/Checkout';
-import HotelCard from '../trip-editor/HotelCard';
+import HotelCard from '../hotel-selection/components/HotelCard';
 import styles from './TripSummaryUnified.module.css';
 
 /**

@@ -59,6 +59,7 @@ function useChatFlow() {
       addZone: store.addZone,
       removeZone: store.removeZone,
       addPackage: store.addPackage,
+      addExperience: store.addExperience,
       selectHotel: store.selectHotel,
       calculateCosts: store.calculateCosts,
       incrementCounter: store.incrementCounter
@@ -97,6 +98,7 @@ function useChatFlow() {
       addZone: storeState.addZone,
       removeZone: storeState.removeZone,
       addPackage: storeState.addPackage,
+      addExperience: storeState.addExperience,
       selectHotel: storeState.selectHotel,
       calculateCosts: storeState.calculateCosts,
       incrementCounter: storeState.incrementCounter

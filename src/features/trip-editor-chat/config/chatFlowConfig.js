@@ -359,7 +359,7 @@ export const CHAT_FLOW_CONFIG = {
       }
     },
 
-    onResponse: ({ value, addUserMessage, addBotMessage, addZone, goToStep, tripData, store }) => {
+    onResponse: ({ value, addUserMessage, addBotMessage, addZone, goToStep, tripData, store, removeZone }) => {
       const availableCounter = store.availableCounter;
 
       if (value.action === 'add') {
@@ -368,12 +368,42 @@ export const CHAT_FLOW_CONFIG = {
         const daysAvailable = tripData.totalDays - 2;
 
         addUserMessage(`📍 ${value.zone.name}`);
-        addBotMessage(`Ottima scelta! Hai selezionato ${value.zone.name}.`);
+
+        // Chiedi se è solo di passaggio o vuole fermarsi
+        setTimeout(() => {
+          addBotMessage(
+            `Vuoi fermarti in ${value.zone.name} per visitarla, o sei solo di passaggio?`,
+            'bot_options',
+            {
+              options: [
+                {
+                  value: { action: 'stay', zone: value.zone },
+                  label: `🏖️ Fermati e visita (${value.zone.daysRecommended} ${value.zone.daysRecommended === 1 ? 'giorno' : 'giorni'})`,
+                  emoji: '✨'
+                },
+                {
+                  value: { action: 'transit', zone: value.zone },
+                  label: 'Sono solo di passaggio',
+                  emoji: '🚗',
+                  description: 'Non fermarti, prosegui verso la prossima destinazione'
+                }
+              ]
+            }
+          );
+        }, 800);
+
+      } else if (value.action === 'stay') {
+        const zone = value.zone;
+        addUserMessage(`🏖️ Fermati e visita ${zone.name}`);
+        addBotMessage(`Perfetto! Trascorrerai ${zone.daysRecommended} ${zone.daysRecommended === 1 ? 'giorno' : 'giorni'} in ${zone.name}.`);
+
+        const totalDaysSelected = tripData.selectedZones.reduce((sum, z) => sum + z.daysRecommended, 0);
+        const daysAvailable = tripData.totalDays - 2;
 
         // Se primo contatore (priorità 1), vai subito ai pacchetti
         if (availableCounter === 1) {
           setTimeout(() => {
-            addBotMessage('Ora selezioniamo i pacchetti esperienza per questa zona! 📦');
+            addBotMessage('Ora selezioniamo le esperienze per questa zona! ✨');
             goToStep('packages');
           }, 1000);
         } else {
@@ -407,6 +437,47 @@ export const CHAT_FLOW_CONFIG = {
           }
         }
 
+      } else if (value.action === 'transit') {
+        const zone = value.zone;
+        // Rimuovi la zona appena aggiunta e riaggiungi con flag isTransit
+        removeZone(zone.code);
+        addZone({ ...zone, isTransit: true, daysRecommended: 0 });
+
+        addUserMessage(`🚗 Solo di passaggio - ${zone.name}`);
+        addBotMessage(`Ok! Passerai per ${zone.name} senza fermarti. Questa zona non richiederà giorni dal tuo itinerario.`);
+
+        const totalDaysSelected = tripData.selectedZones
+          .filter(z => !z.isTransit)
+          .reduce((sum, z) => sum + z.daysRecommended, 0);
+        const daysAvailable = tripData.totalDays - 2;
+
+        // Chiedi se aggiungere altre zone
+        setTimeout(() => {
+          if (totalDaysSelected >= daysAvailable) {
+            addBotMessage(
+              'Hai coperto tutti i giorni disponibili. Proseguiamo?',
+              'bot_options',
+              {
+                options: [
+                  { value: 'continue', label: '✅ Prosegui', emoji: '➡️' },
+                  { value: 'add_more', label: '➕ Aggiungi altra zona', emoji: '🗺️' }
+                ]
+              }
+            );
+          } else {
+            addBotMessage(
+              `Hai ancora ${daysAvailable - totalDaysSelected} giorni disponibili. Vuoi aggiungere un'altra zona?`,
+              'bot_options',
+              {
+                options: [
+                  { value: 'add_more', label: '➕ Aggiungi zona', emoji: '🗺️' },
+                  { value: 'continue', label: '✅ Prosegui così', emoji: '➡️' }
+                ]
+              }
+            );
+          }
+        }, 800);
+
       } else if (value === 'continue' || value === 'add_more') {
         if (value === 'continue') {
           addUserMessage('✅ Prosegui');
@@ -426,88 +497,119 @@ export const CHAT_FLOW_CONFIG = {
     }
   },
 
-  // ===== STEP 4: PACCHETTI (LOOP per ogni zona) =====
+  // ===== STEP 4: ESPERIENZE SINGOLE (LOOP per ogni zona) =====
   packages: {
     id: 'packages',
-    type: 'bot_cards',
+    type: 'bot_experience_swipe', // Nuovo tipo per swipe esperienze
 
     // Tiene traccia della zona corrente nel loop
     currentZoneIndex: 0,
+    // Lista esperienze disponibili per la zona corrente
+    availableExperiences: [],
+    // Indice esperienza corrente mostrata
+    currentExperienceIndex: 0,
+    // Esperienze già selezionate (liked) per la zona corrente
+    selectedExperiences: [],
 
     getMessage: ({ tripData }) => {
       const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
-      if (!currentZone) return 'Selezioniamo i pacchetti esperienza!';
-      return `Perfetto! Ora selezioniamo le esperienze per ${currentZone.name}.\n\nHo trovato pacchetti tematici basati sui tuoi interessi:`;
+      if (!currentZone) return 'Selezioniamo le esperienze per il tuo viaggio!';
+      const daysNeeded = parseInt(currentZone.daysRecommended) || 3;
+      return `Perfetto! Ora selezioniamo le esperienze per **${currentZone.name}**.\n\nHai ${daysNeeded} ${daysNeeded === 1 ? 'giorno' : 'giorni'} disponibili. Ti mostrerò le migliori esperienze una alla volta.\n\n❤️ Mi piace = Aggiungi\n👎 Non mi interessa = Salta`;
     },
 
-    onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store }) => {
-      const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
+    onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store, goToStep, incrementCounter }) => {
+      // Trova la prossima zona che non sia solo di passaggio
+      let currentZone = null;
+      while (CHAT_FLOW_CONFIG.packages.currentZoneIndex < tripData.selectedZones.length) {
+        const zone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
+        if (!zone.isTransit) {
+          currentZone = zone;
+          break;
+        }
+        // Skip questa zona di transito
+        console.log(`⏭️ Skipping transit zone: ${zone.name}`);
+        CHAT_FLOW_CONFIG.packages.currentZoneIndex++;
+        incrementCounter();
+      }
 
+      // Se non ci sono più zone da visitare, vai al summary
       if (!currentZone) {
-        console.error('❌ Nessuna zona selezionata per step packages');
+        console.log('✅ No more zones to process, going to summary');
+        CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
+        goToStep('summary_before_hotels');
         return;
       }
 
       addBotMessage(getMessage({ tripData }));
 
-      // Carica pacchetti per zona
-      const cachedData = store.cachedData;
-      const pacchetti = cachedData.pacchetti;
+      // Reset selezioni per questa zona
+      CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
+      CHAT_FLOW_CONFIG.packages.currentExperienceIndex = 0;
 
-      // Filtra pacchetti per zona
-      let zonePacchetti = pacchetti
-        .filter(p => p.ZONA_COLLEGATA === currentZone.code)
-        .map(p => ({
-          id: p.CODICE,
-          name: p.NOME_PACCHETTO || p.NOME,
-          description: p.DESCRIZIONE_BREVE || '',
-          price: parseFloat(p.PRX_PAX) || 0,
-          duration: parseInt(p.MIN_NOTTI) + 1 || 3,
-          rating: p.RATING ? parseFloat(p.RATING) : 4.5,
-          reviewCount: p.NUMERO_RECENSIONI ? parseInt(p.NUMERO_RECENSIONI) : 0,
-          image: p.URL_IMMAGINE_COPERTINA || '',
-          highlights: [p.HIGHLIGHT_1, p.HIGHLIGHT_2, p.HIGHLIGHT_3].filter(Boolean),
-          tags: (p.TAG || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
-          rawData: p // Mantieni dati originali per dopo
+      // Carica ESPERIENZE per zona (invece di pacchetti)
+      const cachedData = store.cachedData;
+      const esperienze = cachedData.esperienze || [];
+
+      // Filtra esperienze per zona
+      let zoneExperiences = esperienze
+        .filter(exp => exp.ZONA_COLLEGATA === currentZone.code)
+        .map(exp => ({
+          id: exp.CODICE,
+          code: exp.CODICE,
+          nome: exp.NOME || exp.NOME_ESPERIENZA,
+          descrizione: exp.DESCRIZIONE_BREVE || exp.DESCRIZIONE || '',
+          descrizioneEstesa: exp.DESCRIZIONE_ESTESA || exp.DESCRIZIONE || '',
+          prezzo: parseFloat(exp.PREZZO_PAX) || 0,
+          durata: exp.DURATA || '1 giorno',
+          tipo: exp.TIPO_ESPERIENZA || 'Esperienza',
+          difficolta: parseInt(exp.DIFFICOLTA) || 1,
+          emoji: exp.EMOJI || '🎯',
+          immagini: [exp.URL_IMMAGINE_1, exp.URL_IMMAGINE_2, exp.URL_IMMAGINE_3].filter(Boolean),
+          highlights: [exp.HIGHLIGHT_1, exp.HIGHLIGHT_2, exp.HIGHLIGHT_3].filter(Boolean),
+          incluso: [exp.INCLUSO_1, exp.INCLUSO_2, exp.INCLUSO_3].filter(Boolean),
+          nonIncluso: [exp.NON_INCLUSO_1, exp.NON_INCLUSO_2].filter(Boolean),
+          note: exp.NOTE || '',
+          rating: exp.RATING ? parseFloat(exp.RATING) : 4.5,
+          tags: (exp.TAG || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
+          slot: parseInt(exp.SLOT) || 1,
+          rawData: exp
         }));
 
       // Filtra per interessi dell'utente se presenti
       const userInterests = wizardData.interessi || [];
-      if (userInterests.length > 0) {
+      if (userInterests.length > 0 && zoneExperiences.length > 5) {
         const interestKeywords = userInterests.map(i => i.toLowerCase());
 
         // Prima prova con tag esatti
-        let filtered = zonePacchetti.filter(p =>
-          p.tags.some(tag => interestKeywords.some(interest => tag.includes(interest)))
+        let filtered = zoneExperiences.filter(exp =>
+          exp.tags.some(tag => interestKeywords.some(interest => tag.includes(interest)))
         );
 
         // Se non trova nulla, prova con nome e descrizione
         if (filtered.length === 0) {
-          filtered = zonePacchetti.filter(p => {
-            const searchText = `${p.name} ${p.description}`.toLowerCase();
+          filtered = zoneExperiences.filter(exp => {
+            const searchText = `${exp.nome} ${exp.descrizione} ${exp.tipo}`.toLowerCase();
             return interestKeywords.some(interest => searchText.includes(interest));
           });
         }
 
-        // Se ha trovato pacchetti filtrati, usali; altrimenti mostra tutti
+        // Se ha trovato esperienze filtrate, usali; altrimenti mostra tutte
         if (filtered.length > 0) {
-          zonePacchetti = filtered;
-          console.log(`🎯 Pacchetti filtrati per interessi [${userInterests.join(', ')}]:`, zonePacchetti.length);
-        } else {
-          console.log(`⚠️ Nessun pacchetto trovato per interessi [${userInterests.join(', ')}], mostro tutti`);
+          zoneExperiences = filtered;
+          console.log(`🎯 Esperienze filtrate per interessi [${userInterests.join(', ')}]:`, zoneExperiences.length);
         }
       }
 
-      // Limita a max 3 pacchetti (priorità a rating più alto)
-      zonePacchetti = zonePacchetti
-        .sort((a, b) => b.rating - a.rating)
-        .slice(0, 3);
+      // Ordina per rating e shuffle parziale per varietà
+      zoneExperiences = zoneExperiences
+        .sort((a, b) => b.rating - a.rating);
 
-      console.log(`📦 Pacchetti per ${currentZone.name}:`, zonePacchetti.length);
+      console.log(`✨ Esperienze per ${currentZone.name}:`, zoneExperiences.length);
 
-      if (zonePacchetti.length === 0) {
+      if (zoneExperiences.length === 0) {
         addBotMessage(
-          `Non ci sono pacchetti disponibili per ${currentZone.name}. Selezioniamo un'altra zona?`,
+          `Non ci sono esperienze disponibili per ${currentZone.name}. Selezioniamo un'altra zona?`,
           'bot_options',
           {
             options: [
@@ -518,57 +620,166 @@ export const CHAT_FLOW_CONFIG = {
         return;
       }
 
+      // Salva lista esperienze disponibili
+      CHAT_FLOW_CONFIG.packages.availableExperiences = zoneExperiences;
+
+      // Mostra prima esperienza dopo un delay
       setTimeout(() => {
+        const firstExperience = zoneExperiences[0];
+        const daysNeeded = parseInt(currentZone.daysRecommended) || 3;
+
         addBotMessage(
-          'Quale ti ispira di più?',
-          'bot_cards',
+          `Ecco la prima esperienza! (0/${daysNeeded} giorni completati)`,
+          'bot_experience_detail',
           {
-            cards: zonePacchetti,
-            zone: currentZone
+            experience: firstExperience,
+            zone: currentZone,
+            progress: { current: 0, total: daysNeeded },
+            showActions: true
           }
         );
       }, 800);
     },
 
-    onResponse: async ({ value, addUserMessage, addBotMessage, addPackage, goToStep, tripData, store, incrementCounter }) => {
-      // value può essere: { action: 'select', packageId, zoneCode }
-      if (value.action === 'select') {
-        const cachedData = store.cachedData;
-        const pacchetti = cachedData.pacchetti;
-        const esperienze = cachedData.esperienze;
+    onResponse: async ({ value, addUserMessage, addBotMessage, addExperience, goToStep, tripData, store, incrementCounter }) => {
+      const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
+      const daysNeeded = parseInt(currentZone?.daysRecommended) || 3;
 
-        const packageData = pacchetti.find(p => p.CODICE === value.packageId);
+      // value può essere: { action: 'like'/'dislike', experienceId, experience }
+      if (value.action === 'like' || value.action === 'select') {
+        const experience = value.experience || CHAT_FLOW_CONFIG.packages.availableExperiences.find(e => e.id === value.experienceId);
 
-        if (!packageData) {
-          console.error('❌ Pacchetto non trovato:', value.packageId);
+        if (!experience) {
+          console.error('❌ Esperienza non trovata:', value.experienceId);
           return;
         }
 
-        // Estrai esperienze usando helper (con campi corretti DAY2_ESPERIENZA_STD)
-        const experiences = extractExperiencesFromPackage(packageData, esperienze);
+        // Aggiungi esperienza alle selezionate
+        CHAT_FLOW_CONFIG.packages.selectedExperiences.push(experience);
+        const currentCount = CHAT_FLOW_CONFIG.packages.selectedExperiences.length;
 
-        addUserMessage(`✅ Pacchetto selezionato: ${packageData.NOME_PACCHETTO}`);
-        addBotMessage(`Fantastico! 🎉\n\nHo aggiunto il pacchetto "${packageData.NOME_PACCHETTO}" al tuo viaggio!`);
+        addUserMessage(`❤️ Mi piace!`);
+        addBotMessage(`Perfetto! "${experience.nome}" aggiunta al tuo viaggio! ✨\n\n(${currentCount}/${daysNeeded} giorni completati)`);
 
-        // Aggiungi al trip
-        addPackage(value.zoneCode, packageData, experiences);
+        // Aggiungi esperienza al trip (non più pacchetto)
+        addExperience(currentZone.code, experience);
 
-        // Incrementa contatore per sbloccare nuove zone
-        incrementCounter();
+        // Controlla se abbiamo completato i giorni per questa zona
+        if (currentCount >= daysNeeded) {
+          // Zona completata → incrementa contatore e vai alla prossima zona
+          incrementCounter();
+          CHAT_FLOW_CONFIG.packages.currentZoneIndex++;
 
-        // Controlla se ci sono altre zone
-        CHAT_FLOW_CONFIG.packages.currentZoneIndex++;
-        if (CHAT_FLOW_CONFIG.packages.currentZoneIndex < tripData.selectedZones.length) {
-          // Altra zona → ripeti step packages
-          setTimeout(() => {
-            addBotMessage('Prossima zona!');
-            goToStep('packages');
-          }, 1000);
+          if (CHAT_FLOW_CONFIG.packages.currentZoneIndex < tripData.selectedZones.length) {
+            // Altra zona → ripeti step packages
+            setTimeout(() => {
+              addBotMessage(`🎉 ${currentZone.name} completata! Passiamo alla prossima zona.`);
+              setTimeout(() => goToStep('packages'), 1000);
+            }, 1000);
+          } else {
+            // Fine zone → mostra animazione poi vai a summary
+            CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0; // Reset per prossima volta
+            setTimeout(() => {
+              addBotMessage('🎊 Ottimo lavoro! Tutte le zone sono complete!\n\nCreo il tuo itinerario personalizzato...');
+              setTimeout(() => {
+                // Mostra animazione invece di andare direttamente al summary
+                store.setShowItineraryAnimation(true);
+              }, 1000);
+            }, 800);
+          }
         } else {
-          // Fine zone → vai a summary
-          CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0; // Reset per prossima volta
-          setTimeout(() => goToStep('summary_before_hotels'), 1500);
+          // Mostra prossima esperienza
+          CHAT_FLOW_CONFIG.packages.currentExperienceIndex++;
+          const nextExperience = CHAT_FLOW_CONFIG.packages.availableExperiences[CHAT_FLOW_CONFIG.packages.currentExperienceIndex];
+
+          if (nextExperience) {
+            setTimeout(() => {
+              addBotMessage(
+                `Ecco un'altra esperienza per te!`,
+                'bot_experience_detail',
+                {
+                  experience: nextExperience,
+                  zone: currentZone,
+                  progress: { current: currentCount, total: daysNeeded },
+                  showActions: true
+                }
+              );
+            }, 800);
+          } else {
+            // Finite le esperienze disponibili ma mancano ancora giorni
+            addBotMessage(`Hai esplorato tutte le esperienze disponibili per ${currentZone.name}.\n\nPer ora hai selezionato ${currentCount} ${currentCount === 1 ? 'esperienza' : 'esperienze'}. Vuoi procedere ugualmente?`, 'bot_options', {
+              options: [
+                { value: 'proceed_anyway', label: '✅ Procedi così', emoji: '👍' },
+                { value: 'change_zone', label: '🔄 Cambia zona', emoji: '🗺️' }
+              ]
+            });
+          }
         }
+      } else if (value.action === 'dislike') {
+        const experience = value.experience || CHAT_FLOW_CONFIG.packages.availableExperiences.find(e => e.id === value.experienceId);
+
+        addUserMessage(`👎 Non mi interessa`);
+
+        // Mostra prossima esperienza senza aggiungere
+        CHAT_FLOW_CONFIG.packages.currentExperienceIndex++;
+        const nextExperience = CHAT_FLOW_CONFIG.packages.availableExperiences[CHAT_FLOW_CONFIG.packages.currentExperienceIndex];
+        const currentCount = CHAT_FLOW_CONFIG.packages.selectedExperiences.length;
+
+        if (nextExperience) {
+          setTimeout(() => {
+            addBotMessage(
+              `Nessun problema! Ecco un'altra opzione:`,
+              'bot_experience_detail',
+              {
+                experience: nextExperience,
+                zone: currentZone,
+                progress: { current: currentCount, total: daysNeeded },
+                showActions: true
+              }
+            );
+          }, 800);
+        } else {
+          // Finite le esperienze disponibili
+          if (currentCount > 0) {
+            addBotMessage(`Hai esplorato tutte le esperienze disponibili per ${currentZone.name}.\n\nHai selezionato ${currentCount} ${currentCount === 1 ? 'esperienza' : 'esperienze'}. Vuoi procedere?`, 'bot_options', {
+              options: [
+                { value: 'proceed_anyway', label: '✅ Procedi così', emoji: '👍' },
+                { value: 'change_zone', label: '🔄 Cambia zona', emoji: '🗺️' }
+              ]
+            });
+          } else {
+            addBotMessage(`Non hai selezionato nessuna esperienza per ${currentZone.name}.`, 'bot_options', {
+              options: [
+                { value: 'restart_zone', label: '🔄 Rivedi esperienze', emoji: '🔄' },
+                { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🗺️' }
+              ]
+            });
+          }
+        }
+      } else if (value === 'proceed_anyway') {
+        addUserMessage('✅ Procedi così');
+        // Incrementa contatore e vai avanti
+        incrementCounter();
+        CHAT_FLOW_CONFIG.packages.currentZoneIndex++;
+
+        if (CHAT_FLOW_CONFIG.packages.currentZoneIndex < tripData.selectedZones.length) {
+          setTimeout(() => {
+            addBotMessage('Passiamo alla prossima zona!');
+            setTimeout(() => goToStep('packages'), 1000);
+          }, 800);
+        } else {
+          CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
+          setTimeout(() => {
+            // Mostra animazione prima del summary
+            store.setShowItineraryAnimation(true);
+          }, 1000);
+        }
+      } else if (value === 'restart_zone') {
+        addUserMessage('🔄 Rivedi esperienze');
+        // Riavvia lo step per la zona corrente
+        CHAT_FLOW_CONFIG.packages.currentExperienceIndex = 0;
+        CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
+        goToStep('packages');
       } else if (value === 'change_zone') {
         addUserMessage('🔄 Cambia zona');
         CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;

@@ -6,6 +6,7 @@ import useChatFlow from './hooks/useChatFlow';
 import ChatContainer from './components/ChatContainer';
 import ChatHeader from './components/ChatHeader';
 import ExperienceDetailFullscreen from './components/ExperienceDetailFullscreen';
+import ItineraryBuildingAnimation from './components/ItineraryBuildingAnimation';
 import ErrorFallback from '../../shared/ErrorFallback';
 import styles from './TripEditorChat.module.css';
 
@@ -15,10 +16,20 @@ import styles from './TripEditorChat.module.css';
  */
 function TripEditorChat() {
   const location = useLocation();
-  const { messages, isTyping, wizardData, tripData, currentStepId, setWizardData, reset } = useTripEditorChatStore();
+  const { messages, isTyping, wizardData, tripData, currentStepId, showItineraryAnimation, setWizardData, setShowItineraryAnimation, reset, goToStep } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
   const [error, setError] = useState(null);
   const [fullscreenExperience, setFullscreenExperience] = useState(null);
+
+  // Handler completamento animazione itinerario
+  const handleAnimationComplete = () => {
+    // Nascondi animazione
+    setShowItineraryAnimation(false);
+    // Vai allo step summary
+    setTimeout(() => {
+      goToStep('summary_before_hotels');
+    }, 300);
+  };
 
   // Carica dati wizard da navigation state e inizializza conversazione
   useEffect(() => {
@@ -119,6 +130,14 @@ function TripEditorChat() {
           onLike={handleExperienceLike}
           onDislike={handleExperienceDislike}
           onClose={() => setFullscreenExperience(null)}
+        />
+      )}
+
+      {/* Animazione creazione itinerario */}
+      {showItineraryAnimation && (
+        <ItineraryBuildingAnimation
+          tripData={tripData}
+          onComplete={handleAnimationComplete}
         />
       )}
 

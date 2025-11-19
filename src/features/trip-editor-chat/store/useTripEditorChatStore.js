@@ -103,6 +103,11 @@ const useTripEditorChatStore = create(
 
         resetCounter: () => set({ availableCounter: 1 }),
 
+        // ===== ANIMAZIONE ITINERARIO =====
+        showItineraryAnimation: false,
+
+        setShowItineraryAnimation: (show) => set({ showItineraryAnimation: show }),
+
         // ===== ACTIONS DATI VIAGGIO =====
         setWizardData: (data) => set({ wizardData: data }),
 
@@ -160,6 +165,51 @@ const useTripEditorChatStore = create(
             tripData: {
               ...state.tripData,
               filledBlocks: [...state.tripData.filledBlocks, ...newBlocks]
+            }
+          };
+        }),
+
+        // Aggiunge una singola esperienza (per il nuovo flow swipe)
+        addExperience: (zoneCode, experience) => set((state) => {
+          const zone = state.tripData.selectedZones.find(z => z.code === zoneCode);
+          const zoneName = zone?.name || experience.ZONA || 'Zona';
+
+          // Usa tripBuilderService per calcolare lastDay e verificare cambio zona
+          const lastDay = getLastDay(state.tripData.filledBlocks);
+          const hasZoneChange = isZoneChange(state.tripData.filledBlocks, zoneCode);
+          const previousZone = hasZoneChange ? getPreviousZoneName(state.tripData.filledBlocks) : null;
+
+          // Crea il blocco per l'esperienza singola
+          const newBlock = {
+            day: lastDay + 1,
+            zoneCode,
+            zoneName,
+            experience: {
+              codice: experience.code || experience.id,
+              nome: experience.nome,
+              descrizione: experience.descrizione,
+              descrizioneEstesa: experience.descrizioneEstesa,
+              prezzo: experience.prezzo,
+              durata: experience.durata,
+              tipo: experience.tipo,
+              difficolta: experience.difficolta,
+              emoji: experience.emoji,
+              immagini: experience.immagini,
+              highlights: experience.highlights,
+              incluso: experience.incluso,
+              nonIncluso: experience.nonIncluso,
+              note: experience.note,
+              slot: experience.slot,
+              rating: experience.rating
+            },
+            hasZoneChange,
+            previousZone
+          };
+
+          return {
+            tripData: {
+              ...state.tripData,
+              filledBlocks: [...state.tripData.filledBlocks, newBlock]
             }
           };
         }),

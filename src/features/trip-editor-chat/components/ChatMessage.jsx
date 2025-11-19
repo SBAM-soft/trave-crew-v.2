@@ -3,6 +3,7 @@ import ChatOptions from './ChatOptions';
 import ChatCard from './ChatCard';
 import ChatMap from './ChatMap';
 import ChatHotelSelector from './ChatHotelSelector';
+import ChatExperienceCard from './ChatExperienceCard';
 import styles from './ChatMessage.module.css';
 
 /**
@@ -121,6 +122,27 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
               tiers={data.tiers}
               extras={data.extras}
               onSelect={onOptionSelect}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Messaggio bot con esperienza singola (swipe style)
+  if (type === 'bot_experience_detail' || type === 'bot_experience_swipe') {
+    return (
+      <div className={`${styles.message} ${styles.bot}`}>
+        <div className={styles.avatar}>🤖</div>
+        <div className={styles.bubble}>
+          <p className={styles.text}>{content}</p>
+          {data?.experience && (
+            <ChatExperienceCard
+              experience={data.experience}
+              zone={data.zone}
+              progress={data.progress}
+              onLike={onOptionSelect}
+              onDislike={onOptionSelect}
             />
           )}
         </div>
