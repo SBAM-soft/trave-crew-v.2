@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import useTripEditorChatStore from './store/useTripEditorChatStore';
 import useChatFlow from './hooks/useChatFlow';
 import ChatContainer from './components/ChatContainer';
+import ChatHeader from './components/ChatHeader';
 import styles from './TripEditorChat.module.css';
 
 /**
@@ -12,7 +13,7 @@ import styles from './TripEditorChat.module.css';
  */
 function TripEditorChat() {
   const location = useLocation();
-  const { messages, isTyping, setWizardData, reset } = useTripEditorChatStore();
+  const { messages, isTyping, wizardData, tripData, currentStepId, setWizardData, reset } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
 
   // Carica dati wizard da navigation state e inizializza conversazione
@@ -54,8 +55,11 @@ function TripEditorChat() {
 
   return (
     <div className={styles.tripEditorChat}>
-      {/* TODO: ChatSummary sidebar */}
-      {/* <ChatSummary /> */}
+      <ChatHeader
+        wizardData={wizardData}
+        currentStep={currentStepId}
+        tripData={tripData}
+      />
 
       <ChatContainer
         messages={messages}

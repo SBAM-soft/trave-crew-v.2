@@ -1,0 +1,105 @@
+import PropTypes from 'prop-types';
+import styles from './ChatHeader.module.css';
+
+/**
+ * Header persistente per Trip Editor Chat
+ * Mostra informazioni del viaggio e progresso
+ */
+function ChatHeader({ wizardData, currentStep, tripData }) {
+  // Calcola progresso basato sullo step
+  const steps = ['welcome', 'duration', 'zones', 'packages', 'summary_before_hotels', 'hotels', 'final_summary'];
+  const currentIndex = steps.indexOf(currentStep);
+  const progress = currentIndex >= 0 ? Math.round(((currentIndex + 1) / steps.length) * 100) : 0;
+
+  // Etichette step per UI
+  const stepLabels = {
+    'welcome': 'Benvenuto',
+    'duration': 'Durata',
+    'zones': 'Zone',
+    'packages': 'Esperienze',
+    'summary_before_hotels': 'Riepilogo',
+    'hotels': 'Hotel',
+    'final_summary': 'Finale'
+  };
+
+  return (
+    <div className={styles.header}>
+      <div className={styles.topBar}>
+        <div className={styles.tripInfo}>
+          <div className={styles.destination}>
+            <span className={styles.icon}>📍</span>
+            <span className={styles.label}>
+              {wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione'}
+            </span>
+          </div>
+          <div className={styles.details}>
+            <span className={styles.detail}>
+              <span className={styles.icon}>👥</span>
+              {wizardData.numeroPersone || 1} {wizardData.numeroPersone === 1 ? 'persona' : 'persone'}
+            </span>
+            <span className={styles.detail}>
+              <span className={styles.icon}>💰</span>
+              Budget: {wizardData.budget?.toUpperCase() || 'MEDIO'}
+            </span>
+            {tripData?.totalDays && (
+              <span className={styles.detail}>
+                <span className={styles.icon}>📅</span>
+                {tripData.totalDays} giorni
+              </span>
+            )}
+            {wizardData.interessi && wizardData.interessi.length > 0 && (
+              <span className={styles.detail}>
+                <span className={styles.icon}>🎯</span>
+                {wizardData.interessi.join(', ')}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.progressContainer}>
+          <div className={styles.progressLabel}>
+            <span className={styles.stepName}>{stepLabels[currentStep] || 'In corso'}</span>
+            <span className={styles.percentage}>{progress}%</span>
+          </div>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Barra step visuali */}
+      <div className={styles.stepsBar}>
+        {steps.map((step, index) => (
+          <div
+            key={step}
+            className={`${styles.step} ${
+              index < currentIndex ? styles.completed :
+              index === currentIndex ? styles.active :
+              styles.pending
+            }`}
+            title={stepLabels[step]}
+          >
+            {index < currentIndex ? '✓' : index + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ChatHeader.propTypes = {
+  wizardData: PropTypes.object,
+  currentStep: PropTypes.string,
+  tripData: PropTypes.object
+};
+
+ChatHeader.defaultProps = {
+  wizardData: {},
+  currentStep: 'welcome',
+  tripData: {}
+};
+
+export default ChatHeader;
