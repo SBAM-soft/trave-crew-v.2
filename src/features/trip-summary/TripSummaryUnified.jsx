@@ -8,7 +8,7 @@ import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard } from '
 import { toPrice, toInt } from '../../core/utils/typeHelpers';
 import { generateMediaForExperience } from '../../core/utils/mediaHelpers';
 import { useCostiAccessori, calcolaCostiApplicabili } from '../../hooks/useCostiAccessori';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { loadEntityData } from '../../core/utils/dataLoader';
 import { groupHotelsByZoneAndBudget, getHotelExtras, calcolaNottiPerZona } from '../../core/utils/itinerarioHelpers';
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
@@ -233,8 +233,8 @@ function TripSummaryUnified() {
       setLoadingHotels(true);
 
       const [hotelsData, plusData] = await Promise.all([
-        loadCSV('hotel.csv'),
-        plusDB.length > 0 ? Promise.resolve(plusDB) : loadCSV('plus.csv')
+        loadEntityData('hotel', true),
+        plusDB.length > 0 ? Promise.resolve(plusDB) : loadEntityData('extra', false)
       ]);
 
       const destInput = (wizardData.destinazioneNome || wizardData.destinazione || '').toLowerCase().trim();

@@ -3,7 +3,7 @@
  * Utility functions per gestione pacchetti esperienze
  */
 
-import { loadCSV } from './dataLoader';
+import { loadEntityData } from './dataLoader';
 
 /**
  * Carica un pacchetto completo con tutte le sue esperienze
@@ -13,8 +13,8 @@ import { loadCSV } from './dataLoader';
 export const getPackageComplete = async (packageCode) => {
   try {
     // Carica CSV
-    const packages = await loadCSV('pacchetti.csv');
-    const experiences = await loadCSV('esperienze.csv');
+    const packages = await loadEntityData('pacchetti', true);
+    const experiences = await loadEntityData('esperienze', true);
     
     // Trova il pacchetto
     const pkg = packages.find(p => p.CODICE === packageCode);
@@ -67,8 +67,8 @@ export const getPackageComplete = async (packageCode) => {
  */
 export const getPlusForExperience = async (experienceCode) => {
   try {
-    const experiences = await loadCSV('esperienze.csv');
-    const plusData = await loadCSV('plus.csv');
+    const experiences = await loadEntityData('esperienze', true);
+    const plusData = await loadEntityData('extra', false);
     
     // Trova esperienza
     const exp = experiences.find(e => e.CODICE === experienceCode);
@@ -114,7 +114,7 @@ export const calculateTotalPrice = async (packagePrice, selectedPlusCodes = [], 
     let total = parseFloat(packagePrice) * numPersone;
     
     if (selectedPlusCodes.length > 0) {
-      const plusData = await loadCSV('plus.csv');
+      const plusData = await loadEntityData('extra', false);
       
       // Aggiungi prezzo di ogni plus
       selectedPlusCodes.forEach(plusCode => {

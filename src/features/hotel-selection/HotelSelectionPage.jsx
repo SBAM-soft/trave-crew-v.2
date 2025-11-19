@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { loadEntityData } from '../../core/utils/dataLoader';
 import { groupHotelsByZoneAndBudget, getHotelExtras, calcolaNottiPerZona } from '../../core/utils/itinerarioHelpers';
 import { saveTripComplete } from '../../core/utils/tripStorage';
 import HotelCard from '../trip-editor/HotelCard';
@@ -47,8 +47,8 @@ function HotelSelectionPage() {
 
         // Carica hotel e plus (se non già passati)
         const [hotelsData, plusData] = await Promise.all([
-          loadCSV('hotel.csv'),
-          plusDB.length > 0 ? Promise.resolve(plusDB) : loadCSV('plus.csv')
+          loadEntityData('hotel', true),
+          plusDB.length > 0 ? Promise.resolve(plusDB) : loadEntityData('extra', false)
         ]);
 
         // Filtra hotel per destinazione

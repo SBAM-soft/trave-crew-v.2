@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { loadEntityData } from '../../core/utils/dataLoader';
 import HotelCard from './HotelCard';
 import Button from '../../shared/Button';
 import styles from './HotelSelector.module.css';
@@ -27,7 +27,7 @@ function HotelSelector({ destinazione, zone = [], onConfirm, onClose }) {
     const loadHotels = async () => {
       try {
         setLoading(true);
-        const hotelsData = await loadCSV('hotel.csv');
+        const hotelsData = await loadEntityData('hotel', true);
 
         // Filtra per destinazione
         const destHotels = hotelsData.filter(h =>
