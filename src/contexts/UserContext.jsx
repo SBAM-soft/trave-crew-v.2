@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from './AuthContext';
+import { storageService } from '../core/services/storageService';
 
 const UserContext = createContext(null);
 
@@ -26,17 +27,16 @@ export function UserProvider({ children }) {
     }
   }, [user, isAuthenticated]);
 
-  // Carica profilo esteso da localStorage (in futuro da backend)
+  // Carica profilo esteso da storage (in futuro da backend)
   const loadUserProfile = async (userId) => {
     try {
       setLoading(true);
 
-      // Prova a caricare da localStorage
-      const storageKey = `travel_crew_profile_${userId}`;
-      const storedProfile = localStorage.getItem(storageKey);
+      // Prova a caricare da storage
+      const storedProfile = storageService.getProfile(userId);
 
       if (storedProfile) {
-        setUserProfile(JSON.parse(storedProfile));
+        setUserProfile(storedProfile);
       } else {
         // Crea profilo di default
         const defaultProfile = {
@@ -62,7 +62,7 @@ export function UserProvider({ children }) {
         };
 
         setUserProfile(defaultProfile);
-        localStorage.setItem(storageKey, JSON.stringify(defaultProfile));
+        storageService.setProfile(userId, defaultProfile);
       }
     } catch (error) {
       console.error('Errore caricamento profilo:', error);
@@ -88,9 +88,7 @@ export function UserProvider({ children }) {
       };
 
       setUserProfile(updatedProfile);
-
-      const storageKey = `travel_crew_profile_${user.id}`;
-      localStorage.setItem(storageKey, JSON.stringify(updatedProfile));
+      storageService.setProfile(user.id, updatedProfile);
 
       return { success: true, profile: updatedProfile };
     } catch (error) {

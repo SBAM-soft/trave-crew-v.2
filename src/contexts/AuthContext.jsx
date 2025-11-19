@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { storageService } from '../core/services/storageService';
 
 const AuthContext = createContext(null);
 
@@ -15,16 +16,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Carica lo stato di autenticazione da localStorage all'avvio
+  // Carica lo stato di autenticazione da storage all'avvio
   useEffect(() => {
-    const storedUser = localStorage.getItem('travel_crew_user');
+    const storedUser = storageService.getUser();
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Errore nel parsing dei dati utente:', error);
-        localStorage.removeItem('travel_crew_user');
-      }
+      setUser(storedUser);
     }
     setLoading(false);
   }, []);
@@ -50,7 +46,7 @@ export function AuthProvider({ children }) {
       };
 
       setUser(userData);
-      localStorage.setItem('travel_crew_user', JSON.stringify(userData));
+      storageService.setUser(userData);
 
       return { success: true, user: userData };
     } catch (error) {
@@ -83,7 +79,7 @@ export function AuthProvider({ children }) {
       };
 
       setUser(userData);
-      localStorage.setItem('travel_crew_user', JSON.stringify(userData));
+      storageService.setUser(userData);
 
       return { success: true, user: userData };
     } catch (error) {
@@ -95,7 +91,7 @@ export function AuthProvider({ children }) {
   // Logout
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('travel_crew_user');
+    storageService.clearUser();
   };
 
   // Aggiorna profilo utente
@@ -106,7 +102,7 @@ export function AuthProvider({ children }) {
 
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      localStorage.setItem('travel_crew_user', JSON.stringify(updatedUser));
+      storageService.setUser(updatedUser);
 
       return { success: true, user: updatedUser };
     } catch (error) {

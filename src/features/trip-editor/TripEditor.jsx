@@ -14,6 +14,7 @@ import HotelPanel from './HotelPanel';
 import ItineraryTimeline from './ItineraryTimeline';
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
+import ErrorFallback from '../../shared/ErrorFallback';
 import { loadCSV } from '../../core/utils/dataLoader';
 import {
   findItinerarioByZone,
@@ -874,13 +875,16 @@ function TripEditor() {
 
   if (error) {
     return (
-      <div className={styles.error}>
-        <h2>⚠️ Errore</h2>
-        <p>{error}</p>
-        <Button onClick={() => navigate('/create')}>
-          Torna al Wizard
-        </Button>
-      </div>
+      <ErrorFallback
+        error={{
+          icon: '⚠️',
+          title: 'Errore caricamento dati',
+          message: error,
+          description: 'Verifica la connessione e riprova',
+          actionPath: '/create',
+          actionLabel: 'Torna al Wizard'
+        }}
+      />
     );
   }
 

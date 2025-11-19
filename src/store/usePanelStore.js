@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Z_INDEX } from '../core/constants';
 
 /**
  * Zustand store for panel/modal stack management
@@ -33,7 +34,7 @@ const usePanelStore = create((set, get) => ({
   panelStack: [],
 
   // Base z-index for first panel
-  baseZIndex: 900,
+  baseZIndex: Z_INDEX.BASE,
 
   /**
    * Push a new panel onto the stack
