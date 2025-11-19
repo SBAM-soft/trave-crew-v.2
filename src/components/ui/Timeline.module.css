@@ -1,0 +1,128 @@
+/* Timeline container */
+.timeline {
+  position: relative;
+  padding: 0;
+}
+
+/* Timeline item */
+.timelineItem {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.timelineItem.last {
+  padding-bottom: 0;
+}
+
+/* Connector line */
+.connector {
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  width: 2px;
+  height: calc(100% - 40px);
+  border-left: 2px dashed #d1d5db;
+  z-index: 0;
+}
+
+/* Marker (cerchio con icona) */
+.marker {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #6b7280;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.markerIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.meta {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Horizontal variant */
+.timeline--horizontal {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+}
+
+.timeline--horizontal .timelineItem {
+  flex-direction: column;
+  min-width: 200px;
+  padding-bottom: 0;
+  padding-right: 24px;
+}
+
+.timeline--horizontal .connector {
+  left: 50%;
+  top: 40px;
+  width: calc(100% - 40px);
+  height: 2px;
+  border-left: none;
+  border-top: 2px dashed #d1d5db;
+}
+
+.timeline--horizontal .marker {
+  margin: 0 auto;
+}
+
+.timeline--horizontal .content {
+  text-align: center;
+  padding-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .timelineItem {
+    gap: 12px;
+  }
+
+  .marker {
+    width: 32px;
+    height: 32px;
+  }
+
+  .markerIcon {
+    font-size: 1rem;
+  }
+
+  .connector {
+    left: 16px;
+    top: 32px;
+    height: calc(100% - 32px);
+  }
+}
