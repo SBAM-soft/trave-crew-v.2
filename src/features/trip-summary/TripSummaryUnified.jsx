@@ -361,7 +361,7 @@ function TripSummaryUnified() {
 
   const handleEdit = (section) => {
     if (section === 'experiences') {
-      navigate('/trip-editor', { state: { wizardData, filledBlocks, totalDays, editMode: true } });
+      navigate('/trip-editor-chat', { state: { wizardData, filledBlocks, totalDays, editMode: true } });
     }
   };
 

@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './shared/Layout';
 import ScrollToTop from './shared/ScrollToTop';
@@ -6,7 +6,7 @@ import ErrorBoundary from './shared/ErrorBoundary';
 import Home from './features/home/Home';
 import Explore from './features/explore/Explore';
 import CreateWizard from './features/wizard/CreateWizard';
-import TripEditor from './features/trip-editor/TripEditor';
+// import TripEditor from './features/trip-editor/TripEditor'; // DEPRECATED - Redirects to TripEditorChat
 import TripEditorChat from './features/trip-editor-chat/TripEditorChat';
 import TimelineEditor from './features/timeline-editor/TimelineEditor';
 import HotelSelectionPage from './features/hotel-selection/HotelSelectionPage';
@@ -40,7 +40,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/create" element={<CreateWizard />} />
-              <Route path="/trip-editor" element={<TripEditor />} />
+              {/* DEPRECATED: Old trip editor redirects to new chat-based editor */}
+              <Route path="/trip-editor" element={<Navigate to="/trip-editor-chat" replace />} />
               <Route path="/trip-editor-chat" element={<TripEditorChat />} />
               <Route path="/timeline-editor" element={<TimelineEditor />} />
               <Route path="/hotel-selection" element={<HotelSelectionPage />} />

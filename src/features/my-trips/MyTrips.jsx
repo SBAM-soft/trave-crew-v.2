@@ -44,7 +44,7 @@ function MyTrips() {
   // Handler modifica viaggio
   const handleEditTrip = (trip) => {
     if (trip.wizardData && trip.filledBlocks) {
-      navigate('/trip-editor', {
+      navigate('/trip-editor-chat', {
         state: {
           wizardData: trip.wizardData,
           filledBlocks: trip.filledBlocks,
