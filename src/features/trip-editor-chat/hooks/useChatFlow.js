@@ -48,8 +48,10 @@ function useChatFlow() {
     };
 
     // Esegui onEnter
-    currentStep.onEnter(context);
-  }, [currentStepId]); // Solo quando cambia step
+    if (typeof currentStep.onEnter === 'function') {
+      currentStep.onEnter(context);
+    }
+  }, [currentStepId, currentStep, addBotMessage, addUserMessage, store, goToStep, setTotalDays, addZone, removeZone]); // Stable dependencies only (tripData and wizardData excluded to avoid loops)
 
   // Handler per risposta utente (selezione opzione/card)
   const handleUserResponse = useCallback((value) => {
@@ -79,8 +81,10 @@ function useChatFlow() {
     };
 
     // Esegui onResponse
-    currentStep.onResponse(context);
-  }, [currentStepId, currentStep, store]);
+    if (typeof currentStep.onResponse === 'function') {
+      currentStep.onResponse(context);
+    }
+  }, [currentStepId, currentStep, addBotMessage, addUserMessage, goToStep, store, setTotalDays, addZone, removeZone, addPackage, selectHotel, calculateCosts, incrementCounter]); // Stable dependencies only (tripData and wizardData excluded to avoid loops)
 
   return {
     currentStepId,
