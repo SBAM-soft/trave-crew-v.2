@@ -677,12 +677,15 @@ export const CHAT_FLOW_CONFIG = {
               setTimeout(() => goToStep('packages'), 1000);
             }, 1000);
           } else {
-            // Fine zone → vai a summary
+            // Fine zone → mostra animazione poi vai a summary
             CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0; // Reset per prossima volta
             setTimeout(() => {
-              addBotMessage('🎊 Ottimo lavoro! Tutte le zone sono complete!\n\nTi mostro il riepilogo del tuo itinerario...');
-              setTimeout(() => goToStep('summary_before_hotels'), 1500);
-            }, 1000);
+              addBotMessage('🎊 Ottimo lavoro! Tutte le zone sono complete!\n\nCreo il tuo itinerario personalizzato...');
+              setTimeout(() => {
+                // Mostra animazione invece di andare direttamente al summary
+                store.setShowItineraryAnimation(true);
+              }, 1000);
+            }, 800);
           }
         } else {
           // Mostra prossima esperienza
@@ -766,7 +769,10 @@ export const CHAT_FLOW_CONFIG = {
           }, 800);
         } else {
           CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
-          setTimeout(() => goToStep('summary_before_hotels'), 1500);
+          setTimeout(() => {
+            // Mostra animazione prima del summary
+            store.setShowItineraryAnimation(true);
+          }, 1000);
         }
       } else if (value === 'restart_zone') {
         addUserMessage('🔄 Rivedi esperienze');

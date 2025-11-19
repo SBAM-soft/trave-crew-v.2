@@ -103,6 +103,11 @@ const useTripEditorChatStore = create(
 
         resetCounter: () => set({ availableCounter: 1 }),
 
+        // ===== ANIMAZIONE ITINERARIO =====
+        showItineraryAnimation: false,
+
+        setShowItineraryAnimation: (show) => set({ showItineraryAnimation: show }),
+
         // ===== ACTIONS DATI VIAGGIO =====
         setWizardData: (data) => set({ wizardData: data }),
 
