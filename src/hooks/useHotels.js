@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useCSVQuery } from './useCSVQuery';
+import { useEntityQuery } from './useEntityQuery';
 import { filterByField } from '../core/utils/filterHelpers';
 
 /**
@@ -26,7 +26,7 @@ export function useHotels(filters = {}) {
   } = filters;
 
   // Load hotels with caching
-  const { data: hotels = [], isLoading, error } = useCSVQuery('hotel.csv');
+  const { data: hotels = [], isLoading, error } = useEntityQuery('hotel', true);
 
   // Apply all filters with memoization
   const filteredHotels = useMemo(() => {

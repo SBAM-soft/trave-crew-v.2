@@ -1,4 +1,4 @@
-import { useCSVQuery } from './useCSVQuery';
+import { useEntityQuery } from './useEntityQuery';
 
 /**
  * Custom hook for loading destinations with caching
@@ -6,7 +6,7 @@ import { useCSVQuery } from './useCSVQuery';
  * @returns {Object} { destinations, isLoading, error }
  */
 export function useDestinations() {
-  const { data: destinations = [], isLoading, error } = useCSVQuery('destinazioni.csv');
+  const { data: destinations = [], isLoading, error } = useEntityQuery('destinazioni', true);
 
   return {
     destinations,

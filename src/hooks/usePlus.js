@@ -1,10 +1,10 @@
-import { useCSVQuery } from './useCSVQuery';
+import { useEntityQuery } from './useEntityQuery';
 
 /**
- * Hook per caricare e filtrare i plus dal CSV
+ * Hook per caricare e filtrare i plus (extra) dal CSV
  */
 export function usePlus(filters = {}) {
-  const { data: allPlus = [], isLoading, error } = useCSVQuery('plus.csv');
+  const { data: allPlus = [], isLoading, error } = useEntityQuery('extra', false);
 
   // Filtra i plus in base ai parametri
   let filteredPlus = allPlus;
