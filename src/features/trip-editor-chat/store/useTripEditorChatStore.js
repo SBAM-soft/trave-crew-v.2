@@ -26,7 +26,7 @@ const useTripEditorChatStore = create(
           setTimeout(() => {
             get().addMessage({ type, content, data, sender: 'bot' });
             set({ isTyping: false });
-          }, 500 + Math.random() * 500); // Delay realistico 500-1000ms
+          }, 300 + Math.random() * 200); // Delay più veloce 300-500ms
         },
 
         addUserMessage: (content, selectedData) => {
