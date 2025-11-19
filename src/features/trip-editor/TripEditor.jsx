@@ -15,7 +15,7 @@ import ItineraryTimeline from './ItineraryTimeline';
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
 import ErrorFallback from '../../shared/ErrorFallback';
-import { loadCSV } from '../../core/utils/dataLoader';
+import { loadCSV, loadEntityData } from '../../core/utils/dataLoader';
 import {
   findItinerarioByZone,
   getCostiAccessoriItinerario,
@@ -200,13 +200,13 @@ function TripEditor() {
         costiAccessoriData,
         esperienzeData
       ] = await Promise.all([
-        loadCSV('destinazioni.csv').catch(e => { console.error('❌ Errore destinazioni.csv:', e); return []; }),
-        loadCSV('zone.csv').catch(e => { console.error('❌ Errore zone.csv:', e); return []; }),
-        loadCSV('pacchetti.csv').catch(e => { console.error('❌ Errore pacchetti.csv:', e); return []; }),
-        loadCSV('itinerario.csv').catch(e => { console.error('❌ Errore itinerario.csv:', e); return []; }),
-        loadCSV('plus.csv').catch(e => { console.error('❌ Errore plus.csv:', e); return []; }),
-        loadCSV('costi_accessori.csv').catch(e => { console.error('❌ Errore costi_accessori.csv:', e); return []; }),
-        loadCSV('esperienze.csv').catch(e => { console.error('❌ Errore esperienze.csv:', e); return []; })
+        loadEntityData('destinazioni', true).catch(e => { console.error('❌ Errore destinazioni:', e); return []; }),
+        loadEntityData('zone', true).catch(e => { console.error('❌ Errore zone:', e); return []; }),
+        loadEntityData('pacchetti', true).catch(e => { console.error('❌ Errore pacchetti:', e); return []; }),
+        loadEntityData('itinerario', false).catch(e => { console.error('❌ Errore itinerario:', e); return []; }),
+        loadEntityData('extra', false).catch(e => { console.error('❌ Errore extra (plus):', e); return []; }),
+        loadEntityData('costi_accessori', false).catch(e => { console.error('❌ Errore costi_accessori:', e); return []; }),
+        loadEntityData('esperienze', true).catch(e => { console.error('❌ Errore esperienze:', e); return []; })
       ]);
 
       console.log('✅ CSV caricati:', {
