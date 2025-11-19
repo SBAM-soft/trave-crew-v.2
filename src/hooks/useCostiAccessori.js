@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { useCSVQuery } from './useCSVQuery';
+import { useEntityQuery } from './useEntityQuery';
 
 /**
  * Hook per caricare i costi accessori (voli interni, assicurazioni, documenti)
- * da costi_accessori.csv
+ * da costi_accessori_tech.csv
  */
 export function useCostiAccessori(destinazione) {
-  const { data: allCosti = [], isLoading, error } = useCSVQuery('costi_accessori.csv');
+  const { data: allCosti = [], isLoading, error } = useEntityQuery('costi_accessori', false);
 
   // Filtra i costi per destinazione
   const costiDestinazione = useMemo(() => {
