@@ -5,11 +5,21 @@ import styles from './ChatOptions.module.css';
  * Componente per renderizzare opzioni/bottoni cliccabili
  */
 function ChatOptions({ options, onSelect, multiSelect = false }) {
+  console.log('🔘 ChatOptions rendering:', { optionsCount: options?.length, hasOnSelect: !!onSelect, options });
+
   const handleClick = (optionValue) => {
+    console.log('🔘 Option clicked:', optionValue);
     if (onSelect) {
       onSelect(optionValue);
+    } else {
+      console.warn('⚠️ onSelect is not defined!');
     }
   };
+
+  if (!options || options.length === 0) {
+    console.warn('⚠️ No options provided to ChatOptions!');
+    return null;
+  }
 
   return (
     <div className={styles.optionsGrid}>
