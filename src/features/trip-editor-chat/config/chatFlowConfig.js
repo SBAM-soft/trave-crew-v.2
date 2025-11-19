@@ -203,12 +203,12 @@ export const CHAT_FLOW_CONFIG = {
     getNextStep: ({ wizardData }) => wizardData?.durata ? 'zones' : 'duration'
   },
 
-  // ===== STEP 2: DURATA =====
+  // ===== STEP 2: DURATA (NOTTI) =====
   duration: {
     id: 'duration',
     type: 'bot_options',
 
-    getMessage: () => 'Per quanti giorni vorresti partire?',
+    getMessage: () => '🌙 Quante notti vuoi dormire in viaggio?',
 
     onEnter: ({ addBotMessage, getMessage }) => {
       addBotMessage(
@@ -218,27 +218,33 @@ export const CHAT_FLOW_CONFIG = {
           options: [
             {
               value: 4,
-              label: '3-4 giorni',
+              label: '3 notti',
               emoji: '🏃',
-              description: 'Weekend lungo'
+              description: 'Weekend lungo (4 giorni)'
             },
             {
               value: 6,
-              label: '5-6 giorni',
+              label: '5 notti',
               emoji: '✈️',
-              description: 'Settimana classica'
+              description: 'Settimana classica (6 giorni)'
             },
             {
               value: 8,
-              label: '7-8 giorni',
+              label: '7 notti',
               emoji: '🌴',
-              description: 'Relax totale'
+              description: 'Relax totale (8 giorni)'
             },
             {
               value: 10,
-              label: '9-10 giorni',
+              label: '9 notti',
               emoji: '🗺️',
-              description: 'Esplorazione completa'
+              description: 'Esplorazione completa (10 giorni)'
+            },
+            {
+              value: 14,
+              label: '13 notti',
+              emoji: '🌏',
+              description: 'Viaggio epico (14 giorni)'
             }
           ]
         }
@@ -247,12 +253,13 @@ export const CHAT_FLOW_CONFIG = {
 
     onResponse: ({ value, addUserMessage, addBotMessage, setTotalDays, goToStep }) => {
       const days = parseInt(value);
-      addUserMessage(`${days} giorni`);
+      const nights = days - 1;
+      addUserMessage(`${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni)`);
       setTotalDays(days);
 
       // Messaggio di conferma
       addBotMessage(
-        `Perfetto! ${days} giorni ti permetteranno di esplorare diverse zone senza fretta.\n\nIl primo giorno sarà dedicato all'arrivo e sistemazione, quindi avrai ${days - 2} giorni per le esperienze! 🎉`
+        `Perfetto! Con ${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni totali) potrai esplorare diverse zone senza fretta.\n\nIl primo giorno sarà dedicato all'arrivo e sistemazione, quindi avrai circa ${days - 2} giorni pieni per le esperienze! 🎉`
       );
 
       // Vai al prossimo step
