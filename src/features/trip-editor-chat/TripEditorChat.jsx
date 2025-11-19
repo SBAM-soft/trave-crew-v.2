@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import useTripEditorChatStore from './store/useTripEditorChatStore';
 import useChatFlow from './hooks/useChatFlow';
 import ChatContainer from './components/ChatContainer';
 import ChatHeader from './components/ChatHeader';
+import ErrorFallback from '../../shared/ErrorFallback';
 import styles from './TripEditorChat.module.css';
 
 /**
@@ -15,6 +16,7 @@ function TripEditorChat() {
   const location = useLocation();
   const { messages, isTyping, wizardData, tripData, currentStepId, setWizardData, reset } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
+  const [error, setError] = useState(null);
 
   // Carica dati wizard da navigation state e inizializza conversazione
   useEffect(() => {
@@ -22,6 +24,14 @@ function TripEditorChat() {
 
     if (!wizardData) {
       console.error('❌ Nessun dato wizard trovato in navigation state');
+      setError({
+        icon: '🧭',
+        title: 'Dati wizard mancanti',
+        message: 'Non sono stati trovati i dati del wizard',
+        description: 'Torna al wizard per iniziare un nuovo viaggio',
+        actionPath: '/create',
+        actionLabel: 'Vai al Wizard'
+      });
       return;
     }
 
@@ -52,6 +62,11 @@ function TripEditorChat() {
     console.log('🎴 Card selected:', cardData);
     handleUserResponse(cardData);
   };
+
+  // Error fallback
+  if (error) {
+    return <ErrorFallback error={error} />;
+  }
 
   return (
     <div className={styles.tripEditorChat}>

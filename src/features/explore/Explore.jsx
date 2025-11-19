@@ -1,6 +1,8 @@
 // src/components/explore/Explore.jsx
 import { useState, useEffect } from 'react';
 import { loadCSV } from '../../core/utils/dataLoader';
+import { filterByField, filterByTextSearch, sortByField } from '../../core/utils/filterHelpers';
+import { storageService } from '../../core/services/storageService';
 import SearchBar from './SearchBar';
 import Filters from './Filters';
 import TripGrid from './TripGrid';
@@ -31,9 +33,8 @@ function Explore() {
         // Carica viaggi dal CSV
         const csvData = await loadCSV('/data/viaggi.csv');
 
-        // Carica viaggi pubblicati dagli utenti dal localStorage
-        const EXPLORE_TRIPS_KEY = 'trave_crew_explore_trips';
-        const userTrips = JSON.parse(localStorage.getItem(EXPLORE_TRIPS_KEY) || '[]');
+        // Carica viaggi pubblicati dagli utenti dallo storage
+        const userTrips = storageService.getExploreTrips();
 
         // Combina i due set di dati
         const allTrips = [...csvData, ...userTrips];
@@ -53,28 +54,20 @@ function Explore() {
 
   // Applica filtri quando cambiano
   useEffect(() => {
-    let risultati = [...viaggi];
+    let risultati = viaggi;
 
-    // Filtro ricerca testuale
-    if (searchText) {
-      risultati = risultati.filter(v => 
-        v.TITOLO?.toLowerCase().includes(searchText.toLowerCase()) ||
-        v.DESCRIZIONE?.toLowerCase().includes(searchText.toLowerCase()) ||
-        v.DESTINAZIONE?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
+    // Use centralized filter helpers
+    risultati = filterByTextSearch(risultati, searchText, [
+      'TITOLO',
+      'DESCRIZIONE',
+      'DESTINAZIONE'
+    ]);
 
-    // Filtro destinazione
-    if (filters.destinazione !== 'all') {
-      risultati = risultati.filter(v => v.DESTINAZIONE === filters.destinazione);
-    }
+    risultati = filterByField(risultati, 'DESTINAZIONE', filters.destinazione);
+    risultati = filterByField(risultati, 'BUDGET_CATEGORIA', filters.budget);
+    risultati = filterByField(risultati, 'GENERE', filters.genere);
 
-    // Filtro budget
-    if (filters.budget !== 'all') {
-      risultati = risultati.filter(v => v.BUDGET_CATEGORIA === filters.budget);
-    }
-
-    // Filtro durata
+    // Filtro durata (custom logic)
     if (filters.durata !== 'all') {
       risultati = risultati.filter(v => {
         const giorni = v.DURATA_GIORNI;
@@ -85,32 +78,20 @@ function Explore() {
       });
     }
 
-    // Filtro tipo viaggio
-    if (filters.genere !== 'all') {
-      risultati = risultati.filter(v => v.GENERE === filters.genere);
-    }
-
     // Filtro stato
     if (filters.stato === 'aperto') {
       risultati = risultati.filter(v => v.STATO === 'aperto');
     }
 
-    // Sorting
-    switch (sortBy) {
-      case 'price-low':
-        risultati.sort((a, b) => (a.COSTO_TOTALE_PP || 0) - (b.COSTO_TOTALE_PP || 0));
-        break;
-      case 'price-high':
-        risultati.sort((a, b) => (b.COSTO_TOTALE_PP || 0) - (a.COSTO_TOTALE_PP || 0));
-        break;
-      case 'duration':
-        risultati.sort((a, b) => (b.DURATA_GIORNI || 0) - (a.DURATA_GIORNI || 0));
-        break;
-      case 'recent':
-      default:
-        // Ordine originale
-        break;
+    // Use centralized sorting helper
+    if (sortBy === 'price-low') {
+      risultati = sortByField(risultati, 'COSTO_TOTALE_PP', 'asc');
+    } else if (sortBy === 'price-high') {
+      risultati = sortByField(risultati, 'COSTO_TOTALE_PP', 'desc');
+    } else if (sortBy === 'duration') {
+      risultati = sortByField(risultati, 'DURATA_GIORNI', 'desc');
     }
+    // sortBy === 'recent' keeps original order
 
     setViaggiFiltrati(risultati);
   }, [searchText, filters, viaggi, sortBy]);

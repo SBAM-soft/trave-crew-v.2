@@ -1,0 +1,43 @@
+.errorContainer {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.errorContent {
+  max-width: 500px;
+  text-align: center;
+}
+
+.errorIcon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary, #1a1a1a);
+}
+
+.errorMessage {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-secondary, #666);
+}
+
+.errorDescription {
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  color: var(--color-text-tertiary, #999);
+}
+
+.errorActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}

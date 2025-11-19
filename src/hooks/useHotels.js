@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useCSVQuery } from './useCSVQuery';
+import { filterByField } from '../core/utils/filterHelpers';
 
 /**
  * Custom hook for loading hotels with advanced filtering
@@ -29,30 +30,22 @@ export function useHotels(filters = {}) {
 
   // Apply all filters with memoization
   const filteredHotels = useMemo(() => {
-    let filtered = [...hotels];
+    let filtered = hotels;
 
-    // Filter by destination
-    if (destinazione) {
-      filtered = filtered.filter(
-        (h) => h.DESTINAZIONE?.toLowerCase() === destinazione?.toLowerCase()
-      );
-    }
+    // Use centralized filter helper
+    filtered = filterByField(filtered, 'DESTINAZIONE', destinazione, {
+      caseInsensitive: true,
+      trim: true
+    });
 
-    // Filter by budget
-    if (budget !== 'ALL') {
-      filtered = filtered.filter((h) => h.BUDGET === budget);
-    }
+    filtered = filterByField(filtered, 'BUDGET', budget);
+    filtered = filterByField(filtered, 'ZONA', zona);
 
-    // Filter by stars
+    // Filter by stars (requires custom logic for number parsing)
     if (stelle !== 'ALL') {
       filtered = filtered.filter(
         (h) => parseInt(h.STELLE) === parseInt(stelle)
       );
-    }
-
-    // Filter by zone
-    if (zona !== 'ALL') {
-      filtered = filtered.filter((h) => h.ZONA === zona);
     }
 
     // Filter by services

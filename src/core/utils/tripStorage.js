@@ -1,19 +1,13 @@
 /**
- * Sistema di memorizzazione viaggi con localStorage
+ * Sistema di memorizzazione viaggi con storage abstraction layer
  * Gestisce salvataggio, recupero, modifica e cancellazione viaggi
  */
 
-const STORAGE_KEY = 'trave_crew_trips';
+import { storageService } from '../services/storageService';
 
 // Ottieni tutti i viaggi
 export const getAllTrips = () => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : { upcoming: [], past: [], saved: [] };
-  } catch (error) {
-    console.error('Errore lettura viaggi da localStorage:', error);
-    return { upcoming: [], past: [], saved: [] };
-  }
+  return storageService.getAllTrips();
 };
 
 // Salva un nuovo viaggio
@@ -29,7 +23,7 @@ export const saveTrip = (tripData, category = 'saved') => {
     };
 
     trips[category].push(newTrip);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+    storageService.setAllTrips(trips);
 
     return newTrip;
   } catch (error) {
@@ -58,7 +52,7 @@ export const updateTrip = (tripId, updatedData) => {
     });
 
     if (updated) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+      storageService.setAllTrips(trips);
       return true;
     }
     return false;
@@ -84,7 +78,7 @@ export const deleteTrip = (tripId) => {
     });
 
     if (deleted) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+      storageService.setAllTrips(trips);
       return true;
     }
     return false;
@@ -124,7 +118,7 @@ export const moveTripToCategory = (tripId, targetCategory) => {
       updatedAt: new Date().toISOString()
     });
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+    storageService.setAllTrips(trips);
     return true;
   } catch (error) {
     console.error('Errore spostamento viaggio:', error);
@@ -154,7 +148,7 @@ export const getTripById = (tripId) => {
 // Pulisci storage (per test)
 export const clearAllTrips = () => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    storageService.setAllTrips({ upcoming: [], past: [], saved: [] });
     return true;
   } catch (error) {
     console.error('Errore pulizia storage:', error);
@@ -244,7 +238,7 @@ export const saveTripComplete = (tripData, category = 'saved') => {
       trips[category].push(newTrip);
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+    storageService.setAllTrips(trips);
 
     return newTrip;
   } catch (error) {
@@ -318,6 +312,6 @@ export const populateTestData = () => {
     saved: []
   };
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(testTrips));
+  storageService.setAllTrips(testTrips);
   return testTrips;
 };
