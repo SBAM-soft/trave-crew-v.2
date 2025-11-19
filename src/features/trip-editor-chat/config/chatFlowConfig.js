@@ -179,7 +179,7 @@ export const CHAT_FLOW_CONFIG = {
             ]
           }
         );
-      }, 1500); // Aumentato timeout per dare tempo al caricamento
+      }, 800);
     },
 
     onResponse: ({ value, addUserMessage, goToStep }) => {
@@ -271,40 +271,75 @@ export const CHAT_FLOW_CONFIG = {
 
     onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store }) => {
       const availableCounter = store.availableCounter;
-      const cachedData = store.cachedData;
+      const cachedData = store.cachedData || {};
+
+      console.log('📍 Zone step - counter:', availableCounter, 'cachedData:', cachedData);
 
       addBotMessage(getMessage({ wizardData, tripData, availableCounter }));
 
       // Filtra zone disponibili in base al contatore
-      const allZones = cachedData.zone;
-      const itinerari = cachedData.itinerario;
+      const allZones = cachedData.zone || [];
+      const itinerari = cachedData.itinerario || [];
       const availableZones = getAvailableZones(allZones, itinerari, availableCounter);
 
-      // Trasforma zone in formato per mappa
-      const zones = availableZones.map(z => ({
-        code: z.CODICE,
-        name: z.ZONA,
-        description: z.DESCRIZIONE || '',
-        daysRecommended: parseInt(z.GIORNI_CONSIGLIATI) || 2,
-        coordinates: {
-          lat: parseFloat(z.COORDINATE_LAT),
-          lng: parseFloat(z.COORDINATE_LNG)
-        },
-        tipo: z.TIPO_AREA,
-        priorita: parseInt(z.PRIORITA) || 99
-      }));
+      console.log('📍 Available zones:', availableZones.length, availableZones.map(z => z.ZONA));
 
-      setTimeout(() => {
-        addBotMessage(
-          'Clicca sulla mappa per selezionare le zone:',
-          'bot_map',
-          {
-            zones,
-            multiSelect: availableCounter > 1,
-            daysAvailable: tripData.totalDays - 2
-          }
-        );
-      }, 800);
+      // Per il primo contatore (priorità 1), mostra opzioni semplici invece di mappa
+      if (availableCounter === 1) {
+        // Filtra solo zone con priorità 1
+        const primaryZones = availableZones.filter(z => parseInt(z.PRIORITA) === 1);
+
+        setTimeout(() => {
+          addBotMessage(
+            'Dove vuoi iniziare il tuo viaggio?',
+            'bot_options',
+            {
+              options: primaryZones.map(z => ({
+                value: {
+                  action: 'add',
+                  zone: {
+                    code: z.CODICE,
+                    name: z.ZONA,
+                    description: z.DESCRIZIONE || '',
+                    daysRecommended: parseInt(z.GIORNI_CONSIGLIATI) || 2,
+                    tipo: z.TIPO_AREA,
+                    priorita: parseInt(z.PRIORITA) || 99
+                  }
+                },
+                label: z.ZONA,
+                emoji: z.TIPO_AREA === 'mare' ? '🏖️' : z.TIPO_AREA === 'montagna' ? '⛰️' : '🏙️',
+                description: z.DESCRIZIONE?.substring(0, 60) + '...' || ''
+              }))
+            }
+          );
+        }, 600);
+      } else {
+        // Per contatori successivi, usa la mappa
+        const zones = availableZones.map(z => ({
+          code: z.CODICE,
+          name: z.ZONA,
+          description: z.DESCRIZIONE || '',
+          daysRecommended: parseInt(z.GIORNI_CONSIGLIATI) || 2,
+          coordinates: {
+            lat: parseFloat(z.COORDINATE_LAT),
+            lng: parseFloat(z.COORDINATE_LNG)
+          },
+          tipo: z.TIPO_AREA,
+          priorita: parseInt(z.PRIORITA) || 99
+        }));
+
+        setTimeout(() => {
+          addBotMessage(
+            'Clicca sulla mappa per selezionare altre zone:',
+            'bot_map',
+            {
+              zones,
+              multiSelect: true,
+              daysAvailable: tripData.totalDays - 2
+            }
+          );
+        }, 600);
+      }
     },
 
     onResponse: ({ value, addUserMessage, addBotMessage, addZone, goToStep, tripData, store }) => {
