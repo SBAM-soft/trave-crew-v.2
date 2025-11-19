@@ -142,6 +142,9 @@ export const CHAT_FLOW_CONFIG = {
           const destPacchetti = pacchetti.filter(p =>
             p.DESTINAZIONE?.toLowerCase().includes(destName)
           );
+          const destEsperienze = esperienze.filter(e =>
+            e.DESTINAZIONE?.toLowerCase().includes(destName)
+          );
           const destHotel = hotel.filter(h =>
             h.DESTINAZIONE?.toLowerCase().includes(destName)
           );
@@ -149,7 +152,7 @@ export const CHAT_FLOW_CONFIG = {
           // Salva in cache
           store.setCachedData('zone', destZone);
           store.setCachedData('pacchetti', destPacchetti);
-          store.setCachedData('esperienze', esperienze);
+          store.setCachedData('esperienze', destEsperienze);
           store.setCachedData('hotel', destHotel);
           store.setCachedData('itinerario', itinerario);
           store.setCachedData('extra', extra);
@@ -158,6 +161,7 @@ export const CHAT_FLOW_CONFIG = {
           console.log('✅ Database caricato:', {
             zone: destZone.length,
             pacchetti: destPacchetti.length,
+            esperienze: destEsperienze.length,
             hotel: destHotel.length
           });
         } catch (error) {
@@ -541,7 +545,13 @@ export const CHAT_FLOW_CONFIG = {
         return;
       }
 
-      addBotMessage(getMessage({ tripData }));
+      console.log(`📍 Step packages - Processing zone: ${currentZone.name} (${currentZone.code})`);
+
+      // Genera messaggio con zona corrente
+      const daysNeeded = parseInt(currentZone.daysRecommended) || 3;
+      const message = `Perfetto! Ora selezioniamo le esperienze per **${currentZone.name}**.\n\nHai ${daysNeeded} ${daysNeeded === 1 ? 'giorno' : 'giorni'} disponibili. Ti mostrerò le migliori esperienze una alla volta.\n\n❤️ Mi piace = Aggiungi\n👎 Non mi interessa = Salta`;
+
+      addBotMessage(message);
 
       // Reset selezioni per questa zona
       CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
@@ -605,9 +615,20 @@ export const CHAT_FLOW_CONFIG = {
       zoneExperiences = zoneExperiences
         .sort((a, b) => b.rating - a.rating);
 
-      console.log(`✨ Esperienze per ${currentZone.name}:`, zoneExperiences.length);
+      console.log(`✨ Esperienze totali nel cachedData:`, esperienze.length);
+      console.log(`✨ Esperienze filtrate per ${currentZone.name} (${currentZone.code}):`, zoneExperiences.length);
+
+      if (zoneExperiences.length > 0) {
+        console.log('🔍 Prima esperienza:', {
+          nome: zoneExperiences[0].nome,
+          zona: currentZone.name,
+          prezzo: zoneExperiences[0].prezzo,
+          highlights: zoneExperiences[0].highlights
+        });
+      }
 
       if (zoneExperiences.length === 0) {
+        console.warn(`⚠️ Nessuna esperienza trovata per zona ${currentZone.code}`);
         addBotMessage(
           `Non ci sono esperienze disponibili per ${currentZone.name}. Selezioniamo un'altra zona?`,
           'bot_options',
@@ -627,6 +648,13 @@ export const CHAT_FLOW_CONFIG = {
       setTimeout(() => {
         const firstExperience = zoneExperiences[0];
         const daysNeeded = parseInt(currentZone.daysRecommended) || 3;
+
+        console.log('📤 Adding bot message with experience:', {
+          type: 'bot_experience_detail',
+          experienceName: firstExperience.nome,
+          zoneName: currentZone.name,
+          progress: { current: 0, total: daysNeeded }
+        });
 
         addBotMessage(
           `Ecco la prima esperienza! (0/${daysNeeded} giorni completati)`,

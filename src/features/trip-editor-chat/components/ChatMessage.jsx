@@ -131,20 +131,38 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
 
   // Messaggio bot con esperienza singola (swipe style)
   if (type === 'bot_experience_detail' || type === 'bot_experience_swipe') {
+    console.log('🎨 Rendering bot_experience_detail:', {
+      type,
+      hasData: !!data,
+      hasExperience: !!data?.experience,
+      experienceName: data?.experience?.nome
+    });
+
+    if (!data?.experience) {
+      console.error('❌ Missing experience data in bot_experience_detail message');
+      return (
+        <div className={`${styles.message} ${styles.bot}`}>
+          <div className={styles.avatar}>🤖</div>
+          <div className={styles.bubble}>
+            <p className={styles.text}>{content}</p>
+            <p style={{ color: 'red' }}>Errore: dati esperienza mancanti</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className={`${styles.message} ${styles.bot}`}>
         <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
-          {data?.experience && (
-            <ChatExperienceCard
-              experience={data.experience}
-              zone={data.zone}
-              progress={data.progress}
-              onLike={onOptionSelect}
-              onDislike={onOptionSelect}
-            />
-          )}
+          <ChatExperienceCard
+            experience={data.experience}
+            zone={data.zone}
+            progress={data.progress}
+            onLike={onOptionSelect}
+            onDislike={onOptionSelect}
+          />
         </div>
       </div>
     );
