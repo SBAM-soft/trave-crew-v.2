@@ -4,7 +4,7 @@ import { toast, Toaster } from 'sonner';
 import { loadEntityData } from '../../core/utils/dataLoader';
 import { groupHotelsByZoneAndBudget, getHotelExtras, calcolaNottiPerZona } from '../../core/utils/itinerarioHelpers';
 import { saveTripComplete } from '../../core/utils/tripStorage';
-import HotelCard from '../trip-editor/HotelCard';
+import HotelCard from './components/HotelCard';
 import Button from '../../shared/Button';
 import styles from './HotelSelectionPage.module.css';
 
