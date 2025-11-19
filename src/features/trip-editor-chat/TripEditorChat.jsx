@@ -5,6 +5,7 @@ import useTripEditorChatStore from './store/useTripEditorChatStore';
 import useChatFlow from './hooks/useChatFlow';
 import ChatContainer from './components/ChatContainer';
 import ChatHeader from './components/ChatHeader';
+import ExperienceDetailFullscreen from './components/ExperienceDetailFullscreen';
 import ErrorFallback from '../../shared/ErrorFallback';
 import styles from './TripEditorChat.module.css';
 
@@ -17,6 +18,7 @@ function TripEditorChat() {
   const { messages, isTyping, wizardData, tripData, currentStepId, setWizardData, reset } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
   const [error, setError] = useState(null);
+  const [fullscreenExperience, setFullscreenExperience] = useState(null);
 
   // Carica dati wizard da navigation state e inizializza conversazione
   useEffect(() => {
@@ -63,6 +65,32 @@ function TripEditorChat() {
     handleUserResponse(cardData);
   };
 
+  // Handler apertura dettagli esperienza (fullscreen)
+  const handleCardDetails = (cardData) => {
+    console.log('👀 Card details requested:', cardData);
+    // cardData dovrebbe contenere l'esperienza completa
+    // Per ora apriamo il fullscreen con i dati della card
+    setFullscreenExperience(cardData);
+  };
+
+  // Handler like esperienza dal fullscreen
+  const handleExperienceLike = (experience) => {
+    console.log('❤️ Experience liked:', experience);
+    // Chiudi fullscreen
+    setFullscreenExperience(null);
+    // Passa al flow come selezione
+    handleUserResponse({ action: 'select', experienceId: experience.id, ...experience });
+  };
+
+  // Handler dislike esperienza dal fullscreen
+  const handleExperienceDislike = (experience) => {
+    console.log('👎 Experience disliked:', experience);
+    // Chiudi fullscreen
+    setFullscreenExperience(null);
+    // Passa al flow come dislike
+    handleUserResponse({ action: 'dislike', experienceId: experience.id, ...experience });
+  };
+
   // Error fallback
   if (error) {
     return <ErrorFallback error={error} />;
@@ -81,7 +109,18 @@ function TripEditorChat() {
         isTyping={isTyping}
         onOptionSelect={handleOptionSelect}
         onCardSelect={handleCardSelect}
+        onCardDetails={handleCardDetails}
       />
+
+      {/* Fullscreen Experience Detail */}
+      {fullscreenExperience && (
+        <ExperienceDetailFullscreen
+          experience={fullscreenExperience}
+          onLike={handleExperienceLike}
+          onDislike={handleExperienceDislike}
+          onClose={() => setFullscreenExperience(null)}
+        />
+      )}
 
       <Toaster
         position="top-right"

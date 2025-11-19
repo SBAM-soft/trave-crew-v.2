@@ -8,7 +8,7 @@ import {
 import Button from '../../shared/Button';
 import styles from './Step5_DataPartenza.module.css';
 
-function Step5_DataPartenza({ value, onChange, destinazione, numeroNotti, onNumeroNottiChange }) {
+function Step5_DataPartenza({ value, onChange, destinazione }) {
   // Calcola le date suggerite basate sulla destinazione
   const suggestedDates = useMemo(() => {
     if (!destinazione) return [];
@@ -43,41 +43,6 @@ function Step5_DataPartenza({ value, onChange, destinazione, numeroNotti, onNume
       <p className={styles.subtitle}>
         Scegli una data di partenza indicativa (opzionale)
       </p>
-
-      {/* Numero Notti */}
-      <div className={styles.nightsSelector}>
-        <h3 className={styles.sectionTitle}>🌙 Quante notti vuoi fare?</h3>
-        <div className={styles.nightsButtons}>
-          {[3, 5, 7, 10, 14, 21].map((nights) => (
-            <Button
-              key={nights}
-              variant={numeroNotti === nights ? 'primary' : 'outline'}
-              size="md"
-              onClick={() => onNumeroNottiChange(nights)}
-            >
-              {nights} {nights === 1 ? 'notte' : 'notti'}
-            </Button>
-          ))}
-        </div>
-        <div className={styles.customNightsInput}>
-          <label htmlFor="customNights">Oppure inserisci un numero personalizzato:</label>
-          <input
-            id="customNights"
-            type="number"
-            min="1"
-            max="90"
-            placeholder="Es: 12"
-            className={styles.nightsInput}
-            value={numeroNotti && ![3, 5, 7, 10, 14, 21].includes(numeroNotti) ? numeroNotti : ''}
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              if (!isNaN(val) && val > 0) {
-                onNumeroNottiChange(val);
-              }
-            }}
-          />
-        </div>
-      </div>
 
       {/* Quick Date Selector */}
       <div className={styles.quickDates}>
@@ -188,8 +153,6 @@ Step5_DataPartenza.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   destinazione: PropTypes.string,
-  numeroNotti: PropTypes.number,
-  onNumeroNottiChange: PropTypes.func.isRequired,
 };
 
 export default memo(Step5_DataPartenza);

@@ -8,7 +8,7 @@ import styles from './ChatContainer.module.css';
  * Container principale per la chat
  * Gestisce lo scroll automatico e il rendering dei messaggi
  */
-function ChatContainer({ messages, isTyping, onOptionSelect, onCardSelect }) {
+function ChatContainer({ messages, isTyping, onOptionSelect, onCardSelect, onCardDetails }) {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -36,6 +36,7 @@ function ChatContainer({ messages, isTyping, onOptionSelect, onCardSelect }) {
             message={msg}
             onOptionSelect={onOptionSelect}
             onCardSelect={onCardSelect}
+            onCardDetails={onCardDetails}
           />
         ))}
 
@@ -51,7 +52,8 @@ ChatContainer.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   isTyping: PropTypes.bool,
   onOptionSelect: PropTypes.func,
-  onCardSelect: PropTypes.func
+  onCardSelect: PropTypes.func,
+  onCardDetails: PropTypes.func
 };
 
 export default ChatContainer;

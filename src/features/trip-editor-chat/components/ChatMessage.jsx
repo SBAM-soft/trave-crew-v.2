@@ -9,7 +9,7 @@ import styles from './ChatMessage.module.css';
  * Componente per renderizzare un singolo messaggio nella chat
  * Gestisce diversi tipi di messaggio: bot, user, options, cards, map, etc.
  */
-function ChatMessage({ message, onOptionSelect, onCardSelect }) {
+function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   const { type, content, data, sender } = message;
 
   console.log('🎨 Rendering message:', { type, content, hasData: !!data, data });
@@ -75,7 +75,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect }) {
                 key={card.id}
                 card={{ ...card, zoneCode: data.zone?.code }}
                 onSelect={onCardSelect}
-                onDetails={onCardSelect}
+                onDetails={onCardDetails}
               />
             ))}
           </div>
@@ -186,7 +186,8 @@ ChatMessage.propTypes = {
     timestamp: PropTypes.instanceOf(Date)
   }).isRequired,
   onOptionSelect: PropTypes.func,
-  onCardSelect: PropTypes.func
+  onCardSelect: PropTypes.func,
+  onCardDetails: PropTypes.func
 };
 
 export default ChatMessage;
