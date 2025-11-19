@@ -82,21 +82,60 @@
 .cardsContainer {
   margin-top: 16px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   max-width: 100%;
+}
+
+/* Su tablet mostra 2 card affiancate */
+@media (max-width: 1024px) {
+  .cardsContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Su mobile: slider orizzontale */
+@media (max-width: 640px) {
+  .cardsContainer {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding-bottom: 12px;
+    grid-template-columns: none;
+  }
+
+  .cardsContainer::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .cardsContainer::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .cardsContainer::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  .cardsContainer::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Le card nel mobile occupano 85% della larghezza per l'effetto peek */
+  .cardsContainer > * {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
 }
 
 .mapContainer {
   margin-top: 16px;
   width: 100%;
   max-width: 800px;
-}
-
-@media (max-width: 640px) {
-  .cardsContainer {
-    grid-template-columns: 1fr;
-  }
 }
 
 .placeholder {

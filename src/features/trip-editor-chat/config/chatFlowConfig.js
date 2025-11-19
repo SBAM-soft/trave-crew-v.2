@@ -182,17 +182,25 @@ export const CHAT_FLOW_CONFIG = {
       }, 800);
     },
 
-    onResponse: ({ value, addUserMessage, goToStep }) => {
+    onResponse: ({ value, addUserMessage, goToStep, wizardData, setTotalDays }) => {
       if (value === 'start') {
         addUserMessage('✅ Iniziamo!');
-        goToStep('duration');
+
+        // Se la durata è già stata scelta nel wizard, saltala e vai direttamente alle zone
+        if (wizardData.durata && wizardData.durata > 0) {
+          setTotalDays(wizardData.durata);
+          console.log(`✅ Durata già impostata dal wizard: ${wizardData.durata} giorni`);
+          goToStep('zones');
+        } else {
+          goToStep('duration');
+        }
       } else {
         addUserMessage('✏️ Modifica dati');
         toast.info('Torna al wizard per modificare i dati');
       }
     },
 
-    getNextStep: () => 'duration'
+    getNextStep: ({ wizardData }) => wizardData?.durata ? 'zones' : 'duration'
   },
 
   // ===== STEP 2: DURATA =====
@@ -423,7 +431,7 @@ export const CHAT_FLOW_CONFIG = {
       return `Perfetto! Ora selezioniamo le esperienze per ${currentZone.name}.\n\nHo trovato pacchetti tematici basati sui tuoi interessi:`;
     },
 
-    onEnter: ({ addBotMessage, getMessage, tripData, store }) => {
+    onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store }) => {
       const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
 
       if (!currentZone) {
@@ -437,7 +445,8 @@ export const CHAT_FLOW_CONFIG = {
       const cachedData = store.cachedData;
       const pacchetti = cachedData.pacchetti;
 
-      const zonePacchetti = pacchetti
+      // Filtra pacchetti per zona
+      let zonePacchetti = pacchetti
         .filter(p => p.ZONA_COLLEGATA === currentZone.code)
         .map(p => ({
           id: p.CODICE,
@@ -449,8 +458,41 @@ export const CHAT_FLOW_CONFIG = {
           reviewCount: p.NUMERO_RECENSIONI ? parseInt(p.NUMERO_RECENSIONI) : 0,
           image: p.URL_IMMAGINE_COPERTINA || '',
           highlights: [p.HIGHLIGHT_1, p.HIGHLIGHT_2, p.HIGHLIGHT_3].filter(Boolean),
+          tags: (p.TAG || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
           rawData: p // Mantieni dati originali per dopo
         }));
+
+      // Filtra per interessi dell'utente se presenti
+      const userInterests = wizardData.interessi || [];
+      if (userInterests.length > 0) {
+        const interestKeywords = userInterests.map(i => i.toLowerCase());
+
+        // Prima prova con tag esatti
+        let filtered = zonePacchetti.filter(p =>
+          p.tags.some(tag => interestKeywords.some(interest => tag.includes(interest)))
+        );
+
+        // Se non trova nulla, prova con nome e descrizione
+        if (filtered.length === 0) {
+          filtered = zonePacchetti.filter(p => {
+            const searchText = `${p.name} ${p.description}`.toLowerCase();
+            return interestKeywords.some(interest => searchText.includes(interest));
+          });
+        }
+
+        // Se ha trovato pacchetti filtrati, usali; altrimenti mostra tutti
+        if (filtered.length > 0) {
+          zonePacchetti = filtered;
+          console.log(`🎯 Pacchetti filtrati per interessi [${userInterests.join(', ')}]:`, zonePacchetti.length);
+        } else {
+          console.log(`⚠️ Nessun pacchetto trovato per interessi [${userInterests.join(', ')}], mostro tutti`);
+        }
+      }
+
+      // Limita a max 3 pacchetti (priorità a rating più alto)
+      zonePacchetti = zonePacchetti
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 3);
 
       console.log(`📦 Pacchetti per ${currentZone.name}:`, zonePacchetti.length);
 
