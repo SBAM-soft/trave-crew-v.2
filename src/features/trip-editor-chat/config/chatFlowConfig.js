@@ -109,13 +109,17 @@ export const CHAT_FLOW_CONFIG = {
     }),
 
     onEnter: async ({ addBotMessage, getMessage, wizardData, store }) => {
+      console.log('📥 Wizard data ricevuto:', wizardData);
+
       const message = getMessage({ wizardData });
       addBotMessage(message.text, 'bot_message_with_card', { card: message.card });
 
       // Carica dati necessari in cache se non già caricati
-      const cachedData = store.cachedData;
+      const cachedData = store.cachedData || {};
+      const needsDataLoad = !cachedData.zone || cachedData.zone.length === 0 ||
+                            !cachedData.pacchetti || cachedData.pacchetti.length === 0;
 
-      if (cachedData.zone.length === 0 || cachedData.pacchetti.length === 0) {
+      if (needsDataLoad) {
         console.log('📥 Caricamento database per destinazione...');
 
         try {
@@ -159,11 +163,11 @@ export const CHAT_FLOW_CONFIG = {
         } catch (error) {
           console.error('❌ Errore caricamento database:', error);
           toast.error('Errore nel caricamento dei dati');
-          return;
+          // Non fare return qui - mostra comunque le opzioni
         }
       }
 
-      // Mostra opzioni
+      // Mostra opzioni - sempre, anche in caso di errore nel caricamento
       setTimeout(() => {
         addBotMessage(
           'Iniziamo?',
@@ -175,7 +179,7 @@ export const CHAT_FLOW_CONFIG = {
             ]
           }
         );
-      }, 800);
+      }, 1500); // Aumentato timeout per dare tempo al caricamento
     },
 
     onResponse: ({ value, addUserMessage, goToStep }) => {
