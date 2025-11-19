@@ -12,17 +12,7 @@ import styles from './ChatMessage.module.css';
 function ChatMessage({ message, onOptionSelect, onCardSelect }) {
   const { type, content, data, sender } = message;
 
-  // Messaggio bot standard
-  if (type === 'bot' || sender === 'bot') {
-    return (
-      <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
-        <div className={styles.bubble}>
-          {content}
-        </div>
-      </div>
-    );
-  }
+  console.log('🎨 Rendering message:', { type, content, hasData: !!data, data });
 
   // Messaggio utente
   if (type === 'user' || sender === 'user') {
@@ -35,7 +25,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect }) {
     );
   }
 
-  // Messaggio bot con opzioni
+  // Messaggio bot con opzioni (DEVE essere prima del controllo generico 'bot')
   if (type === 'bot_options') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
@@ -138,7 +128,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect }) {
     );
   }
 
-  // Fallback: messaggio semplice
+  // Fallback: messaggio bot standard (DEVE essere DOPO tutti i controlli specifici)
   return (
     <div className={`${styles.message} ${styles.bot}`}>
       <div className={styles.avatar}>🤖</div>
