@@ -285,10 +285,12 @@ export const CHAT_FLOW_CONFIG = {
 
       addBotMessage(getMessage({ wizardData, tripData, availableCounter }));
 
-      // Filtra zone disponibili in base al contatore
+      // SOLUZIONE SEMPLIFICATA: Mostra zone in base alla PRIORITA, non all'itinerario
+      // Priorità 1 (01) al primo giro, poi tutte le altre
       const allZones = cachedData.zone || [];
-      const itinerari = cachedData.itinerario || [];
-      const availableZones = getAvailableZones(allZones, itinerari, availableCounter);
+      const availableZones = availableCounter === 1
+        ? allZones.filter(z => parseInt(z.PRIORITA) === 1)
+        : allZones.filter(z => parseInt(z.PRIORITA) > 1);
 
       console.log('📍 Available zones:', availableZones.length, availableZones.map(z => z.ZONA));
 
