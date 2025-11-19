@@ -23,6 +23,16 @@ import {
   getZoneItinerario,
   getZoneVisitate
 } from '../../core/utils/itinerarioHelpers';
+import {
+  calculateDaysNeeded,
+  validatePackageAddition,
+  findDuplicateExperiences,
+  prepareExperienceBlocks,
+  compactBlocks,
+  getLastDay,
+  isZoneChange as checkZoneChange,
+  getPreviousZoneName
+} from '../../core/services/tripBuilderService';
 import styles from './TripEditor.module.css';
 
 function TripEditor() {
@@ -376,45 +386,40 @@ function TripEditor() {
 
     // MODALITÀ NORMALE - Aggiungi nuovi blocchi
 
-    // 🆕 Calcolo giorni necessari con logica avanzata:
-    // - 1 esperienza = 1 giorno attività
-    // - Aggiungi 1 giorno logistico di arrivo nella zona
-    // - Se cambi zona, aggiungi 1 giorno di spostamento
+    // Usa tripBuilderService per validazione
+    const hasZoneChange = checkZoneChange(filledBlocks, codiceZona);
+    const validation = validatePackageAddition(
+      validExperiences,
+      totalDays,
+      filledBlocks,
+      hasZoneChange
+    );
 
-    const experienceDays = validExperiences.length;
-    let totalDaysNeeded = experienceDays + 1; // +1 giorno logistico arrivo
-
-    // Verifica se c'è cambio zona rispetto all'ultima zona visitata
-    const lastBlock = filledBlocks.length > 0 ? filledBlocks[filledBlocks.length - 1] : null;
-    const isZoneChange = lastBlock && lastBlock.codiceZona !== codiceZona;
-
-    if (isZoneChange) {
-      totalDaysNeeded += 1; // +1 giorno spostamento tra zone
+    if (hasZoneChange) {
+      const lastBlock = filledBlocks[filledBlocks.length - 1];
       console.log(`🚗 Cambio zona rilevato: ${lastBlock.zona} → ${pexp.ZONA}. Aggiunto 1 giorno di spostamento`);
     }
 
-    const availableDays = totalDays - 1 - filledBlocks.length; // -1 per il giorno di arrivo iniziale
-
     // Validazione: controlla se ci sono abbastanza giorni disponibili
-    if (totalDaysNeeded > availableDays) {
-      const giornoOGiorni = totalDaysNeeded === 1 ? 'giorno' : 'giorni';
-      const giornoOGiorni2 = availableDays === 1 ? 'giorno' : 'giorni';
+    if (!validation.canAdd) {
+      const giornoOGiorni = validation.daysNeeded === 1 ? 'giorno' : 'giorni';
+      const giornoOGiorni2 = validation.availableDays === 1 ? 'giorno' : 'giorni';
 
       // Mostra dettaglio giorni necessari
-      let dettaglio = `${experienceDays} ${experienceDays === 1 ? 'giorno' : 'giorni'} di esperienze + 1 giorno logistico`;
-      if (isZoneChange) {
+      let dettaglio = `${validExperiences.length} ${validExperiences.length === 1 ? 'giorno' : 'giorni'} di esperienze + 1 giorno logistico`;
+      if (hasZoneChange) {
         dettaglio += ' + 1 giorno spostamento';
       }
 
       // Mostra alert chiedendo se vuole aggiungere giorni
       const shouldAddDays = window.confirm(
-        `⚠️ Il pacchetto richiede ${totalDaysNeeded} ${giornoOGiorni} (${dettaglio}), ma hai solo ${availableDays} ${giornoOGiorni2} disponibili.\n\n` +
-        `Vuoi aggiungere ${totalDaysNeeded - availableDays} ${giornoOGiorni} al viaggio?`
+        `⚠️ Il pacchetto richiede ${validation.daysNeeded} ${giornoOGiorni} (${dettaglio}), ma hai solo ${validation.availableDays} ${giornoOGiorni2} disponibili.\n\n` +
+        `Vuoi aggiungere ${validation.missingDays} ${giornoOGiorni} al viaggio?`
       );
 
       if (shouldAddDays) {
         // Aggiungi giorni necessari
-        const newTotalDays = totalDays + (totalDaysNeeded - availableDays);
+        const newTotalDays = totalDays + validation.missingDays;
         setTotalDays(newTotalDays);
 
         toast.success('Giorni aggiunti al viaggio!', {
@@ -429,70 +434,30 @@ function TripEditor() {
       }
     }
 
-    // Validazione: controlla esperienze duplicate
-    const existingExperienceIds = filledBlocks.map(block => block.experience?.id).filter(Boolean);
-    const duplicateExperiences = validExperiences.filter(exp =>
-      existingExperienceIds.includes(exp.id)
-    );
+    // Validazione: controlla esperienze duplicate usando tripBuilderService
+    const duplicates = findDuplicateExperiences(validExperiences, filledBlocks);
 
-    if (duplicateExperiences.length > 0) {
-      const duplicateNames = duplicateExperiences.map(exp => exp.nome).join(', ');
+    if (duplicates.length > 0) {
+      const duplicateNames = duplicates.map(exp => exp.nome).join(', ');
       toast.error('Esperienza già presente nel viaggio!', {
         description: `Le seguenti esperienze sono già state aggiunte: ${duplicateNames}`,
       });
       return;
     }
 
-    // Riempi blocchi giorni con le esperienze
-    const newBlocks = [];
-    let currentDay = filledBlocks.length > 0 ? Math.max(...filledBlocks.map(b => b.day || b)) + 1 : 2; // Inizia dal giorno 2 (1 è arrivo)
+    // Usa tripBuilderService per preparare i blocchi
+    const lastDay = getLastDay(filledBlocks);
+    const previousZone = hasZoneChange ? getPreviousZoneName(filledBlocks) : null;
 
-    // 🆕 Se c'è cambio zona, aggiungi giorno di spostamento
-    if (isZoneChange) {
-      newBlocks.push({
-        day: currentDay,
-        type: 'transfer',
-        zona: pexp.ZONA,
-        codiceZona: codiceZona,
-        packageName: null,
-        experience: {
-          nome: `Spostamento verso ${pexp.ZONA}`,
-          descrizione: `Giorno dedicato al trasferimento da ${lastBlock.zona} a ${pexp.ZONA}`,
-          type: 'transfer'
-        }
-      });
-      currentDay++;
-    }
-
-    // 🆕 Aggiungi giorno logistico di arrivo nella zona
-    newBlocks.push({
-      day: currentDay,
-      type: 'logistics',
-      zona: pexp.ZONA,
-      codiceZona: codiceZona,
-      packageName: pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome,
-      experience: {
-        nome: `Arrivo e sistemazione a ${pexp.ZONA}`,
-        descrizione: `Giorno logistico per check-in hotel e orientamento`,
-        type: 'logistics'
-      }
-    });
-    currentDay++;
-
-    // Aggiungi le esperienze
-    for (let i = 0; i < experienceDays; i++) {
-      if (currentDay <= totalDays) {
-        newBlocks.push({
-          day: currentDay,
-          type: 'experience',
-          experience: validExperiences[i],
-          packageName: pexp.NOME_PACCHETTO || pexp.NOME || pexp.nome,
-          zona: pexp.ZONA,
-          codiceZona: codiceZona
-        });
-        currentDay++;
-      }
-    }
+    const newBlocks = prepareExperienceBlocks(
+      validExperiences,
+      pexp,
+      codiceZona,
+      pexp.ZONA,
+      lastDay + 1,
+      hasZoneChange,
+      previousZone
+    );
 
     // Aggiungi i nuovi blocchi
     setFilledBlocks([...filledBlocks, ...newBlocks]);
@@ -563,17 +528,8 @@ function TripEditor() {
     const dayNumber = blockToRemove.day;
     const zonaNome = blockToRemove.zona || '';
 
-    // Rimuovi il blocco e compatta i giorni successivi
-    const updatedBlocks = filledBlocks
-      .filter(b => b.day !== dayNumber)
-      .map(b => {
-        // Sposta indietro i giorni successivi per riempire il vuoto
-        if (b.day > dayNumber) {
-          return { ...b, day: b.day - 1 };
-        }
-        return b;
-      })
-      .sort((a, b) => a.day - b.day);
+    // Usa tripBuilderService per compattare i blocchi
+    const updatedBlocks = compactBlocks(filledBlocks, dayNumber);
 
     setFilledBlocks(updatedBlocks);
 

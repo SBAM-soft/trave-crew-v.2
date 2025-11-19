@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { getLastDay, prepareExperienceBlocks, isZoneChange, getPreviousZoneName } from '../../../core/services/tripBuilderService';
+import { ANIMATION, HOTEL_TIER_PRICES } from '../../../core/constants';
 
 /**
  * Zustand Store per Trip Editor Chat
@@ -26,7 +28,7 @@ const useTripEditorChatStore = create(
           setTimeout(() => {
             get().addMessage({ type, content, data, sender: 'bot' });
             set({ isTyping: false });
-          }, 300 + Math.random() * 200); // Delay più veloce 300-500ms
+          }, ANIMATION.TYPING_DELAY_MIN + Math.random() * (ANIMATION.TYPING_DELAY_MAX - ANIMATION.TYPING_DELAY_MIN));
         },
 
         addUserMessage: (content, selectedData) => {
@@ -138,26 +140,21 @@ const useTripEditorChatStore = create(
           const zone = state.tripData.selectedZones.find(z => z.code === zoneCode);
           const zoneName = zone?.name || packageData.ZONA;
 
-          // Calcola giorno iniziale
-          const lastDay = state.tripData.filledBlocks.length > 0
-            ? Math.max(...state.tripData.filledBlocks.map(b => b.day))
-            : 1; // Giorno 1 è arrivo
+          // Usa tripBuilderService per calcolare lastDay e verificare cambio zona
+          const lastDay = getLastDay(state.tripData.filledBlocks);
+          const hasZoneChange = isZoneChange(state.tripData.filledBlocks, zoneCode);
+          const previousZone = hasZoneChange ? getPreviousZoneName(state.tripData.filledBlocks) : null;
 
-          let currentDay = lastDay + 1;
-
-          // Aggiungi blocchi esperienze
-          const newBlocks = experiences.map((exp) => {
-            const block = {
-              day: currentDay,
-              zone: zoneName,
-              zoneCode: zoneCode,
-              package: packageData,
-              experience: exp,
-              extras: []
-            };
-            currentDay++;
-            return block;
-          });
+          // Prepara blocchi usando service
+          const newBlocks = prepareExperienceBlocks(
+            experiences,
+            packageData,
+            zoneCode,
+            zoneName,
+            lastDay + 1,
+            hasZoneChange,
+            previousZone
+          );
 
           return {
             tripData: {
@@ -287,13 +284,7 @@ const useTripEditorChatStore = create(
 
 // Helper functions
 function getTierPriceFromBudget(tier) {
-  const prices = {
-    low: 40,
-    medium: 75,
-    high: 150,
-    luxury: 150
-  };
-  return prices[tier?.toLowerCase()] || 75;
+  return HOTEL_TIER_PRICES[tier?.toUpperCase()] || HOTEL_TIER_PRICES.MEDIUM;
 }
 
 export default useTripEditorChatStore;
