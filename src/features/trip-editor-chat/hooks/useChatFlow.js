@@ -33,13 +33,13 @@ function useChatFlow() {
 
     console.log(`📍 Step ${currentStepId} - Executing onEnter...`);
 
-    // Prepara context per onEnter
+    // Prepara context per onEnter - leggi tripData e wizardData freschi dallo store
     const context = {
       addBotMessage,
       addUserMessage,
       getMessage: currentStep.getMessage || (() => ''),
-      tripData,
-      wizardData,
+      tripData: store.tripData,  // Leggi dal store invece della closure per evitare stale data
+      wizardData: store.wizardData,  // Leggi dal store invece della closure per evitare stale data
       store,
       goToStep,
       setTotalDays,
@@ -62,14 +62,14 @@ function useChatFlow() {
 
     console.log(`💬 User response in step ${currentStepId}:`, value);
 
-    // Prepara context per onResponse
+    // Prepara context per onResponse - leggi tripData e wizardData freschi dallo store
     const context = {
       value,
       addBotMessage,
       addUserMessage,
       goToStep,
-      tripData,
-      wizardData,
+      tripData: store.tripData,  // Leggi dal store invece della closure per evitare stale data
+      wizardData: store.wizardData,  // Leggi dal store invece della closure per evitare stale data
       store,
       setTotalDays,
       addZone,
