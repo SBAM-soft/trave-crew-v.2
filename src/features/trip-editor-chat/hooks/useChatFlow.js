@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import useTripEditorChatStore from '../store/useTripEditorChatStore';
 import CHAT_FLOW_CONFIG from '../config/chatFlowConfig';
 
@@ -7,14 +7,17 @@ import CHAT_FLOW_CONFIG from '../config/chatFlowConfig';
  * Esegue onEnter quando cambia step, gestisce risposte utente
  */
 function useChatFlow() {
+  // Usa selettori per ottenere solo ciò che serve ed evitare re-render inutili
+  const currentStepId = useTripEditorChatStore(state => state.currentStepId);
+  const goToStep = useTripEditorChatStore(state => state.goToStep);
+
+  // Ottieni lo store completo solo per passarlo al context
   const store = useTripEditorChatStore();
+
+  // Estrai le funzioni dallo store - sono stabili in Zustand
   const {
-    currentStepId,
-    goToStep,
     addBotMessage,
     addUserMessage,
-    tripData,
-    wizardData,
     setTotalDays,
     addZone,
     removeZone,
@@ -24,67 +27,82 @@ function useChatFlow() {
     incrementCounter
   } = store;
 
+  // Ref per tracciare l'ultimo step eseguito e prevenire esecuzioni multiple
+  const lastExecutedStepRef = useRef(null);
+
   // Ottieni configurazione step corrente
   const currentStep = CHAT_FLOW_CONFIG[currentStepId];
 
   // Esegui onEnter quando cambia step
   useEffect(() => {
-    if (!currentStep || !currentStep.onEnter) return;
+    if (!currentStep || !currentStep.onEnter || !currentStepId) return;
+
+    // Previeni esecuzioni multiple dello stesso step
+    if (lastExecutedStepRef.current === currentStepId) {
+      console.log(`⏭️ Step ${currentStepId} - Already executed, skipping...`);
+      return;
+    }
 
     console.log(`📍 Step ${currentStepId} - Executing onEnter...`);
+    lastExecutedStepRef.current = currentStepId;
 
-    // Prepara context per onEnter - leggi tripData e wizardData freschi dallo store
+    // Prepara context per onEnter - usa lo store per funzioni stabili
     const context = {
-      addBotMessage,
-      addUserMessage,
+      addBotMessage: store.addBotMessage,
+      addUserMessage: store.addUserMessage,
       getMessage: currentStep.getMessage || (() => ''),
       tripData: store.tripData,  // Leggi dal store invece della closure per evitare stale data
       wizardData: store.wizardData,  // Leggi dal store invece della closure per evitare stale data
       store,
-      goToStep,
-      setTotalDays,
-      addZone,
-      removeZone
+      goToStep: store.goToStep,
+      setTotalDays: store.setTotalDays,
+      addZone: store.addZone,
+      removeZone: store.removeZone
     };
 
     // Esegui onEnter
     if (typeof currentStep.onEnter === 'function') {
       currentStep.onEnter(context);
     }
-  }, [currentStepId, currentStep, addBotMessage, addUserMessage, store, goToStep, setTotalDays, addZone, removeZone]); // Stable dependencies only (tripData and wizardData excluded to avoid loops)
+  }, [currentStepId]); // Solo currentStepId come dipendenza - tutte le funzioni vengono prese dallo store
 
   // Handler per risposta utente (selezione opzione/card)
   const handleUserResponse = useCallback((value) => {
-    if (!currentStep || !currentStep.onResponse) {
+    const step = CHAT_FLOW_CONFIG[currentStepId];
+
+    if (!step || !step.onResponse) {
       console.warn(`⚠️ No onResponse handler for step ${currentStepId}`);
       return;
     }
 
     console.log(`💬 User response in step ${currentStepId}:`, value);
 
-    // Prepara context per onResponse - leggi tripData e wizardData freschi dallo store
+    // Ottieni riferimento fresco allo store
+    const storeState = useTripEditorChatStore.getState();
+
+    // Prepara context per onResponse - usa lo store per funzioni stabili
     const context = {
       value,
-      addBotMessage,
-      addUserMessage,
-      goToStep,
-      tripData: store.tripData,  // Leggi dal store invece della closure per evitare stale data
-      wizardData: store.wizardData,  // Leggi dal store invece della closure per evitare stale data
-      store,
-      setTotalDays,
-      addZone,
-      removeZone,
-      addPackage,
-      selectHotel,
-      calculateCosts,
-      incrementCounter
+      addBotMessage: storeState.addBotMessage,
+      addUserMessage: storeState.addUserMessage,
+      goToStep: storeState.goToStep,
+      tripData: storeState.tripData,
+      wizardData: storeState.wizardData,
+      store: storeState,
+      setTotalDays: storeState.setTotalDays,
+      addZone: storeState.addZone,
+      removeZone: storeState.removeZone,
+      addPackage: storeState.addPackage,
+      selectHotel: storeState.selectHotel,
+      calculateCosts: storeState.calculateCosts,
+      incrementCounter: storeState.incrementCounter
     };
 
     // Esegui onResponse
-    if (typeof currentStep.onResponse === 'function') {
-      currentStep.onResponse(context);
+    if (typeof step.onResponse === 'function') {
+      step.onResponse(context);
     }
-  }, [currentStepId, currentStep, addBotMessage, addUserMessage, goToStep, store, setTotalDays, addZone, removeZone, addPackage, selectHotel, calculateCosts, incrementCounter]); // Stable dependencies only (tripData and wizardData excluded to avoid loops)
+  }, [currentStepId]); // Solo currentStepId come dipendenza
 
   return {
     currentStepId,
