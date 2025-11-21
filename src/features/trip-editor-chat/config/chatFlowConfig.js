@@ -123,16 +123,14 @@ export const CHAT_FLOW_CONFIG = {
 
       // Carica dati necessari in cache se non già caricati
       const cachedData = store.cachedData || {};
-      const needsDataLoad = !cachedData.zone || cachedData.zone.length === 0 ||
-                            !cachedData.pacchetti || cachedData.pacchetti.length === 0;
+      const needsDataLoad = !cachedData.zone || cachedData.zone.length === 0;
 
       if (needsDataLoad) {
         console.log('📥 Caricamento database per destinazione...');
 
         try {
-          const [zone, pacchetti, esperienze, hotel, itinerario, extra, costi_accessori] = await Promise.all([
+          const [zone, esperienze, hotel, itinerario, extra, costi_accessori] = await Promise.all([
             loadEntityData('zone', true),
-            loadEntityData('pacchetti', true),
             loadEntityData('esperienze', true),
             loadEntityData('hotel', true),
             loadEntityData('itinerario', false),
@@ -146,9 +144,6 @@ export const CHAT_FLOW_CONFIG = {
           const destZone = zone.filter(z =>
             z.DESTINAZIONE?.toLowerCase().includes(destName)
           );
-          const destPacchetti = pacchetti.filter(p =>
-            p.DESTINAZIONE?.toLowerCase().includes(destName)
-          );
           const destEsperienze = esperienze.filter(e =>
             e.DESTINAZIONE?.toLowerCase().includes(destName)
           );
@@ -158,7 +153,7 @@ export const CHAT_FLOW_CONFIG = {
 
           // Salva in cache
           store.setCachedData('zone', destZone);
-          store.setCachedData('pacchetti', destPacchetti);
+          // pacchetti removed (Nov 2025)
           store.setCachedData('esperienze', destEsperienze);
           store.setCachedData('hotel', destHotel);
           store.setCachedData('itinerario', itinerario);
@@ -167,7 +162,6 @@ export const CHAT_FLOW_CONFIG = {
 
           console.log('✅ Database caricato:', {
             zone: destZone.length,
-            pacchetti: destPacchetti.length,
             esperienze: destEsperienze.length,
             hotel: destHotel.length
           });
