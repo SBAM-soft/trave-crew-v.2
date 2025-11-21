@@ -7,6 +7,13 @@ import { calculateNightsForZone, formatPrice } from '../utils/validators';
  * Con correzioni per campi CSV reali
  */
 
+// Helper per normalizzare codici zona (rimuove zeri finali per matching)
+const normalizeZoneCode = (code) => {
+  if (!code) return '';
+  // Rimuove zeri prima degli ultimi 1-2 caratteri numerici (es. ZTHBA01 -> ZTHBA1)
+  return code.replace(/0+(\d{1,2})$/, '$1');
+};
+
 // Helper per filtrare zone disponibili in base a contatore (logica progressiva priorità)
 const getAvailableZones = (allZones, itinerari, counter) => {
   if (!itinerari || itinerari.length === 0) {
@@ -561,9 +568,10 @@ export const CHAT_FLOW_CONFIG = {
       const cachedData = store.cachedData;
       const esperienze = cachedData.esperienze || [];
 
-      // Filtra esperienze per zona
+      // Filtra esperienze per zona (usa normalizzazione per match robusto)
+      const normalizedZoneCode = normalizeZoneCode(currentZone.code);
       let zoneExperiences = esperienze
-        .filter(exp => exp.ZONA_COLLEGATA === currentZone.code)
+        .filter(exp => normalizeZoneCode(exp.ZONA_COLLEGATA) === normalizedZoneCode)
         .map(exp => ({
           id: exp.CODICE,
           code: exp.CODICE,
@@ -616,6 +624,7 @@ export const CHAT_FLOW_CONFIG = {
         .sort((a, b) => b.rating - a.rating);
 
       console.log(`✨ Esperienze totali nel cachedData:`, esperienze.length);
+      console.log(`✨ Zone code: ${currentZone.code} -> normalized: ${normalizedZoneCode}`);
       console.log(`✨ Esperienze filtrate per ${currentZone.name} (${currentZone.code}):`, zoneExperiences.length);
 
       if (zoneExperiences.length > 0) {
