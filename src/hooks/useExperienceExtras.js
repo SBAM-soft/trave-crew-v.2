@@ -38,9 +38,10 @@ export function useExperienceExtras(experience) {
         supplemento: parseFloat(extra.SUPPLEMENTO) || 0,
         costoSupplemento: parseFloat(extra.COSTO_SUPPLEMENTO) || 0,
         codiceCollegato: extra.CODICE_COLLEGATO,
-        prezzoServizioBase: parseFloat(extra.PREZZO_SERVIZIO_BASE) || 0,
-        prezzoFinaleServizio: parseFloat(extra.PREZZO_FINALE_SERVIZIO) || 0,
-        marginaleFinale: extra.MARGINE_FINALE || '',
+        // DEPRECATED: Following fields removed from database (Nov 2025)
+        // prezzoServizioBase: 0,
+        // prezzoFinaleServizio: 0,
+        // marginaleFinale: '',
         destinazione: extra.DESTINAZIONE,
         zona: extra.ZONA,
         icon: getIconForExtra(extra.TIPO, extra.LIVELLO_PLUS),
