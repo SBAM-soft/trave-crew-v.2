@@ -1,0 +1,1024 @@
+================================================================================
+ANALISI MODIFICHE DATABASE TRAVELCREW
+================================================================================
+
+📁 File originale: TravelCrew_Database.xlsx
+   Fogli: ['destinazioni_tech', 'destinazioni_copy', 'zone_tech', 'zone_copy', 'esperienze_tech', 'esperienze_copy', 'pacchetti_tech', 'pacchetti_copy', 'hotel_tech', 'hotel_copy', 'voli_tech', 'itinerario_tech', 'costi_accessori_tech', 'extra_tech']
+
+📁 File modificato: TravelCrew_Database Edit.xlsx
+   Fogli: ['destinazioni_tech', 'destinazioni_copy', 'zone_tech', 'zone_copy', 'esperienze_tech', 'esperienze_copy', 'hotel_tech', 'hotel_copy', 'voli_tech', 'itinerario_tech', 'costi_accessori_tech', 'extra_tech']
+
+❌ Fogli rimossi: {'pacchetti_copy', 'pacchetti_tech'}
+
+================================================================================
+FOGLIO: costi_accessori_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (7):
+   - EXTRA_1
+   - EXTRA_2
+   - EXTRA_3
+   - EXTRA_4
+   - EXTRA_5
+   - EXTRA_6
+   - EXTRA_7
+
+📊 Numero righe:
+   Vecchio: 33 righe
+   Nuovo: 33 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 7):
+
+   Usando 'SERVIZIO' come chiave di confronto
+
+   ⚠️  La colonna 'SERVIZIO' contiene duplicati, uso indice numerico
+   ✅ Nessuna modifica nei valori delle righe comuni
+
+
+================================================================================
+FOGLIO: destinazioni_copy
+================================================================================
+
+📊 Numero righe:
+   Vecchio: 7 righe
+   Nuovo: 7 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 14):
+
+   Usando 'PERIODO_MIGLIORE' come chiave di confronto
+
+   ⚠️  La colonna 'PERIODO_MIGLIORE' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 7 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | CODICE
+         Vecchio: DTH01
+         Nuovo:   DTH
+      1 | CODICE
+         Vecchio: DVI02
+         Nuovo:   DVI
+      2 | CODICE
+         Vecchio: DGR01
+         Nuovo:   DGR
+      3 | CODICE
+         Vecchio: DCU01
+         Nuovo:   DCU
+      4 | CODICE
+         Vecchio: DMA01
+         Nuovo:   DMA
+      5 | CODICE
+         Vecchio: DSP01
+         Nuovo:   DSP
+      6 | CODICE
+         Vecchio: DGI01
+         Nuovo:   DGI
+
+
+================================================================================
+FOGLIO: destinazioni_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (3):
+   - BUDGET_MEDIO_GIORNO
+   - DIFFICOLTA_LINGUA
+   - ORDINE
+
+📊 Numero righe:
+   Vecchio: 7 righe
+   Nuovo: 7 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 16):
+
+   Usando 'COSTI_ACC_5' come chiave di confronto
+
+   ⚠️  La colonna 'COSTI_ACC_5' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 61 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | COSTI_ACC_2
+         Vecchio: nan
+         Nuovo:   ATHDO13
+      0 | COSTI_ACC_6
+         Vecchio: nan
+         Nuovo:   ND
+      0 | COSTI_ACC_8
+         Vecchio: nan
+         Nuovo:   ND
+      0 | CODICE
+         Vecchio: DTH01
+         Nuovo:   DTH
+      0 | COSTI_ACC_3
+         Vecchio: nan
+         Nuovo:   ND
+      0 | COSTI_ACC_4
+         Vecchio: nan
+         Nuovo:   ND
+      0 | COSTI_ACC_7
+         Vecchio: nan
+         Nuovo:   ND
+      0 | COSTI_ACC_1
+         Vecchio: nan
+         Nuovo:   ATHAS12
+      1 | COSTI_ACC_2
+         Vecchio: nan
+         Nuovo:   AVIDO13
+      1 | COSTI_ACC_6
+         Vecchio: nan
+         Nuovo:   ND
+      1 | COSTI_ACC_8
+         Vecchio: nan
+         Nuovo:   ND
+      1 | CODICE
+         Vecchio: DVI02
+         Nuovo:   DVI
+      1 | COSTI_ACC_3
+         Vecchio: nan
+         Nuovo:   ND
+      1 | COSTI_ACC_4
+         Vecchio: nan
+         Nuovo:   ND
+      1 | COSTI_ACC_7
+         Vecchio: nan
+         Nuovo:   ND
+      1 | COSTI_ACC_1
+         Vecchio: nan
+         Nuovo:   AVIAS12
+      2 | COSTI_ACC_2
+         Vecchio: nan
+         Nuovo:   ATHDO15
+      2 | COSTI_ACC_6
+         Vecchio: nan
+         Nuovo:   ND
+      2 | DEST_ABBINATA_1
+         Vecchio: DCU01
+         Nuovo:   ND
+      2 | COSTI_ACC_8
+         Vecchio: nan
+         Nuovo:   ND
+
+
+================================================================================
+FOGLIO: esperienze_copy
+================================================================================
+
+📊 Numero righe:
+   Vecchio: 76 righe
+   Nuovo: 74 righe
+   Differenza: -2 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 6):
+
+   Usando 'DESTINAZIONE' come chiave di confronto
+
+   ⚠️  La colonna 'DESTINAZIONE' contiene duplicati, uso indice numerico
+   🔴 Righe rimosse (2):
+      - 74
+      - 75
+
+   ⚠️  Valori modificati: 208 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | DESCRIZIONE
+         Vecchio: Tour in auto del Grand Palace del Wat Pho e del Wa
+         Nuovo:   Tour in auto del Grand Palace, del Wat Pho e del W
+      7 | DESCRIZIONE
+         Vecchio: Un tour di mezza giornata che copre le attrazioni 
+         Nuovo:   Un tour di mezza giornata che copre le attrazioni 
+      8 | DESCRIZIONE
+         Vecchio: Esplora la città di notte con un tour in tuk-tuk; 
+         Nuovo:   Esplora la città di notte con un tour in tuk-tuk, 
+      10 | DESCRIZIONE
+         Vecchio: Crociera di lusso con cena; birra e vino a volontà
+         Nuovo:   Crociera di lusso con cena, birra e vino a volontà
+      14 | DESCRIZIONE
+         Vecchio: Templi bianchi; blu e rossi; tour del collo lungo
+         Nuovo:   Templi bianchi, blu e rossi, tour del collo lungo
+      16 | ESPERIENZE
+         Vecchio: Doi Inthanon
+         Nuovo:   Tour Privato a Pai (min2)
+      17 | ESPERIENZE
+         Vecchio: Doi Inthanon Lowcost
+         Nuovo:   Doi Inthanon
+      19 | ESPERIENZE
+         Vecchio: Tour dei Templi di Chiang Mai
+         Nuovo:   Corso di cucina e Tour del mercato
+      19 | DESCRIZIONE
+         Vecchio: Tour di mezza giornata del Wat Pha Lat e del Wat P
+         Nuovo:   Corso di cucina, mercato e tour del giardino delle
+      20 | ESPERIENZE
+         Vecchio: Santuario degli elefanti
+         Nuovo:   ZipLine
+      20 | DESCRIZIONE
+         Vecchio: Programma di alimentazione del santuario degli ele
+         Nuovo:   Kingkong Smile Zipline con pranzo e trasferimenti
+      21 | ESPERIENZE
+         Vecchio: Corso di cucina e Tour delle erbe
+         Nuovo:   City Tour
+      21 | CODICE
+         Vecchio: XTHCH10
+         Nuovo:   XTHPH01
+      21 | DESCRIZIONE
+         Vecchio: Corso di cucina mercato e tour del giardino delle 
+         Nuovo:   Tour guidato della città di Phuket
+      21 | ZONA
+         Vecchio: CHIANG MAI
+         Nuovo:   PHUKET
+      22 | ESPERIENZE
+         Vecchio: ZipLine
+         Nuovo:   City Tour e Wat Chalong
+      22 | CODICE
+         Vecchio: XTHCH11
+         Nuovo:   XTHPH02
+      22 | DESCRIZIONE
+         Vecchio: Kingkong Smile Zipline con pranzo e trasferimenti
+         Nuovo:   nan
+      22 | ZONA
+         Vecchio: CHIANG MAI
+         Nuovo:   PHUKET
+      23 | ESPERIENZE
+         Vecchio: Alba Spirituale
+         Nuovo:   Baia di Phang Nga
+
+
+================================================================================
+FOGLIO: esperienze_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (1):
+   - ORDINE
+
+🟢 COLONNE AGGIUNTE (4):
+   + CATEGORIA_1
+   + CATEGORIA_2
+   + CATEGORIA_3
+   + CONTATORE_ZONA
+
+📊 Numero righe:
+   Vecchio: 76 righe
+   Nuovo: 76 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 17):
+
+   Usando 'EXTRA_1' come chiave di confronto
+
+   ⚠️  La colonna 'EXTRA_1' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 153 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      21 | CODICE
+         Vecchio: XTHCH10
+         Nuovo:   XTHPH01
+      21 | ZONA_COLLEGATA
+         Vecchio: ZTHCH2
+         Nuovo:   ZTHPH1
+      21 | ZONA
+         Vecchio: CHIANG MAI
+         Nuovo:   PHUKET
+      22 | CODICE
+         Vecchio: XTHCH11
+         Nuovo:   XTHPH02
+      22 | ZONA_COLLEGATA
+         Vecchio: ZTHCH2
+         Nuovo:   ZTHPH1
+      22 | ZONA
+         Vecchio: CHIANG MAI
+         Nuovo:   PHUKET
+      23 | CODICE
+         Vecchio: XTHCH12
+         Nuovo:   XTHPH03
+      23 | ZONA_COLLEGATA
+         Vecchio: ZTHCH2
+         Nuovo:   ZTHPH1
+      23 | ZONA
+         Vecchio: CHIANG MAI
+         Nuovo:   PHUKET
+      24 | CODICE
+         Vecchio: XTHPH01
+         Nuovo:   XTHPH04
+      25 | CODICE
+         Vecchio: XTHPH02
+         Nuovo:   XTHPH05
+      26 | CODICE
+         Vecchio: XTHPH03
+         Nuovo:   XTHPH06
+      27 | CODICE
+         Vecchio: XTHPH04
+         Nuovo:   XTHPH07
+      28 | CODICE
+         Vecchio: XTHPH05
+         Nuovo:   XTHPH08
+      29 | CODICE
+         Vecchio: XTHPH06
+         Nuovo:   XTHPH09
+      29 | ZONA_COLLEGATA
+         Vecchio: ZTHPH1
+         Nuovo:   ZTHPH2
+      30 | CODICE
+         Vecchio: XTHPH07
+         Nuovo:   XTHKO01
+      30 | ZONA_COLLEGATA
+         Vecchio: ZTHPH1
+         Nuovo:   ZTHKO2
+      30 | ZONA
+         Vecchio: PHUKET
+         Nuovo:   KOH SAMUI
+      31 | DESTINAZIONE
+         Vecchio: THAILANDIA
+         Nuovo:   VIETNAM
+
+
+================================================================================
+FOGLIO: extra_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (5):
+   - EXTRA_1
+   - EXTRA_2
+   - MARGINE_FINALE
+   - PREZZO_FINALE_SERVIZIO
+   - PREZZO_SERVIZIO_BASE
+
+📊 Numero righe:
+   Vecchio: 40 righe
+   Nuovo: 44 righe
+   Differenza: +4 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 10):
+
+   Usando 'LIVELLO_PLUS' come chiave di confronto
+
+   ⚠️  La colonna 'LIVELLO_PLUS' contiene duplicati, uso indice numerico
+   🟢 Righe aggiunte (4):
+      + 40
+      + 41
+      + 42
+      + 43
+
+   ⚠️  Valori modificati: 113 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      1 | SUPPLEMENTO
+         Vecchio: 72.0
+         Nuovo:   71.5
+      1 | PLUS
+         Vecchio: Prelievo in hotel biglietti e Guida in Italiano - 
+         Nuovo:   Prelievo in hotel, biglietti e Guida in Italiano -
+      2 | SUPPLEMENTO
+         Vecchio: 108.0
+         Nuovo:   107.9
+      4 | PLUS
+         Vecchio: Prelievo in hotel  e Guida in Italiano - Damnoen S
+         Nuovo:   nan
+      5 | SUPPLEMENTO
+         Vecchio: 113.0
+         Nuovo:   113.10000000000001
+      8 | SUPPLEMENTO
+         Vecchio: 98.0
+         Nuovo:   97.5
+      9 | SUPPLEMENTO
+         Vecchio: 107.0
+         Nuovo:   106.60000000000001
+      12 | SUPPLEMENTO
+         Vecchio: 49.0
+         Nuovo:   49.4
+      16 | SUPPLEMENTO
+         Vecchio: 53.0
+         Nuovo:   53.300000000000004
+      17 | SUPPLEMENTO
+         Vecchio: 46.0
+         Nuovo:   45.5
+      18 | SUPPLEMENTO
+         Vecchio: 23.0
+         Nuovo:   23.400000000000002
+      19 | SUPPLEMENTO
+         Vecchio: 147.0
+         Nuovo:   146.9
+      20 | SUPPLEMENTO
+         Vecchio: 140.0
+         Nuovo:   140.4
+      21 | PLUS
+         Vecchio: Prelievo in hotel - Long Neck e Templi
+         Nuovo:   Prelievo in hotel  e Guida in Italiano - Tour dei 
+      22 | SUPPLEMENTO
+         Vecchio: nan
+         Nuovo:   35.1
+      22 | CODICE
+         Vecchio: ETHPH01
+         Nuovo:   ETHCH07
+      22 | CODICE_COLLEGATO
+         Vecchio: nan
+         Nuovo:   XTHCH05
+      22 | ZONA
+         Vecchio: PHUKET
+         Nuovo:   CHIANG MAI
+      22 | COSTO_SUPPLEMENTO
+         Vecchio: 0.0
+         Nuovo:   27.0
+      22 | PLUS
+         Vecchio: nan
+         Nuovo:   Punto di incontro  e Guida in Italiano - Tour Priv
+
+
+================================================================================
+FOGLIO: hotel_copy
+================================================================================
+
+📊 Numero righe:
+   Vecchio: 69 righe
+   Nuovo: 69 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 7):
+
+   Usando 'BUDGET' come chiave di confronto
+
+   ⚠️  La colonna 'BUDGET' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 9 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      33 | CODICE
+         Vecchio: HMASALO
+         Nuovo:   HMADELO
+      34 | CODICE
+         Vecchio: HMASAME
+         Nuovo:   HMADEME
+      35 | CODICE
+         Vecchio: HMASAHI
+         Nuovo:   HMADEHI
+      63 | CODICE
+         Vecchio: HVIHOLO
+         Nuovo:   HVIHNLO
+      64 | CODICE
+         Vecchio: HVIHOME
+         Nuovo:   HVIHNME
+      65 | CODICE
+         Vecchio: HVIHOHI
+         Nuovo:   HVIHNHI
+      66 | CODICE
+         Vecchio: HVISGLO
+         Nuovo:   HVIHOLO
+      67 | CODICE
+         Vecchio: HVISGME
+         Nuovo:   HVIHOME
+      68 | CODICE
+         Vecchio: HVISGH I
+         Nuovo:   HVIHOHI
+
+
+================================================================================
+FOGLIO: hotel_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (24):
+   - PRZ_PAX_NIGHT_02_04_2026
+   - PRZ_PAX_NIGHT_02_07_2026
+   - PRZ_PAX_NIGHT_04_06_2026
+   - PRZ_PAX_NIGHT_05_03_2026
+   - PRZ_PAX_NIGHT_06_08_2026
+   - PRZ_PAX_NIGHT_07_05_2026
+   - PRZ_PAX_NIGHT_08_12_2026
+   - PRZ_PAX_NIGHT_09_10_2026
+   - PRZ_PAX_NIGHT_10_09_2026
+   - PRZ_PAX_NIGHT_11_11_2026
+   - PRZ_PAX_NIGHT_12_02_2026
+   - PRZ_PAX_NIGHT_13_05_2026
+   - PRZ_PAX_NIGHT_15_01_2026
+   - PRZ_PAX_NIGHT_15_12_2026
+   - PRZ_PAX_NIGHT_16_04_2026
+   - PRZ_PAX_NIGHT_16_07_2026
+   - PRZ_PAX_NIGHT_16_10_2026
+   - PRZ_PAX_NIGHT_17_09_2026
+   - PRZ_PAX_NIGHT_18_06_2026
+   - PRZ_PAX_NIGHT_18_11_2026
+   - PRZ_PAX_NIGHT_20_03_2026
+   - PRZ_PAX_NIGHT_20_08_2026
+   - PRZ_PAX_NIGHT_23_01_2026
+   - PRZ_PAX_NIGHT_26_02_2026
+
+🟢 COLONNE AGGIUNTE (24):
+   + PRZ_PAX_NIGHT_AGOSTO1
+   + PRZ_PAX_NIGHT_AGOSTO3
+   + PRZ_PAX_NIGHT_APRILE1
+   + PRZ_PAX_NIGHT_APRILE3
+   + PRZ_PAX_NIGHT_DICEMBRE2
+   + PRZ_PAX_NIGHT_DICEMBRE3
+   + PRZ_PAX_NIGHT_FEBBRAIO2
+   + PRZ_PAX_NIGHT_FEBBRAIO4
+   + PRZ_PAX_NIGHT_GENNAIO2
+   + PRZ_PAX_NIGHT_GENNAIO3
+   + PRZ_PAX_NIGHT_GIUGNO1
+   + PRZ_PAX_NIGHT_GIUGNO3
+   + PRZ_PAX_NIGHT_LUGLIO1
+   + PRZ_PAX_NIGHT_LUGLIO3
+   + PRZ_PAX_NIGHT_MAGGIO1
+   + PRZ_PAX_NIGHT_MAGGIO2
+   + PRZ_PAX_NIGHT_MARZO1
+   + PRZ_PAX_NIGHT_MARZO3
+   + PRZ_PAX_NIGHT_NOVEMBRE2
+   + PRZ_PAX_NIGHT_NOVEMBRE3
+   + PRZ_PAX_NIGHT_OTTOBRE2
+   + PRZ_PAX_NIGHT_OTTOBRE3
+   + PRZ_PAX_NIGHT_SETTEMBRE2
+   + PRZ_PAX_NIGHT_SETTEMBRE3
+
+📊 Numero righe:
+   Vecchio: 69 righe
+   Nuovo: 69 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 13):
+
+   Usando 'EXTRA_1' come chiave di confronto
+
+   ⚠️  La colonna 'EXTRA_1' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 31 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | QUARTIERE
+         Vecchio: OLD TOWN | SUKHUMVIT | CITY CENTER
+         Nuovo:   OLD TOWN
+SUKHUMVIT
+CITY CENTER
+      1 | QUARTIERE
+         Vecchio: OLD TOWN | SUKHUMVIT | CITY CENTER
+         Nuovo:   OLD TOWN
+SUKHUMVIT
+CITY CENTER
+      2 | QUARTIERE
+         Vecchio: OLD TOWN | SUKHUMVIT | CITY CENTER
+         Nuovo:   OLD TOWN
+SUKHUMVIT
+CITY CENTER
+      3 | QUARTIERE
+         Vecchio: OLD TOWN | NIMMANHAEMIN | RIVERSIDE
+         Nuovo:   OLD TOWN
+NIMMANHAEMIN
+RIVERSIDE
+      4 | BUDGET
+         Vecchio: MEDIUM
+         Nuovo:   nan
+      4 | QUARTIERE
+         Vecchio: OLD TOWN | NIMMANHAEMIN | RIVERSIDE
+         Nuovo:   OLD TOWN
+NIMMANHAEMIN
+RIVERSIDE
+      5 | QUARTIERE
+         Vecchio: OLD TOWN | NIMMANHAEMIN | RIVERSIDE
+         Nuovo:   OLD TOWN
+NIMMANHAEMIN
+RIVERSIDE
+      6 | QUARTIERE
+         Vecchio: PHUKET TOWN | PATONG | KATA E KARON BEACH
+         Nuovo:   PHUKET TOWN
+PATONG
+KATA E KARON BEACH
+      7 | QUARTIERE
+         Vecchio: PHUKET TOWN | PATONG | KATA E KARON BEACH
+         Nuovo:   PHUKET TOWN
+PATONG
+KATA E KARON BEACH
+      8 | QUARTIERE
+         Vecchio: PHUKET TOWN | PATONG | KATA E KARON BEACH
+         Nuovo:   PHUKET TOWN
+PATONG
+KATA E KARON BEACH
+      9 | QUARTIERE
+         Vecchio: BOPHUT | CHAWENG | LAMAI
+         Nuovo:   BOPHUT
+CHAWENG
+LAMAI
+      10 | QUARTIERE
+         Vecchio: BOPHUT | CHAWENG | LAMAI
+         Nuovo:   BOPHUT
+CHAWENG
+LAMAI
+      11 | QUARTIERE
+         Vecchio: BOPHUT | CHAWENG | LAMAI
+         Nuovo:   BOPHUT
+CHAWENG
+LAMAI
+      21 | ZONA
+         Vecchio: L'AVANA
+         Nuovo:   HAVANA
+      22 | ZONA
+         Vecchio: L'AVANA
+         Nuovo:   HAVANA
+      23 | ZONA
+         Vecchio: L'AVANA
+         Nuovo:   HAVANA
+      24 | ZONA
+         Vecchio: VIÑALES
+         Nuovo:   VIÃ‘ALES
+      25 | ZONA
+         Vecchio: VIÑALES
+         Nuovo:   VINALES
+      26 | ZONA
+         Vecchio: VIÑALES
+         Nuovo:   VINALES
+      33 | CODICE
+         Vecchio: HMASALO
+         Nuovo:   HMADELO
+
+
+================================================================================
+FOGLIO: itinerario_tech
+================================================================================
+
+📊 Numero righe:
+   Vecchio: 19 righe
+   Nuovo: 23 righe
+   Differenza: +4 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 23):
+
+   Usando 'COSTI_ACC_6' come chiave di confronto
+
+   ⚠️  La colonna 'COSTI_ACC_6' contiene duplicati, uso indice numerico
+   🟢 Righe aggiunte (4):
+      + 19
+      + 20
+      + 21
+      + 22
+
+   ⚠️  Valori modificati: 223 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | ZONA_4
+         Vecchio: 2
+         Nuovo:   nan
+      0 | EXTRA_3
+         Vecchio: EVOLO03
+         Nuovo:   nan
+      0 | EXTRA_4
+         Vecchio: EASSIC01
+         Nuovo:   nan
+      0 | EXTRA_2
+         Vecchio: ETRAN01
+         Nuovo:   ETHBA14
+      0 | EXTRA_1
+         Vecchio: ETHBA03
+         Nuovo:   ETHBA16
+      0 | MIN_NOTTI
+         Vecchio: nan
+         Nuovo:   2.0
+      1 | COSTI_ACC_2
+         Vecchio: nan
+         Nuovo:   ATHBA04
+      1 | CONTATORE_ZONA
+         Vecchio: 1
+         Nuovo:   2
+      1 | ZONA_4
+         Vecchio: 2
+         Nuovo:   nan
+      1 | EXTRA_2
+         Vecchio: EASSIC01
+         Nuovo:   ETHBA14
+      1 | ZONA_2
+         Vecchio: nan
+         Nuovo:   ZTHCH04
+      1 | ZONA_1
+         Vecchio: ZTHCH02
+         Nuovo:   ZTHBA01
+      1 | EXTRA_1
+         Vecchio: ETRAN01
+         Nuovo:   ETHBA16
+      1 | MIN_NOTTI
+         Vecchio: nan
+         Nuovo:   6.0
+      1 | CODICE
+         Vecchio: ITHCH01
+         Nuovo:   ITHBA02
+      1 | ZONA
+         Vecchio: CHIANG MAI
+         Nuovo:   BANGKOK
+      1 | COSTI_ACC_1
+         Vecchio: nan
+         Nuovo:   ATHCH01
+      2 | CONTATORE_ZONA
+         Vecchio: 1
+         Nuovo:   3
+      2 | ZONA_4
+         Vecchio: 3
+         Nuovo:   nan
+      2 | EXTRA_3
+         Vecchio: EASSIC01
+         Nuovo:   nan
+
+
+================================================================================
+FOGLIO: voli_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (24):
+   - PRZ_PAX_FLIGHT_01_04_2026
+   - PRZ_PAX_FLIGHT_01_07_2026
+   - PRZ_PAX_FLIGHT_03_06_2026
+   - PRZ_PAX_FLIGHT_04_03_2026
+   - PRZ_PAX_FLIGHT_05_08_2026
+   - PRZ_PAX_FLIGHT_06_05_2026
+   - PRZ_PAX_FLIGHT_08_10_2026
+   - PRZ_PAX_FLIGHT_09_09_2026
+   - PRZ_PAX_FLIGHT_09_12_2026
+   - PRZ_PAX_FLIGHT_10_11_2026
+   - PRZ_PAX_FLIGHT_11_02_2026
+   - PRZ_PAX_FLIGHT_12_05_2026
+   - PRZ_PAX_FLIGHT_14_01_2026
+   - PRZ_PAX_FLIGHT_14_12_2026
+   - PRZ_PAX_FLIGHT_15_07_2026
+   - PRZ_PAX_FLIGHT_15_10_2026
+   - PRZ_PAX_FLIGHT_16_09_2026
+   - PRZ_PAX_FLIGHT_17_04_2026
+   - PRZ_PAX_FLIGHT_17_11_2026
+   - PRZ_PAX_FLIGHT_19_03_2026
+   - PRZ_PAX_FLIGHT_19_06_2026
+   - PRZ_PAX_FLIGHT_19_08_2026
+   - PRZ_PAX_FLIGHT_22_01_2026
+   - PRZ_PAX_FLIGHT_25_02_2026
+
+🟢 COLONNE AGGIUNTE (24):
+   + PRZ_PAX_FLIGHT_AGOSTO1
+   + PRZ_PAX_FLIGHT_AGOSTO2
+   + PRZ_PAX_FLIGHT_APRILE1
+   + PRZ_PAX_FLIGHT_APRILE2
+   + PRZ_PAX_FLIGHT_DICEMBRE1
+   + PRZ_PAX_FLIGHT_DICEMBRE2
+   + PRZ_PAX_FLIGHT_FEBBRAIO1
+   + PRZ_PAX_FLIGHT_FEBBRAIO2
+   + PRZ_PAX_FLIGHT_GENNAIO1
+   + PRZ_PAX_FLIGHT_GENNAIO2
+   + PRZ_PAX_FLIGHT_GIUGNO1
+   + PRZ_PAX_FLIGHT_GIUGNO2
+   + PRZ_PAX_FLIGHT_LUGLIO1
+   + PRZ_PAX_FLIGHT_LUGLIO2
+   + PRZ_PAX_FLIGHT_MAGGIO1
+   + PRZ_PAX_FLIGHT_MAGGIO2
+   + PRZ_PAX_FLIGHT_MARZO1
+   + PRZ_PAX_FLIGHT_MARZO2
+   + PRZ_PAX_FLIGHT_NOVEMBRE1
+   + PRZ_PAX_FLIGHT_NOVEMBRE2
+   + PRZ_PAX_FLIGHT_OTTOBRE1
+   + PRZ_PAX_FLIGHT_OTTOBRE2
+   + PRZ_PAX_FLIGHT_SETTEMBRE1
+   + PRZ_PAX_FLIGHT_SETTEMBRE2
+
+📊 Numero righe:
+   Vecchio: 16 righe
+   Nuovo: 16 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 16):
+
+   Usando 'EXTRA_1' come chiave di confronto
+
+   ⚠️  La colonna 'EXTRA_1' contiene duplicati, uso indice numerico
+   ✅ Nessuna modifica nei valori delle righe comuni
+
+
+================================================================================
+FOGLIO: zone_copy
+================================================================================
+
+📊 Numero righe:
+   Vecchio: 24 righe
+   Nuovo: 24 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 11):
+
+   Usando 'PERIODO_MIGLIORE' come chiave di confronto
+
+   ⚠️  La colonna 'PERIODO_MIGLIORE' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 24 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | CODICE
+         Vecchio: ZTHBA01
+         Nuovo:   ZTHBA
+      1 | CODICE
+         Vecchio: ZTHCH04
+         Nuovo:   ZTHCH
+      2 | CODICE
+         Vecchio: ZTHPH02
+         Nuovo:   ZTHPH
+      3 | CODICE
+         Vecchio: ZTHKO05
+         Nuovo:   ZTHKO
+      4 | CODICE
+         Vecchio: ZTHPA05
+         Nuovo:   ZTHPA
+      5 | CODICE
+         Vecchio: ZVIHA01
+         Nuovo:   ZVIHA
+      6 | CODICE
+         Vecchio: ZVIHL02
+         Nuovo:   ZVIHL
+      7 | CODICE
+         Vecchio: ZVIHO03
+         Nuovo:   ZVIHN
+      8 | CODICE
+         Vecchio: ZVISG04
+         Nuovo:   ZVIHO
+      9 | CODICE
+         Vecchio: ZGRAT01
+         Nuovo:   ZGRAT
+      10 | CODICE
+         Vecchio: ZGRSA02
+         Nuovo:   ZGRSA
+      11 | CODICE
+         Vecchio: ZGRCR03
+         Nuovo:   ZGRCR
+      12 | CODICE
+         Vecchio: ZCUHA01
+         Nuovo:   ZCUHA
+      13 | CODICE
+         Vecchio: ZCUVI02
+         Nuovo:   ZCUVI
+      14 | CODICE
+         Vecchio: ZCUTR03
+         Nuovo:   ZCUTR
+      15 | CODICE
+         Vecchio: ZMAMA01
+         Nuovo:   ZMAMA
+      16 | CODICE
+         Vecchio: ZMASA02
+         Nuovo:   ZMADE
+      17 | CODICE
+         Vecchio: ZMAES03
+         Nuovo:   ZMAES
+      18 | CODICE
+         Vecchio: ZSPBA01
+         Nuovo:   ZSPBA
+      19 | CODICE
+         Vecchio: ZSPMA02
+         Nuovo:   ZSPMA
+
+
+================================================================================
+FOGLIO: zone_tech
+================================================================================
+
+🔴 COLONNE RIMOSSE (1):
+   - ORDINE
+
+🟢 COLONNE AGGIUNTE (6):
+   + VOLO_3
+   + VOLO_4
+   + VOLO_5
+   + VOLO_6
+   + VOLO_7
+   + VOLO_8
+
+📊 Numero righe:
+   Vecchio: 24 righe
+   Nuovo: 24 righe
+   Differenza: +0 righe
+
+📝 ANALISI MODIFICHE DATI (colonne comuni: 21):
+
+   Usando 'HOTEL_1' come chiave di confronto
+
+   ⚠️  La colonna 'HOTEL_1' contiene duplicati, uso indice numerico
+   ⚠️  Valori modificati: 27 cambiamenti
+
+   Esempi di modifiche (primi 20):
+      0 | CODICE
+         Vecchio: ZTHBA01
+         Nuovo:   ZTHBA
+      1 | EXTRA_1
+         Vecchio: nan
+         Nuovo:   ETHCH10
+      1 | CODICE
+         Vecchio: ZTHCH04
+         Nuovo:   ZTHCH
+      2 | CODICE
+         Vecchio: ZTHPH02
+         Nuovo:   ZTHPH
+      3 | CODICE
+         Vecchio: ZTHKO05
+         Nuovo:   ZTHKO
+      4 | CODICE
+         Vecchio: ZTHPA05
+         Nuovo:   ZTHPA
+      5 | CODICE
+         Vecchio: ZVIHA01
+         Nuovo:   ZVIHA
+      6 | CODICE
+         Vecchio: ZVIHL02
+         Nuovo:   ZVIHL
+      7 | CODICE
+         Vecchio: ZVIHO03
+         Nuovo:   ZVIHN
+      8 | CODICE
+         Vecchio: ZVISG04
+         Nuovo:   ZVIHO
+      9 | CODICE
+         Vecchio: ZGRAT01
+         Nuovo:   ZGRAT
+      10 | CODICE
+         Vecchio: ZGRSA02
+         Nuovo:   ZGRSA
+      11 | CODICE
+         Vecchio: ZGRCR03
+         Nuovo:   ZGRCR
+      12 | CODICE
+         Vecchio: ZCUHA01
+         Nuovo:   ZCUHA
+      12 | ZONA
+         Vecchio: L'AVANA
+         Nuovo:   HAVANA
+      13 | CODICE
+         Vecchio: ZCUVI02
+         Nuovo:   ZCUVI
+      13 | ZONA
+         Vecchio: VIÑALES
+         Nuovo:   VINALES
+      14 | CODICE
+         Vecchio: ZCUTR03
+         Nuovo:   ZCUTR
+      15 | CODICE
+         Vecchio: ZMAMA01
+         Nuovo:   ZMAMA
+      16 | CODICE
+         Vecchio: ZMASA02
+         Nuovo:   ZMADE
+
+
+================================================================================
+RIEPILOGO MODIFICHE
+================================================================================
+
+📑 costi_accessori_tech:
+   - Colonne rimosse: 7
+     EXTRA_1, EXTRA_6, EXTRA_5, EXTRA_7, EXTRA_3, EXTRA_4, EXTRA_2
+   - Righe: 33 → 33
+
+📑 destinazioni_copy:
+   - Righe: 7 → 7
+   - Modificati 7 valori
+
+📑 destinazioni_tech:
+   - Colonne rimosse: 3
+     DIFFICOLTA_LINGUA, BUDGET_MEDIO_GIORNO, ORDINE
+   - Righe: 7 → 7
+   - Modificati 61 valori
+
+📑 esperienze_copy:
+   - Righe: 76 → 74
+   - Rimosse 2 righe
+   - Modificati 208 valori
+
+📑 esperienze_tech:
+   - Colonne rimosse: 1
+     ORDINE
+   - Colonne aggiunte: 4
+     CATEGORIA_1, CONTATORE_ZONA, CATEGORIA_3, CATEGORIA_2
+   - Righe: 76 → 76
+   - Modificati 153 valori
+
+📑 extra_tech:
+   - Colonne rimosse: 5
+     PREZZO_SERVIZIO_BASE, EXTRA_1, PREZZO_FINALE_SERVIZIO, MARGINE_FINALE, EXTRA_2
+   - Righe: 40 → 44
+   - Aggiunte 4 righe
+   - Modificati 113 valori
+
+📑 hotel_copy:
+   - Righe: 69 → 69
+   - Modificati 9 valori
+
+📑 hotel_tech:
+   - Colonne rimosse: 24
+     PRZ_PAX_NIGHT_15_12_2026, PRZ_PAX_NIGHT_13_05_2026, PRZ_PAX_NIGHT_17_09_2026, PRZ_PAX_NIGHT_06_08_2026, PRZ_PAX_NIGHT_18_06_2026, PRZ_PAX_NIGHT_09_10_2026, PRZ_PAX_NIGHT_18_11_2026, PRZ_PAX_NIGHT_08_12_2026, PRZ_PAX_NIGHT_11_11_2026, PRZ_PAX_NIGHT_12_02_2026, PRZ_PAX_NIGHT_20_03_2026, PRZ_PAX_NIGHT_02_04_2026, PRZ_PAX_NIGHT_04_06_2026, PRZ_PAX_NIGHT_16_04_2026, PRZ_PAX_NIGHT_02_07_2026, PRZ_PAX_NIGHT_16_07_2026, PRZ_PAX_NIGHT_10_09_2026, PRZ_PAX_NIGHT_26_02_2026, PRZ_PAX_NIGHT_16_10_2026, PRZ_PAX_NIGHT_07_05_2026, PRZ_PAX_NIGHT_23_01_2026, PRZ_PAX_NIGHT_20_08_2026, PRZ_PAX_NIGHT_15_01_2026, PRZ_PAX_NIGHT_05_03_2026
+   - Colonne aggiunte: 24
+     PRZ_PAX_NIGHT_NOVEMBRE2, PRZ_PAX_NIGHT_NOVEMBRE3, PRZ_PAX_NIGHT_MARZO1, PRZ_PAX_NIGHT_SETTEMBRE3, PRZ_PAX_NIGHT_GIUGNO1, PRZ_PAX_NIGHT_LUGLIO1, PRZ_PAX_NIGHT_OTTOBRE3, PRZ_PAX_NIGHT_DICEMBRE2, PRZ_PAX_NIGHT_SETTEMBRE2, PRZ_PAX_NIGHT_APRILE3, PRZ_PAX_NIGHT_FEBBRAIO2, PRZ_PAX_NIGHT_GENNAIO3, PRZ_PAX_NIGHT_GIUGNO3, PRZ_PAX_NIGHT_DICEMBRE3, PRZ_PAX_NIGHT_APRILE1, PRZ_PAX_NIGHT_MARZO3, PRZ_PAX_NIGHT_OTTOBRE2, PRZ_PAX_NIGHT_GENNAIO2, PRZ_PAX_NIGHT_LUGLIO3, PRZ_PAX_NIGHT_FEBBRAIO4, PRZ_PAX_NIGHT_AGOSTO1, PRZ_PAX_NIGHT_AGOSTO3, PRZ_PAX_NIGHT_MAGGIO2, PRZ_PAX_NIGHT_MAGGIO1
+   - Righe: 69 → 69
+   - Modificati 31 valori
+
+📑 itinerario_tech:
+   - Righe: 19 → 23
+   - Aggiunte 4 righe
+   - Modificati 223 valori
+
+📑 voli_tech:
+   - Colonne rimosse: 24
+     PRZ_PAX_FLIGHT_05_08_2026, PRZ_PAX_FLIGHT_19_06_2026, PRZ_PAX_FLIGHT_17_04_2026, PRZ_PAX_FLIGHT_14_01_2026, PRZ_PAX_FLIGHT_12_05_2026, PRZ_PAX_FLIGHT_08_10_2026, PRZ_PAX_FLIGHT_09_12_2026, PRZ_PAX_FLIGHT_19_08_2026, PRZ_PAX_FLIGHT_14_12_2026, PRZ_PAX_FLIGHT_01_04_2026, PRZ_PAX_FLIGHT_03_06_2026, PRZ_PAX_FLIGHT_16_09_2026, PRZ_PAX_FLIGHT_15_07_2026, PRZ_PAX_FLIGHT_25_02_2026, PRZ_PAX_FLIGHT_09_09_2026, PRZ_PAX_FLIGHT_15_10_2026, PRZ_PAX_FLIGHT_11_02_2026, PRZ_PAX_FLIGHT_06_05_2026, PRZ_PAX_FLIGHT_10_11_2026, PRZ_PAX_FLIGHT_22_01_2026, PRZ_PAX_FLIGHT_01_07_2026, PRZ_PAX_FLIGHT_19_03_2026, PRZ_PAX_FLIGHT_04_03_2026, PRZ_PAX_FLIGHT_17_11_2026
+   - Colonne aggiunte: 24
+     PRZ_PAX_FLIGHT_DICEMBRE2, PRZ_PAX_FLIGHT_GENNAIO1, PRZ_PAX_FLIGHT_LUGLIO2, PRZ_PAX_FLIGHT_MAGGIO2, PRZ_PAX_FLIGHT_APRILE2, PRZ_PAX_FLIGHT_GIUGNO2, PRZ_PAX_FLIGHT_APRILE1, PRZ_PAX_FLIGHT_MAGGIO1, PRZ_PAX_FLIGHT_SETTEMBRE1, PRZ_PAX_FLIGHT_MARZO2, PRZ_PAX_FLIGHT_OTTOBRE2, PRZ_PAX_FLIGHT_FEBBRAIO2, PRZ_PAX_FLIGHT_GENNAIO2, PRZ_PAX_FLIGHT_SETTEMBRE2, PRZ_PAX_FLIGHT_DICEMBRE1, PRZ_PAX_FLIGHT_LUGLIO1, PRZ_PAX_FLIGHT_FEBBRAIO1, PRZ_PAX_FLIGHT_OTTOBRE1, PRZ_PAX_FLIGHT_AGOSTO2, PRZ_PAX_FLIGHT_NOVEMBRE2, PRZ_PAX_FLIGHT_AGOSTO1, PRZ_PAX_FLIGHT_NOVEMBRE1, PRZ_PAX_FLIGHT_GIUGNO1, PRZ_PAX_FLIGHT_MARZO1
+   - Righe: 16 → 16
+
+📑 zone_copy:
+   - Righe: 24 → 24
+   - Modificati 24 valori
+
+📑 zone_tech:
+   - Colonne rimosse: 1
+     ORDINE
+   - Colonne aggiunte: 6
+     VOLO_4, VOLO_7, VOLO_3, VOLO_6, VOLO_5, VOLO_8
+   - Righe: 24 → 24
+   - Modificati 27 valori
+
