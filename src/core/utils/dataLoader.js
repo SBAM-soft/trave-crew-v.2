@@ -126,7 +126,6 @@ export const loadAllData = async () => {
       destinazioni,
       zone,
       esperienze,
-      pacchetti,
       hotel,
       voli,
       itinerario,
@@ -137,7 +136,6 @@ export const loadAllData = async () => {
       loadEntityData('destinazioni', true),
       loadEntityData('zone', true),
       loadEntityData('esperienze', true),
-      loadEntityData('pacchetti', true),
       loadEntityData('hotel', true),
 
       // Entità solo tech (no copy)
@@ -153,7 +151,6 @@ export const loadAllData = async () => {
       destinazioni,
       zone,
       esperienze,
-      pacchetti,
       hotel,
       voli,
       itinerario,
@@ -162,6 +159,7 @@ export const loadAllData = async () => {
 
       // Backward compatibility (deprecato)
       plus: extra, // Alias per compatibilità con codice esistente
+      pacchetti: [], // Entità rimossa, array vuoto per backward compatibility
       viaggi: [] // Vuoto, entità obsoleta
     };
   } catch (error) {

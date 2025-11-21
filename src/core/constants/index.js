@@ -28,6 +28,9 @@ export const Z_INDEX = {
 
 // CSV Field Names
 export const CSV_FIELDS = {
+  // DEPRECATED: Pacchetti entity removed from database (Nov 2025)
+  // Kept for backward compatibility only, returns empty array
+  /*
   PACCHETTI: {
     CODICE: 'CODICE',
     NOME: 'NOME_PACCHETTO',
@@ -46,6 +49,7 @@ export const CSV_FIELDS = {
       DAY_10: 'DAY10_ESPERIENZA_STD',
     }
   },
+  */
   HOTEL: {
     CODICE: 'CODICE',
     NOME: 'NOME',

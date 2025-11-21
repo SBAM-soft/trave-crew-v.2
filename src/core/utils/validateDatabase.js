@@ -137,45 +137,16 @@ export const validateZoneLinks = (data) => {
 };
 
 /**
+ * @deprecated Pacchetti entity removed from database (Nov 2025)
  * Valida collegamenti pacchetti → esperienze
- * @param {Object} data - Oggetto con tutti i database caricati
- * @returns {Object} - { valid: boolean, errors: string[], warnings: string[] }
+ * Returns valid result for backward compatibility
  */
 export const validatePacchettiLinks = (data) => {
-  const errors = [];
-  const warnings = [];
-
-  if (!data.pacchetti) {
-    errors.push('Database pacchetti non caricato');
-    return { valid: false, errors, warnings };
-  }
-
-  data.pacchetti.forEach((pkt, index) => {
-    const rigaNum = index + 2;
-
-    // Estrai codici esperienze dalle colonne ATTIVITA_G*_ORD*
-    const codiciEsperienze = [];
-    for (let g = 2; g <= 5; g++) {
-      for (let ord = 1; ord <= 2; ord++) {
-        const colonna = `ATTIVITA_G${g}_ORD${ord}`;
-        if (pkt[colonna]) {
-          codiciEsperienze.push(pkt[colonna]);
-        }
-      }
-    }
-
-    codiciEsperienze.forEach(codiceExp => {
-      const expExists = data.esperienze?.find(e => e.CODICE === codiceExp);
-      if (!expExists) {
-        warnings.push(`Pacchetto ${pkt.CODICE} riga ${rigaNum}: ESPERIENZA ${codiceExp} non trovata in esperienze.csv`);
-      }
-    });
-  });
-
+  console.warn('⚠️  validatePacchettiLinks is deprecated: pacchetti entity has been removed');
   return {
-    valid: errors.length === 0,
-    errors,
-    warnings
+    valid: true,
+    errors: [],
+    warnings: ['Pacchetti validation skipped: entity removed from database']
   };
 };
 
@@ -187,20 +158,18 @@ export const validatePacchettiLinks = (data) => {
 export const validateAllDatabases = (data) => {
   const results = {
     itinerari: validateItinerari(data),
-    zone: validateZoneLinks(data),
-    pacchetti: validatePacchettiLinks(data)
+    zone: validateZoneLinks(data)
+    // pacchetti: removed (Nov 2025)
   };
 
   const allErrors = [
     ...results.itinerari.errors,
-    ...results.zone.errors,
-    ...results.pacchetti.errors
+    ...results.zone.errors
   ];
 
   const allWarnings = [
     ...results.itinerari.warnings,
-    ...results.zone.warnings,
-    ...results.pacchetti.warnings
+    ...results.zone.warnings
   ];
 
   return {
@@ -211,8 +180,8 @@ export const validateAllDatabases = (data) => {
       totalErrors: allErrors.length,
       totalWarnings: allWarnings.length,
       itinerariChecked: data.itinerario?.length || 0,
-      zoneChecked: data.zone?.length || 0,
-      pacchettiChecked: data.pacchetti?.length || 0
+      zoneChecked: data.zone?.length || 0
+      // pacchettiChecked: removed (Nov 2025)
     },
     details: results
   };
