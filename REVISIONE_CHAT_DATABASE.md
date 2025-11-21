@@ -467,10 +467,11 @@ Possibile integrazione:
 - CODICE (PK)
 - TIPO = "Z"
 - DESTINAZIONE (FK)
+- DESTINAZIONE_COLLEGATA (FK → destinazioni)
 - ZONA (nome)
 - PRIORITA (1 = città arrivo, 2+ = zone secondarie)
-- GIORNI_CONSIGLIATI
-- COORDINATE_LAT, COORDINATE_LNG
+- GIORNI_CONSIGLIATI (raccomandazione, NON vincolo)
+- COORDINATE_LAT, COORDINATE_LNG (per mappa interattiva)
 - HOTEL_1, HOTEL_2, HOTEL_3 (FK → hotel)
 - VOLO_1, VOLO_2 (FK → voli)
 - COSTI_ACC_1-3 (FK → costi_accessori)
@@ -479,9 +480,24 @@ Possibile integrazione:
 ```
 [ANDREA: Logiche relazioni, priorità progressive unlock, collegamenti]
 
+Logica PRIORITA:
+- PRIORITA = "1" → Zone di arrivo dall'Italia (es: Bangkok, Atene)
+  Mostrate per prime in Step 3, l'utente DEVE scegliere una di queste
+- PRIORITA = "2" o superiore → Zone secondarie/interne
+  Sbloccate DOPO scelta prima zona, mostrate su mappa interattiva
 
+Filtro destinazione:
+- DESTINAZIONE_COLLEGATA deve matchare destinazione scelta nel wizard
+- Es: wizard.destination = "TH" → mostra solo zone con DESTINAZIONE_COLLEGATA = "TH"
 
+GIORNI_CONSIGLIATI:
+- È solo una raccomandazione visiva per l'utente
+- NON determina allocazione automatica giorni
+- L'utente decide quanti giorni allocare tramite esperienze selezionate
 
+Collegamenti:
+- HOTEL_1/2/3: codici hotel disponibili per quella zona (LOW/MEDIUM/HIGH)
+- COSTI_ACC_1-3: costi accessori specifici per quella zona (tasse locali, transfer, etc.)
 ```
 
 #### 3. esperienze_tech.csv
@@ -490,8 +506,9 @@ Possibile integrazione:
 - TIPO = "X"
 - DESTINAZIONE (FK)
 - ZONA
-- ZONA_COLLEGATA (FK → zone)
-- DIFFICOLTA (1-3)
+- ZONA_COLLEGATA (FK → zone.CODICE)
+- CATEGORIA_1, CATEGORIA_2, CATEGORIA_3 (interessi: cultura, natura, avventura, etc.)
+- DIFFICOLTA (1-3: facile/media/difficile)
 - SLOT (durata in giorni, di solito 2)
 - PRX_PAX (prezzo per persona)
 - EXTRA_1-9 (FK → extra)
@@ -499,9 +516,32 @@ Possibile integrazione:
 ```
 [ANDREA: Logiche filtri per zona, difficoltà, collegamenti extra]
 
+Filtri principali (Step 4):
+1. Filtro zona:
+   - ZONA_COLLEGATA = zona_corrente.CODICE
+   - Mostra solo esperienze disponibili nella zona in cui si trova l'utente
 
+2. Filtro destinazione:
+   - DESTINAZIONE = wizard.destination
 
+3. ⚠️ CRITICO - Filtro interessi:
+   - Match tra wizard.interests e (CATEGORIA_1 OR CATEGORIA_2 OR CATEGORIA_3)
+   - Es: Se wizard.interests = ["cultura", "natura"]
+     Mostra esperienze dove CATEGORIA_1="cultura" OR CATEGORIA_2="cultura"
+     OR CATEGORIA_3="cultura" OR CATEGORIA_1="natura" OR ...
+   - VERIFICARE mapping esatto nomi categorie wizard ↔ CSV
 
+4. SLOT (durata):
+   - Indica quanti giorni/blocchi temporali occupa l'esperienza
+   - Quando utente fa Like, riempie SLOT giorni nella barra tempo
+   - Es: SLOT=2 → occupa 2 notti del viaggio
+
+Collegamenti EXTRA:
+- EXTRA_1-9 contengono codici FK → extra_tech.csv
+- Query extra per fullscreen modal:
+  SELECT * FROM extra_tech
+  WHERE CODICE IN (EXTRA_1, EXTRA_2, ..., EXTRA_9)
+  AND LIVELLO_PLUS = "esp"
 ```
 
 #### 4. pacchetti_tech.csv
@@ -514,14 +554,16 @@ Possibile integrazione:
 - PRX_PAX
 - DAY2_ESPERIENZA_STD ... DAY10_ESPERIENZA_STD (FK → esperienze)
 
-**NOTA:** Sistema pacchetti vecchio, ora si usa swipe esperienze singole
-
 ```
 [ANDREA: Logiche pacchetti (se ancora in uso), relazioni esperienze]
 
+⚠️ DEPRECATO: Sistema pacchetti vecchio
 
+Il nuovo flusso (Step 4) NON usa più i pacchetti pre-confezionati.
+Utilizza invece selezione esperienze singole stile Tinder.
 
-
+Tabella probabilmente da ignorare o da rimuovere in futuro.
+Se ancora in uso per altro scopo, documentare qui.
 ```
 
 #### 5. hotel_tech.csv
@@ -529,26 +571,62 @@ Possibile integrazione:
 - CODICE (PK)
 - TIPO = "H"
 - DESTINAZIONE (FK)
-- ZONA
+- ZONA (match con zone_tech.ZONA)
 - QUARTIERE
 - BUDGET (LOW/MEDIUM/HIGH)
-- PRZ_PAX_NIGHT_[DATE] (25 colonne per date specifiche)
+- PRZ_PAX_NIGHT_GENNAIO2, PRZ_PAX_NIGHT_GENNAIO4, ... PRZ_PAX_NIGHT_DICEMBRE4
+  (25 colonne: 12 mesi × 2 periodi = 24, più alcune settimane extra)
 - EXTRA_1-7 (FK → extra)
 
 ```
 [ANDREA: Logiche pricing dinamico per date, filtri per zona/budget]
 
+Modalità BLIND (Step 6):
+- Le card hotel NON mostrano hotel specifici
+- Mostrano "hotel tipo" con servizi generici per fascia budget
+- Es: "Hotel 3* in zona centrale con piscina" (generico)
 
+Filtri (Step 6):
+1. Zona: ZONA = zona_corrente.nome
+2. Destinazione: DESTINAZIONE = wizard.destination
+3. Budget tier: BUDGET IN ("LOW", "MEDIUM", "HIGH")
+   - Query 3 hotel (uno per tier) per ogni zona
 
+Pricing dinamico PRZ_PAX_NIGHT_[MESE][SETTIMANA]:
+- Colonne: PRZ_PAX_NIGHT_GENNAIO2 = seconda settimana gennaio
+           PRZ_PAX_NIGHT_MARZO4 = quarta settimana marzo, etc.
 
+Logica selezione prezzo:
+1. Se wizard.departureDate disponibile:
+   - Estrai mese (es: Gennaio)
+   - Calcola settimana del mese (1-4)
+   - Match colonna: PRZ_PAX_NIGHT_[MESE][SETTIMANA]
+
+2. Se wizard ha solo mese/periodo:
+   - Usa quel periodo direttamente
+
+3. Se wizard non ha date:
+   - CHIEDI IN CHAT (Step 6):
+     * Proponi 3 date suggerite OR
+     * Proponi mese + periodo (inizio/metà/fine mese)
+   - Poi match colonna pricing
+
+Calcolo costo hotel zona:
+- prezzo_base = PRZ_PAX_NIGHT_[PERIODO] × notti_zona × numberOfPeople
+- notti_zona = COUNT(giorni allocati a quella zona) da tripData
+
+Collegamenti EXTRA:
+- EXTRA_1-7 → extra_tech.csv (spa, transfer, upgrade, etc.)
+- Filtro: LIVELLO_PLUS = "htl"
 ```
 
 #### 6. itinerario_tech.csv
 **Campi principali:**
 - CODICE (PK)
 - TIPO = "I"
-- CONTATORE_ZONA (livello unlock progressivo)
-- ZONA_1, ZONA_2, ZONA_3, ZONA_4 (FK → zone permesse in sequenza)
+- DESTINAZIONE (FK)
+- CONTATORE_ZONA (livello unlock progressivo - probabilmente non più usato)
+- ZONA_1, ZONA_2, ZONA_3, ZONA_4 (FK → zone.CODICE - sequenza zone itinerario)
 - MIN_NOTTI
 - COSTI_ACC_1-6 (FK → costi_accessori)
 - EXTRA_1-7 (FK → extra)
@@ -556,20 +634,41 @@ Possibile integrazione:
 ```
 [ANDREA: Logiche sequenze zone permesse, contatore unlock]
 
+Utilizzo (Step 5):
+- Trova itinerario che match le zone scelte dall'utente
+- Query: WHERE ZONA_1 = zona1.CODICE AND ZONA_2 = zona2.CODICE AND ...
+- Questo identifica l'itinerario "ufficiale" per quella combinazione di zone
 
+⚠️ NOTA: CONTATORE_ZONA probabilmente non più usato con nuovo flusso
+(progressive unlock ora basato solo su PRIORITA in zone_tech.csv)
 
+Validazione sequenze zone:
+- ZONA_1/2/3/4 definiscono sequenze logiche/geografiche permesse
+- Es: ZONA_1=Bangkok, ZONA_2=Chiang Mai, ZONA_3=Phuket
+  → sequenza geograficamente sensata
+- Se utente sceglie combinazione non esistente → ???
+  (Da definire: warning? proposta itinerario simile?)
 
+Collegamenti costi accessori:
+- COSTI_ACC_1-6 → costi_accessori_tech.csv
+- Costi obbligatori per quell'itinerario (voli interni, tasse, etc.)
+
+⚠️ NUOVO FILE NECESSARIO: itinerario_copy.csv
+- Per rendering TTS con info marketing/descrittive
+- Campi da definire con Andrea
 ```
 
 #### 7. extra_tech.csv
 **Campi principali:**
 - CODICE (PK)
 - TIPO = "E"
-- PLUS (nome extra)
+- DESTINAZIONE (FK)
+- ZONA
+- PLUS (nome extra, es: "Spa Premium", "Transfer aeroporto", "Guida privata")
 - LIVELLO_PLUS (esp = esperienza, htl = hotel, etc.)
-- SUPPLEMENTO (descrizione)
-- COSTO_SUPPLEMENTO
-- CODICE_COLLEGATO (FK a esperienza/hotel)
+- SUPPLEMENTO (descrizione dettagliata)
+- COSTO_SUPPLEMENTO (costo extra da aggiungere)
+- CODICE_COLLEGATO (FK a esperienza/hotel - opzionale?)
 - PREZZO_SERVIZIO_BASE
 - PREZZO_FINALE_SERVIZIO
 - MARGINE_FINALE
@@ -577,18 +676,70 @@ Possibile integrazione:
 ```
 [ANDREA: Logiche collegamenti extra a esperienze/hotel, calcoli costi]
 
+Collegamenti a esperienze (Step 4):
+- Esperienze hanno EXTRA_1-9 con codici FK
+- Query: SELECT * FROM extra_tech
+         WHERE CODICE IN (esperienza.EXTRA_1-9)
+         AND LIVELLO_PLUS = "esp"
+- Display in fullscreen modal esperienza
 
+Collegamenti a hotel (Step 6):
+- Hotel hanno EXTRA_1-7 con codici FK
+- Query: SELECT * FROM extra_tech
+         WHERE CODICE IN (hotel.EXTRA_1-7)
+         AND LIVELLO_PLUS = "htl"
+- Display come checkbox in card hotel espansa
+- Es: Spa (+€50/notte), Transfer (+€30), Upgrade camera (+€40/notte)
 
+Calcolo costi extra:
+- Esperienze: COSTO_SUPPLEMENTO × numberOfPeople (una tantum)
+- Hotel: COSTO_SUPPLEMENTO × notti_zona × numberOfPeople
 
+⚠️ NOTA: CODICE_COLLEGATO sembra ridondante se esperienze/hotel
+hanno già EXTRA_1-9/EXTRA_1-7. Verificare utilizzo con Andrea.
 ```
 
 #### 8. costi_accessori_tech.csv
+**Campi principali (da confermare con Andrea):**
+- CODICE (PK)
+- TIPO = "CA" (costo accessorio?)
+- DESTINAZIONE (FK)
+- ZONA (opzionale - se specifico per zona)
+- NOME_COSTO (es: "Volo interno Bangkok-Phuket", "Tassa ingresso Angkor Wat")
+- DESCRIZIONE
+- COSTO (??? nome campo da confermare)
+- OBBLIGATORIO (sì/no)
+
 ```
 [ANDREA: Descrivi struttura, costi obbligatori (voli interni, tasse, tickets)]
 
+Utilizzo (Step 7):
+- Costi accessori sono costi obbligatori NON inclusi in esperienze/hotel
+- Es: voli interni tra zone, tasse ingresso parchi nazionali, transfer obbligatori
 
+Collegamenti:
+- Da itinerario_tech.csv tramite COSTI_ACC_1-6
+- Da zone_tech.csv tramite COSTI_ACC_1-3
 
+Query (Step 7):
+SELECT * FROM costi_accessori_tech
+WHERE CODICE IN (
+  itinerario.COSTI_ACC_1-6,
+  zona1.COSTI_ACC_1-3,
+  zona2.COSTI_ACC_1-3,
+  ...
+)
+AND DESTINAZIONE = wizard.destination
 
+Calcolo:
+- costo_accessorio × numberOfPeople (per ogni accessorio)
+- TOTALE accessori = SUM(tutti gli accessori)
+
+⚠️ SE TABELLA NON DISPONIBILE O INCOMPLETA:
+- Usa stima fissa: 180 × numberOfPeople
+- Da sostituire con calcolo preciso quando disponibile
+
+⚠️ CRITICO: Confermare struttura esatta con Andrea
 ```
 
 ---
@@ -598,22 +749,43 @@ Possibile integrazione:
 ```
 [ANDREA: Crea diagramma testuale delle relazioni principali]
 
-Destinazione (1) ──┬──> (*) Zone
-                   ├──> (*) Esperienze
-                   ├──> (*) Pacchetti
-                   ├──> (*) Hotel
-                   └──> (*) Itinerario
+Destinazione (1) ──┬──> (*) Zone (via DESTINAZIONE_COLLEGATA)
+                   ├──> (*) Esperienze (via DESTINAZIONE)
+                   ├──> (*) Pacchetti (via DESTINAZIONE) [DEPRECATO]
+                   ├──> (*) Hotel (via DESTINAZIONE)
+                   ├──> (*) Itinerario (via DESTINAZIONE)
+                   ├──> (*) Extra (via DESTINAZIONE)
+                   └──> (*) Costi_Accessori (via DESTINAZIONE)
 
-Zone (1) ──┬──> (*) Esperienze (via ZONA_COLLEGATA)
-           ├──> (*) Pacchetti (via ZONA_COLLEGATA)
+Zone (1) ──┬──> (*) Esperienze (via ZONA_COLLEGATA = zone.CODICE)
            ├──> (*) Hotel (via ZONA match)
-           └──> ...
+           ├──> (3) Hotel_Tier (via HOTEL_1, HOTEL_2, HOTEL_3)
+           ├──> (*) Extra (via ZONA)
+           └──> (*) Costi_Accessori (via COSTI_ACC_1-3)
 
-[CONTINUA QUI]
+Esperienze (1) ──┬──> (*) Extra (via EXTRA_1-9, filtro LIVELLO_PLUS="esp")
+                 └──> (1) Zona (via ZONA_COLLEGATA)
 
+Hotel (1) ──┬──> (*) Extra (via EXTRA_1-7, filtro LIVELLO_PLUS="htl")
+            └──> (1) Zona (via ZONA)
 
+Itinerario (1) ──┬──> (4) Zone (via ZONA_1, ZONA_2, ZONA_3, ZONA_4)
+                 ├──> (*) Costi_Accessori (via COSTI_ACC_1-6)
+                 └──> (*) Extra (via EXTRA_1-7)
 
+Extra ──> (1) Esperienze/Hotel (via CODICE_COLLEGATO - opzionale/ridondante?)
 
+Wizard (runtime) ──┬──> seleziona (1) Destinazione
+                   ├──> filtro interessi → Esperienze (CATEGORIA_1/2/3)
+                   ├──> filtro numberOfPeople → calcoli prezzi
+                   └──> filtro departureDate → Hotel pricing (PRZ_PAX_NIGHT_[PERIODO])
+
+TripData (runtime Zustand) ──┬──> (*) Zone selezionate
+                              ├──> (*) Esperienze (filledBlocks)
+                              ├──> (*) Hotel (per zona con tier)
+                              └──> (1) Itinerario (match ZONA_1-4)
+
+[ANDREA: Verifica e completa relazioni mancanti]
 ```
 
 ---
@@ -624,52 +796,182 @@ Zone (1) ──┬──> (*) Esperienze (via ZONA_COLLEGATA)
 ```
 [ANDREA: Spiega come si filtrano i dati per destinazione selezionata]
 
+Filtro globale applicato a TUTTE le query:
+- wizard.destination = codice destinazione (es: "TH" = Thailand, "GR" = Greece)
 
+Tabelle con campo DESTINAZIONE:
+- zone_tech.csv → DESTINAZIONE_COLLEGATA = wizard.destination
+- esperienze_tech.csv → DESTINAZIONE = wizard.destination
+- hotel_tech.csv → DESTINAZIONE = wizard.destination
+- itinerario_tech.csv → DESTINAZIONE = wizard.destination
+- extra_tech.csv → DESTINAZIONE = wizard.destination
+- costi_accessori_tech.csv → DESTINAZIONE = wizard.destination
 
-
+Tutte le query DEVONO includere questo filtro per evitare mix di dati
+tra destinazioni diverse.
 ```
 
 #### Filtro Zone per Progressive Unlock
 ```
 [ANDREA: Spiega logica PRIORITA e CONTATORE_AREA per sblocco progressivo]
 
+Step 3 - Prima selezione (zone arrivo):
+SELECT * FROM zone_tech
+WHERE DESTINAZIONE_COLLEGATA = wizard.destination
+AND PRIORITA = "1"
 
+Output: Zone di arrivo dall'Italia (es: Bangkok, Atene, L'Avana)
+L'utente DEVE scegliere una di queste per iniziare.
 
+Step 3B - Selezioni successive (zone interne):
+SELECT * FROM zone_tech
+WHERE DESTINAZIONE_COLLEGATA = wizard.destination
+AND PRIORITA >= "2"
 
+Output: Tutte le altre zone, mostrate su mappa interattiva.
+L'utente può scegliere liberamente.
+
+⚠️ NOTA IMPORTANTE:
+- CONTATORE_AREA in pacchetti_tech.csv NON più usato (pacchetti deprecati)
+- CONTATORE_ZONA in itinerario_tech.csv probabilmente non più usato
+- Progressive unlock ora basato SOLO su PRIORITA (1 vs 2+)
+- NON c'è più unlock graduale dopo ogni zona completata
 ```
 
 #### Filtro Esperienze per Zona e Interessi
 ```
 [ANDREA: Spiega filtri applicati a esperienze (zona, interessi utente, difficoltà)]
 
+Step 4 - Query esperienze per zona corrente:
 
+SELECT * FROM esperienze_tech
+WHERE ZONA_COLLEGATA = zona_corrente.CODICE
+AND DESTINAZIONE = wizard.destination
+AND (
+  CATEGORIA_1 IN wizard.interests OR
+  CATEGORIA_2 IN wizard.interests OR
+  CATEGORIA_3 IN wizard.interests
+)
+ORDER BY ???  -- [ANDREA: priorità? prezzo? random?]
 
+⚠️ CRITICO - Mapping interessi:
+- wizard.interests = array di stringhe (es: ["cultura", "natura", "avventura"])
+- CATEGORIA_1/2/3 devono avere ESATTAMENTE gli stessi valori stringa
+- Es: Se wizard usa "cultura" → CSV deve avere "cultura" (non "culturale")
+- VERIFICARE ASSOLUTAMENTE prima di implementare
 
+Filtro difficoltà (opzionale?):
+- DIFFICOLTA 1 = facile, 2 = media, 3 = difficile
+- Da filtrare in base a wizard.fitnessLevel? (se disponibile)
+
+Output: Lista esperienze filtrate
+- Mostra 3 alla volta in slider orizzontale
+- Pulsante "Carica altre" per vedere successive
 ```
 
 #### Selezione Hotel per Zona e Budget
 ```
 [ANDREA: Spiega come si selezionano hotel per zona e tier budget]
 
+Step 6 - Query 3 hotel per zona (uno per tier):
 
+Per ogni zona nell'itinerario:
 
+-- Hotel LOW
+SELECT * FROM hotel_tech
+WHERE ZONA = zona_corrente.nome
+AND DESTINAZIONE = wizard.destination
+AND BUDGET = "LOW"
+LIMIT 1  -- [ANDREA: quale scegliere se ce ne sono multipli? random? first?]
 
+-- Hotel MEDIUM
+SELECT * FROM hotel_tech
+WHERE ZONA = zona_corrente.nome
+AND DESTINAZIONE = wizard.destination
+AND BUDGET = "MEDIUM"
+LIMIT 1
+
+-- Hotel HIGH (LUXURY)
+SELECT * FROM hotel_tech
+WHERE ZONA = zona_corrente.nome
+AND DESTINAZIONE = wizard.destination
+AND BUDGET = "HIGH"
+LIMIT 1
+
+Output: 3 card hotel (blind) con prezzi dinamici per periodo viaggio
+
+Pricing dinamico - Selezione colonna:
+1. Determina mese/periodo da wizard.departureDate (o chiedi in chat)
+2. Map mese+settimana → nome colonna
+   Es: 15 Gennaio (settimana 2) → PRZ_PAX_NIGHT_GENNAIO2
+   Es: 25 Marzo (settimana 4) → PRZ_PAX_NIGHT_MARZO4
+3. Estrai prezzo da colonna corrispondente
+
+Calcolo costo zona:
+- prezzo_notte = hotel.PRZ_PAX_NIGHT_[PERIODO]
+- notti_zona = COUNT(giorni allocati) da tripData per quella zona
+- costo_base = prezzo_notte × notti_zona × numberOfPeople
 ```
 
 #### Calcolo Costi
 ```
 [ANDREA: Formula calcolo costi totali]
 
-Esperienze: SUM(esperienza.PRX_PAX × numberOfPeople)
-Hotel: tierPrice × nights × numberOfPeople (per ogni zona)
-Hotel Extras: extraPrice × nights × numberOfPeople
-Accessori: 180 × numberOfPeople (fisso stimato)
+Formula breakdown completo (Step 7):
 
-TOTALE = ...
+1. COSTO ESPERIENZE:
+   FOR EACH esperienza IN tripData.filledBlocks:
+     costo_esperienza = esperienza.PRX_PAX × numberOfPeople
 
+   TOTALE_ESPERIENZE = SUM(costo_esperienza per tutte le esperienze)
 
+2. COSTO HOTEL BASE:
+   FOR EACH zona IN tripData.selectedZones:
+     notti_zona = COUNT(giorni in tripData.filledBlocks per quella zona)
+     hotel_tier = tripData.hotels[zona].selectedTier  -- LOW/MEDIUM/HIGH
+     prezzo_notte = hotel_tier.PRZ_PAX_NIGHT_[PERIODO]
+     costo_hotel_zona = prezzo_notte × notti_zona × numberOfPeople
 
+   TOTALE_HOTEL_BASE = SUM(costo_hotel_zona per tutte le zone)
 
+3. COSTO HOTEL EXTRAS:
+   FOR EACH zona IN tripData.selectedZones:
+     notti_zona = COUNT(giorni per quella zona)
+     FOR EACH extra IN tripData.hotels[zona].selectedExtras:
+       costo_extra_zona = extra.COSTO_SUPPLEMENTO × notti_zona × numberOfPeople
+
+   TOTALE_HOTEL_EXTRAS = SUM(costo_extra_zona per tutte le zone e extra)
+
+4. COSTI ACCESSORI:
+   -- Da itinerario
+   itinerario_accessori = SELECT FROM costi_accessori_tech
+                          WHERE CODICE IN itinerario.COSTI_ACC_1-6
+
+   -- Da zone
+   zone_accessori = SELECT FROM costi_accessori_tech
+                    WHERE CODICE IN zona.COSTI_ACC_1-3 PER OGNI zona
+
+   FOR EACH accessorio IN (itinerario_accessori + zone_accessori):
+     costo_accessorio = accessorio.COSTO × numberOfPeople
+
+   TOTALE_ACCESSORI = SUM(costo_accessorio)
+
+   ⚠️ SE costi_accessori_tech.csv non disponibile o incompleto:
+   TOTALE_ACCESSORI = 180 × numberOfPeople (stima fissa)
+
+5. TOTALE FINALE:
+   TOTALE = TOTALE_ESPERIENZE +
+            TOTALE_HOTEL_BASE +
+            TOTALE_HOTEL_EXTRAS +
+            TOTALE_ACCESSORI
+
+Display breakdown:
+- Esperienze: €X
+- Hotel: €Y
+- Servizi extra hotel: €Z
+- Costi accessori: €W
+- ─────────────────
+- TOTALE VIAGGIO: €TOTALE
 ```
 
 ---
