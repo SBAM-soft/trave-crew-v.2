@@ -8,10 +8,10 @@ import pandas as pd
 import os
 from pathlib import Path
 
-EXCEL_FILE = "TravelCrew_Database.xlsx"
+EXCEL_FILE = "TravelCrew_Database Edit.xlsx"
 OUTPUT_DIR = "public/data"
 
-# Array dei 14 fogli da convertire
+# Array dei 12 fogli da convertire (pacchetti_tech e pacchetti_copy rimossi)
 SHEETS = [
     "destinazioni_tech",
     "destinazioni_copy",
@@ -19,8 +19,6 @@ SHEETS = [
     "zone_copy",
     "esperienze_tech",
     "esperienze_copy",
-    "pacchetti_tech",
-    "pacchetti_copy",
     "hotel_tech",
     "hotel_copy",
     "voli_tech",

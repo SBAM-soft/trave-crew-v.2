@@ -306,141 +306,43 @@ export const getHotelExtras = (hotel, plusDB) => {
 };
 
 /**
+ * @deprecated Pacchetti entity removed from database (Nov 2025)
  * Filtra pacchetti in base agli interessi del wizard
- * @param {Array} pacchetti - Array di pacchetti PEXP
- * @param {Array} interessi - Array di interessi selezionati nel wizard
- * @returns {Array} - Array di pacchetti filtrati
+ * Returns empty array for backward compatibility
  */
 export const filterPacchettiByInteressi = (pacchetti, interessi) => {
-  if (!pacchetti || pacchetti.length === 0) {
-    return [];
-  }
-
-  // Se non ci sono interessi, restituisci tutti i pacchetti
-  if (!interessi || interessi.length === 0) {
-    return pacchetti;
-  }
-
-  // Normalizza interessi per confronto (lowercase e trim)
-  const interessiNormalized = interessi.map(i => i.toLowerCase().trim());
-
-  return pacchetti.filter(pacco => {
-    // Estrai categorie/tag del pacchetto
-    const categoriePacco = [];
-
-    // Aggiungi categoria principale se presente
-    if (pacco.CATEGORIA) {
-      categoriePacco.push(pacco.CATEGORIA.toLowerCase().trim());
-    }
-
-    // Aggiungi tag se presenti (campo TAGS separato da virgole o punto e virgola)
-    if (pacco.TAGS) {
-      const tags = pacco.TAGS.split(/[,;]/).map(t => t.toLowerCase().trim());
-      categoriePacco.push(...tags);
-    }
-
-    // Aggiungi tipo di esperienza se presente
-    if (pacco.TIPO) {
-      categoriePacco.push(pacco.TIPO.toLowerCase().trim());
-    }
-
-    // Verifica se almeno un interesse matcha con le categorie del pacchetto
-    return interessiNormalized.some(interesse =>
-      categoriePacco.some(cat =>
-        cat.includes(interesse) || interesse.includes(cat)
-      )
-    );
-  });
+  console.warn('⚠️  filterPacchettiByInteressi is deprecated: pacchetti entity has been removed');
+  return [];
 };
 
 /**
+ * @deprecated Pacchetti entity removed from database (Nov 2025)
  * Suggerisci prossimi pacchetti basandosi sulla logistica
- * Usa il campo possibili_next_zone per proporre pacchetti ottimizzati
- * @param {Object} currentPEXP - Pacchetto corrente selezionato
- * @param {Array} allPEXP - Array di tutti i pacchetti disponibili
- * @returns {Array} - Array di pacchetti suggeriti per il prossimo giorno
+ * Returns empty array for backward compatibility
  */
 export const getNextPossiblePEXP = (currentPEXP, allPEXP) => {
-  if (!currentPEXP || !allPEXP || allPEXP.length === 0) {
-    return allPEXP;
-  }
-
-  // Se il pacchetto corrente non ha zone successive specificate, restituisci tutti
-  if (!currentPEXP.possibili_next_zone || currentPEXP.possibili_next_zone === '') {
-    return allPEXP;
-  }
-
-  // Estrai le zone successive possibili (separate da virgole)
-  const nextZones = currentPEXP.possibili_next_zone
-    .split(',')
-    .map(z => z.trim())
-    .filter(z => z !== '');
-
-  // Filtra pacchetti che appartengono alle zone successive
-  const suggeriti = allPEXP.filter(pexp => {
-    const zonaId = pexp.ZONA_ID || pexp.zona_id;
-    return nextZones.includes(zonaId);
-  });
-
-  // Se ci sono suggerimenti, restituiscili, altrimenti tutti
-  return suggeriti.length > 0 ? suggeriti : allPEXP;
+  console.warn('⚠️  getNextPossiblePEXP is deprecated: pacchetti entity has been removed');
+  return [];
 };
 
 /**
- * Calcola score di rilevanza per un pacchetto basato su interessi e logistica
- * @param {Object} pexp - Pacchetto da valutare
- * @param {Array} interessi - Interessi utente
- * @param {Object} currentPEXP - Pacchetto corrente (per logistica)
- * @returns {Number} - Score di rilevanza (0-100)
+ * @deprecated Pacchetti entity removed from database (Nov 2025)
+ * Calcola score di rilevanza per un pacchetto
+ * Returns 0 for backward compatibility
  */
 export const calculatePEXPRelevanceScore = (pexp, interessi = [], currentPEXP = null) => {
-  let score = 50; // Base score
-
-  // +30 punti se matcha con gli interessi
-  if (interessi && interessi.length > 0) {
-    const categoriePacco = [];
-
-    if (pexp.CATEGORIA) categoriePacco.push(pexp.CATEGORIA.toLowerCase());
-    if (pexp.TAGS) {
-      const tags = pexp.TAGS.split(/[,;]/).map(t => t.toLowerCase().trim());
-      categoriePacco.push(...tags);
-    }
-    if (pexp.TIPO) categoriePacco.push(pexp.TIPO.toLowerCase());
-
-    const interessiNormalized = interessi.map(i => i.toLowerCase().trim());
-    const hasMatch = interessiNormalized.some(interesse =>
-      categoriePacco.some(cat => cat.includes(interesse) || interesse.includes(cat))
-    );
-
-    if (hasMatch) score += 30;
-  }
-
-  // +20 punti se è logisticamente ottimale (zona successiva suggerita)
-  if (currentPEXP && currentPEXP.possibili_next_zone) {
-    const nextZones = currentPEXP.possibili_next_zone.split(',').map(z => z.trim());
-    const zonaId = pexp.ZONA_ID || pexp.zona_id;
-
-    if (nextZones.includes(zonaId)) {
-      score += 20;
-    }
-  }
-
-  return Math.min(score, 100);
+  console.warn('⚠️  calculatePEXPRelevanceScore is deprecated: pacchetti entity has been removed');
+  return 0;
 };
 
 /**
- * Ordina pacchetti per rilevanza (score decrescente)
- * @param {Array} pacchetti - Array di pacchetti
- * @param {Array} interessi - Interessi utente
- * @param {Object} currentPEXP - Pacchetto corrente
- * @returns {Array} - Array ordinato per rilevanza
+ * @deprecated Pacchetti entity removed from database (Nov 2025)
+ * Ordina pacchetti per rilevanza
+ * Returns empty array for backward compatibility
  */
 export const sortPacchettiByRelevance = (pacchetti, interessi = [], currentPEXP = null) => {
-  return [...pacchetti].sort((a, b) => {
-    const scoreA = calculatePEXPRelevanceScore(a, interessi, currentPEXP);
-    const scoreB = calculatePEXPRelevanceScore(b, interessi, currentPEXP);
-    return scoreB - scoreA; // Decrescente
-  });
+  console.warn('⚠️  sortPacchettiByRelevance is deprecated: pacchetti entity has been removed');
+  return [];
 };
 
 /**

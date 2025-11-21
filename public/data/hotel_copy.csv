@@ -32,9 +32,9 @@ HCUTRHI,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,HIGH,5 stelle | Mono/Doppia
 HMAMALO,H,MAROCCO,MARRAKECH,MEDINA | GUELIZ | HIVERNAGE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HMAMAME,H,MAROCCO,MARRAKECH,MEDINA | GUELIZ | HIVERNAGE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HMAMAHI,H,MAROCCO,MARRAKECH,MEDINA | GUELIZ | HIVERNAGE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HMASALO,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,LOW,Campo berbero | Tenda condivisa | Bagno comune | Cena e colazione incluse
-HMASAME,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,MEDIUM,Campo berbero | Tenda privata | Bagno privato | Cena e colazione incluse
-HMASAHI,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,HIGH,Campo luxury | Suite tenda | Bagno privato | Cena e colazione incluse
+HMADELO,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,LOW,Campo berbero | Tenda condivisa | Bagno comune | Cena e colazione incluse
+HMADEME,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,MEDIUM,Campo berbero | Tenda privata | Bagno privato | Cena e colazione incluse
+HMADEHI,H,MAROCCO,DESERTO SAHARA,MERZOUGA | ERG CHEBBI,HIGH,Campo luxury | Suite tenda | Bagno privato | Cena e colazione incluse
 HMAESLO,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HMAESME,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HMAESHI,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
@@ -62,9 +62,9 @@ HVIHAHI,H,VIETNAM,HANOI,OLD QUARTER | HOAN KIEM | FRENCH QUARTER,HIGH,5 stelle |
 HVIHLLO,H,VIETNAM,HA LONG BAY,BAI CHAY | TU LONG | BAIA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HVIHLME,H,VIETNAM,HA LONG BAY,BAI CHAY | TU LONG | BAIA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HVIHLHI,H,VIETNAM,HA LONG BAY,BAI CHAY | TU LONG | BAIA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HVIHOLO,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HVIHOME,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HVIHOHI,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HVISGLO,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HVISGME,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HVISGH I,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHNLO,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HVIHNME,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHNHI,H,VIETNAM,HOI AN,OLD TOWN | AN BANG BEACH | CAM CHAU,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHOLO,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HVIHOME,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HVIHOHI,H,VIETNAM,HO CHI MINH,DISTRICT 1 | PHU NHUAN | BINH THANH,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa

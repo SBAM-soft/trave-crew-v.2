@@ -1,48 +1,46 @@
 CODICE,TIPO,DESTINAZIONE,ZONA,ESPERIENZE,DESCRIZIONE
-XTHBA01,X,THAILANDIA,BANGKOK,Tour Privato di Bangkok in auto  (min2),Tour in auto del Grand Palace del Wat Pho e del Wat Arun
+XTHBA01,X,THAILANDIA,BANGKOK,Tour Privato di Bangkok in auto  (min2),"Tour in auto del Grand Palace, del Wat Pho e del Wat Arun"
 XTHBA02,X,THAILANDIA,BANGKOK,Damnoen Saduak e Maeklong,Mercato di Damnoen Saduak e Mercato ferroviario di Maeklong
 XTHBA03,X,THAILANDIA,BANGKOK,Antico Siam,Tour guidato dei templi di Ayutthaya
 XTHBA04,X,THAILANDIA,BANGKOK,Tour Ferrovia della morte,Tour della ferrovia della morte e dell'Hellfire Pass
 XTHBA05,X,THAILANDIA,BANGKOK,Santuario degli Elefanti,Escursione di un giorno al Santuario degli Elefanti Living Green
 XTHBA06,X,THAILANDIA,BANGKOK,Escursione a Pattaya da Bangkok,Escursione di un giorno a Pattaya Koh Larn e Santuario della Verità
 XTHBA07,X,THAILANDIA,BANGKOK,TBD,TBD
-XTHBA08,X,THAILANDIA,BANGKOK,Tour dei Templi,Un tour di mezza giornata che copre le attrazioni principali come il Palazzo Reale; il Tempio del Buddha di Smeraldo; Wat Trimit (Buddha d'Oro) e Wat Pho
-XTHBA09,X,THAILANDIA,BANGKOK,Tuk Tuk Tour,Esplora la città di notte con un tour in tuk-tuk; che può includere visite ai mercati e assaggi di street food; ad esempio a Chinatown.
+XTHBA08,X,THAILANDIA,BANGKOK,Tour dei Templi,"Un tour di mezza giornata che copre le attrazioni principali come il Palazzo Reale, il Tempio del Buddha di Smeraldo, Wat Trimit (Buddha d'Oro) e Wat Pho"
+XTHBA09,X,THAILANDIA,BANGKOK,Tuk Tuk Tour,"Esplora la città di notte con un tour in tuk-tuk, che può includere visite ai mercati e assaggi di street food, ad esempio a Chinatown. "
 XTHBA10,X,THAILANDIA,BANGKOK,Mahanakhon SkyWalk,Biglietto d'ingresso per Mahanakhon SkyWalk con opzioni
-XTHBA11,X,THAILANDIA,BANGKOK,Crociera di Lusso,Crociera di lusso con cena; birra e vino a volontà
+XTHBA11,X,THAILANDIA,BANGKOK,Crociera di Lusso,"Crociera di lusso con cena, birra e vino a volontà"
 XTHBA12,X,THAILANDIA,BANGKOK,Coocking Class Thailandese,Corso di cucina tailandese e tour del mercato
 XTHCH01,X,THAILANDIA,CHIANG MAI,Tour dei Templi di Chiang Mai,Tour di mezza giornata del Wat Pha Lat e del Wat Phra That Doi Suthep
 XTHCH02,X,THAILANDIA,CHIANG MAI,Tour dei Templi di Chiang Rai,Escursione di un giorno ai templi di Chiang Rai
-XTHCH03,X,THAILANDIA,CHIANG MAI,Long Neck e Templi,Templi bianchi; blu e rossi; tour del collo lungo
+XTHCH03,X,THAILANDIA,CHIANG MAI,Long Neck e Templi,"Templi bianchi, blu e rossi, tour del collo lungo"
 XTHCH04,X,THAILANDIA,CHIANG MAI,Elephant Jungle Sanctuary,TBD
-XTHCH05,X,THAILANDIA,CHIANG MAI,Doi Inthanon,Tour ecologico del Parco Nazionale di Doi Inthanon
-XTHCH06,X,THAILANDIA,CHIANG MAI,Doi Inthanon Lowcost,Tour ecologico del Parco Nazionale di Doi Inthanon
+XTHCH05,X,THAILANDIA,CHIANG MAI,Tour Privato a Pai (min2),Tour ecologico del Parco Nazionale di Doi Inthanon
+XTHCH06,X,THAILANDIA,CHIANG MAI,Doi Inthanon,Tour ecologico del Parco Nazionale di Doi Inthanon
 XTHCH07,X,THAILANDIA,CHIANG MAI,Quad nella Jungla,TBD
-XTHCH08,X,THAILANDIA,CHIANG MAI,Tour dei Templi di Chiang Mai,Tour di mezza giornata del Wat Pha Lat e del Wat Phra That Doi Suthep
-XTHCH09,X,THAILANDIA,CHIANG MAI,Santuario degli elefanti,Programma di alimentazione del santuario degli elefanti
-XTHCH10,X,THAILANDIA,CHIANG MAI,Corso di cucina e Tour delle erbe,Corso di cucina mercato e tour del giardino delle erbe tailandesi
-XTHCH11,X,THAILANDIA,CHIANG MAI,ZipLine,Kingkong Smile Zipline con pranzo e trasferimenti
-XTHCH12,X,THAILANDIA,CHIANG MAI,Alba Spirituale,Alba spirituale al Wat Doi Suthep; Pha Lat; elemosina e meditazione
-XTHPH01,X,THAILANDIA,PHUKET,City Tour e dintorni,Tour guidato della città di Phuket
-XTHPH02,X,THAILANDIA,PHUKET,Baia di Phang Nga,Tour della Baia di Phang
-XTHPH03,X,THAILANDIA,PHUKET,Phi Phi e Maya Bay,Escursione alle isole Phi Phi e Maya Bay
-XTHPH04,X,THAILANDIA,PHUKET,Similan,Escursione di un giorno alle isole Similan
-XTHPH05,X,THAILANDIA,PHUKET,Tour delle isole Khai,Tour delle 3 isole Khai per lo snorkeling e il relax
-XTHPH06,X,THAILANDIA,PHUKET,Santuario degli Elefanti,Escursione al santuario della giungla degli elefanti con alimentazione e doccia
+XTHCH08,X,THAILANDIA,CHIANG MAI,Corso di cucina e Tour del mercato,"Corso di cucina, mercato e tour del giardino delle erbe tailandesi"
+XTHCH09,X,THAILANDIA,CHIANG MAI,ZipLine,Kingkong Smile Zipline con pranzo e trasferimenti
+XTHPH01,X,THAILANDIA,PHUKET,City Tour,Tour guidato della città di Phuket
+XTHPH02,X,THAILANDIA,PHUKET,City Tour e Wat Chalong,TBD
+XTHPH03,X,THAILANDIA,PHUKET,Baia di Phang Nga,Tour della Baia di Phang
+XTHPH04,X,THAILANDIA,PHUKET,Phi Phi e Maya Bay ,Escursione alle isole Phi Phi e Maya Bay
+XTHPH05,X,THAILANDIA,PHUKET,Similan,Escursione di un giorno alle isole Similan
+XTHPH06,X,THAILANDIA,PHUKET,Tour delle isole Khai,Tour delle 3 isole Khai per lo snorkeling e il relax
 XTHPH07,X,THAILANDIA,PHUKET,Fuoristrada e ZipLine,Avventura in fuoristrada e zipline a Phuket
 XTHPH08,X,THAILANDIA,PHUKET,Equitazione a Kamala,Attività di equitazione sulla spiaggia di Kamala
-XTHKO01,X,THAILANDIA,KOH SAMUI,Tour Isola di Koh Samui,Tour guidato dell'isola con spiagge e cascate
+XTHPH09,X,THAILANDIA,PHUKET,Santuario degli Elefanti,TBD
+XTHKO01,X,THAILANDIA,KOH SAMUI,TBD,TBD
 XVIHA01,X,VIETNAM,HANOI,Tour del Quartiere Vecchio,Walking tour del Quartiere Vecchio con street food
 XVIHA02,X,VIETNAM,HANOI,Tempio della Letteratura,Visita al Tempio della Letteratura e Pagoda
 XVIHA03,X,VIETNAM,HANOI,Spettacolo Marionette,Spettacolo tradizionale di marionette sull'acqua
 XVIHL01,X,VIETNAM,HA LONG BAY,Crociera Ha Long Bay,Crociera di un giorno nella baia con kayak e grotte
 XVIHL02,X,VIETNAM,HA LONG BAY,Villaggio Galleggiante,Visita al villaggio galleggiante con kayak
-XVIHO01,X,VIETNAM,HOI AN,Tour Città Antica,Walking tour della città antica con lanterne
-XVIHO02,X,VIETNAM,HOI AN,Cooking Class Vietnamita,Corso di cucina vietnamita e tour del mercato
-XVIHO03,X,VIETNAM,HOI AN,Sartoria Su Misura,Esperienza sartoria con abito su misura
-XVISG01,X,VIETNAM,HO CHI MINH,Tunnel di Cu Chi,Tour dei tunnel di Cu Chi e museo della guerra
-XVISG02,X,VIETNAM,HO CHI MINH,Tour Città e Mercati,Tour della città con Palazzo della Riunificazione e mercati
-XVISG03,X,VIETNAM,HO CHI MINH,Delta del Mekong,Escursione di un giorno al Delta del Mekong
+XVIHN01,X,VIETNAM,HOI AN,Tour CittÃ  Antica,Walking tour della cittÃ  antica con lanterne
+XVIHN02,X,VIETNAM,HOI AN,Cooking Class Vietnamita,Corso di cucina vietnamita e tour del mercato
+XVIHN03,X,VIETNAM,HOI AN,Sartoria Su Misura,Esperienza sartoria con abito su misura
+XVIHO01,X,VIETNAM,HO CHI MINH,Tunnel di Cu Chi,Tour dei tunnel di Cu Chi e museo della guerra
+XVIHO02,X,VIETNAM,HO CHI MINH,Tour CittÃ  e Mercati,Tour della cittÃ  con Palazzo della Riunificazione e mercati
+XVIHO03,X,VIETNAM,HO CHI MINH,Delta del Mekong,Escursione di un giorno al Delta del Mekong
 XGRAT01,X,GRECIA,ATENE,Tour Acropoli e Partenone,Visita guidata dell'Acropoli e del Partenone
 XGRAT02,X,GRECIA,ATENE,Tour Atene Classica,Tour dei principali siti archeologici di Atene
 XGRAT03,X,GRECIA,ATENE,Tour Gastronomico,Food tour nei mercati e taverne di Atene
@@ -50,25 +48,25 @@ XGRSA01,X,GRECIA,SANTORINI,Tramonto a Oia,Esperienza del tramonto a Oia
 XGRSA02,X,GRECIA,SANTORINI,Wine Tour Santorini,Tour delle cantine con degustazione
 XGRCR01,X,GRECIA,CRETA,Palazzo di Cnosso,Visita al Palazzo Minoico di Cnosso
 XGRCR02,X,GRECIA,CRETA,Gola di Samaria,Trekking nella Gola di Samaria
-XGRCR03,X,GRECIA,CRETA,Spiagge di Creta,Tour delle spiagge più belle di Creta
-XCUHA01,X,CUBA,L'AVANA,Tour L'Avana Vieja,Walking tour dell'Avana Vecchia
-XCUHA02,X,CUBA,L'AVANA,Tour in Auto d'Epoca,Tour della città in auto d'epoca americana
-XCUHA03,X,CUBA,L'AVANA,Esperienza Salsa e Rum,Serata con musica salsa e degustazione rum
-XCUVI01,X,CUBA,VIÑALES,Valle di Viñales,Tour della valle con piantagioni di tabacco
+XGRCR03,X,GRECIA,CRETA,Spiagge di Creta,Tour delle spiagge piÃ¹ belle di Creta
+XCUHA01,X,CUBA,HAVANA,Tour L'Avana Vieja,Walking tour dell'Avana Vecchia
+XCUHA02,X,CUBA,HAVANA,Tour in Auto d'Epoca,Tour della cittÃ  in auto d'epoca americana
+XCUHA03,X,CUBA,HAVANA,Esperienza Salsa e Rum,Serata con musica salsa e degustazione rum
+XCUVI01,X,CUBA,VINALES,Valle di ViÃ±ales,Tour della valle con piantagioni di tabacco
 XCUTR01,X,CUBA,TRINIDAD,Tour Trinidad Coloniale,Walking tour del centro storico coloniale
-XCUTR02,X,CUBA,TRINIDAD,Playa Ancón,Escursione alla spiaggia di Playa Ancón
+XCUTR02,X,CUBA,TRINIDAD,Playa AncÃ³n,Escursione alla spiaggia di Playa AncÃ³n
 XMAMA01,X,MAROCCO,MARRAKECH,Medina e Souq,Tour guidato della Medina e dei Souq
 XMAMA02,X,MAROCCO,MARRAKECH,Giardini Majorelle,Visita ai Giardini Majorelle e Museo YSL
-XMASA01,X,MAROCCO,DESERTO SAHARA,Notte nel Deserto,Campo berbero con cena e notte sotto le stelle
+XMADE01,X,MAROCCO,DESERTO SAHARA,Notte nel Deserto,Campo berbero con cena e notte sotto le stelle
 XMAES01,X,MAROCCO,ESSAOUIRA,Tour Essaouira,Tour della medina e del porto di Essaouira
-XSPBA01,X,SPAGNA,BARCELLONA,Tour Gaudí,Visita Sagrada Familia e opere di Gaudí
+XSPBA01,X,SPAGNA,BARCELLONA,Tour GaudÃ­,Visita Sagrada Familia e opere di GaudÃ­
 XSPBA02,X,SPAGNA,BARCELLONA,Gothic Quarter,Walking tour del Quartiere Gotico
 XSPBA03,X,SPAGNA,BARCELLONA,Tapas Tour,Tour gastronomico con tapas e vini catalani
 XSPMA01,X,SPAGNA,MADRID,Tour Museo Prado,Visita guidata del Museo del Prado
 XSPMA02,X,SPAGNA,MADRID,Madrid Reale,Tour del Palazzo Reale e centro storico
 XSPAN01,X,SPAGNA,ANDALUSIA,Alhambra di Granada,Visita guidata dell'Alhambra
 XSPAN02,X,SPAGNA,ANDALUSIA,Spettacolo Flamenco,Spettacolo di flamenco a Siviglia
-XSPAN03,X,SPAGNA,ANDALUSIA,Mezquita di Córdoba,Visita della Mezquita-Cattedrale di Córdoba
+XSPAN03,X,SPAGNA,ANDALUSIA,Mezquita di CÃ³rdoba,Visita della Mezquita-Cattedrale di CÃ³rdoba
 XGITO01,X,GIAPPONE,TOKYO,Tokyo Moderna,Tour dei quartieri moderni Shibuya e Shinjuku
 XGITO02,X,GIAPPONE,TOKYO,Templi di Tokyo,Visita Sensoji e Meiji Jingu
 XGITO03,X,GIAPPONE,TOKYO,Tsukiji e Sushi Experience,Mercato del pesce e sushi making class
