@@ -572,27 +572,45 @@ export const CHAT_FLOW_CONFIG = {
       const normalizedZoneCode = normalizeZoneCode(currentZone.code);
       let zoneExperiences = esperienze
         .filter(exp => normalizeZoneCode(exp.ZONA_COLLEGATA) === normalizedZoneCode)
-        .map(exp => ({
-          id: exp.CODICE,
-          code: exp.CODICE,
-          nome: exp.NOME || exp.NOME_ESPERIENZA,
-          descrizione: exp.DESCRIZIONE_BREVE || exp.DESCRIZIONE || '',
-          descrizioneEstesa: exp.DESCRIZIONE_ESTESA || exp.DESCRIZIONE || '',
-          prezzo: parseFloat(exp.PREZZO_PAX) || 0,
-          durata: exp.DURATA || '1 giorno',
-          tipo: exp.TIPO_ESPERIENZA || 'Esperienza',
-          difficolta: parseInt(exp.DIFFICOLTA) || 1,
-          emoji: exp.EMOJI || '🎯',
-          immagini: [exp.URL_IMMAGINE_1, exp.URL_IMMAGINE_2, exp.URL_IMMAGINE_3].filter(Boolean),
-          highlights: [exp.HIGHLIGHT_1, exp.HIGHLIGHT_2, exp.HIGHLIGHT_3].filter(Boolean),
-          incluso: [exp.INCLUSO_1, exp.INCLUSO_2, exp.INCLUSO_3].filter(Boolean),
-          nonIncluso: [exp.NON_INCLUSO_1, exp.NON_INCLUSO_2].filter(Boolean),
-          note: exp.NOTE || '',
-          rating: exp.RATING ? parseFloat(exp.RATING) : 4.5,
-          tags: (exp.TAG || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
-          slot: parseInt(exp.SLOT) || 1,
-          rawData: exp
-        }));
+        .map(exp => {
+          const slot = parseInt(exp.SLOT) || 1;
+          const difficolta = parseInt(exp.DIFFICOLTA) || 1;
+
+          // Genera emoji basato sul tipo esperienza
+          const getEmojiByType = (tipo) => {
+            const tipoLower = (tipo || '').toLowerCase();
+            if (tipoLower.includes('tour')) return '🚌';
+            if (tipoLower.includes('mare') || tipoLower.includes('spiaggia')) return '🏖️';
+            if (tipoLower.includes('templo') || tipoLower.includes('tempio')) return '🛕';
+            if (tipoLower.includes('natura') || tipoLower.includes('parco')) return '🌴';
+            if (tipoLower.includes('cibo') || tipoLower.includes('food')) return '🍜';
+            if (tipoLower.includes('avventura')) return '🧗';
+            if (tipoLower.includes('cultura')) return '🎭';
+            return '🎯';
+          };
+
+          return {
+            id: exp.CODICE,
+            code: exp.CODICE,
+            nome: exp.ESPERIENZE || 'Esperienza',
+            descrizione: exp.DESCRIZIONE || '',
+            descrizioneEstesa: exp.DESCRIZIONE || '',
+            prezzo: parseFloat(exp.PRX_PAX) || 0,
+            durata: `${slot} ${slot === 1 ? 'giorno' : 'giorni'}`,
+            tipo: exp.TIPO || 'Esperienza',
+            difficolta: difficolta,
+            emoji: getEmojiByType(exp.TIPO),
+            immagini: [],
+            highlights: [],
+            incluso: [],
+            nonIncluso: [],
+            note: '',
+            rating: 4.5,
+            tags: [],
+            slot: slot,
+            rawData: exp
+          };
+        });
 
       // Filtra per interessi dell'utente se presenti
       const userInterests = wizardData.interessi || [];

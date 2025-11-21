@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'prop-types';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styles from './ExperienceDetailFullscreen.module.css';
 
