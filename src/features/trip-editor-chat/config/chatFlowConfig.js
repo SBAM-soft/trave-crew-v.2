@@ -697,22 +697,26 @@ export const CHAT_FLOW_CONFIG = {
       // Salva lista esperienze disponibili
       CHAT_FLOW_CONFIG.packages.availableExperiences = zoneExperiences;
 
-      // Mostra prime 3 esperienze in slider
+      // Mostra la prima esperienza singola con like/dislike
       setTimeout(() => {
-        const experiencesToShow = zoneExperiences.slice(0, 3); // Prime 3 esperienze
+        const firstExperience = zoneExperiences[0];
 
-        console.log('📤 Adding bot message with experience slider:', {
-          type: 'bot_experience_slider',
+        console.log('📤 Adding bot message with single experience card:', {
+          type: 'bot_experience_detail',
           zoneName: currentZone.name,
-          experiencesCount: experiencesToShow.length
+          experienceName: firstExperience.nome
         });
 
         addBotMessage(
-          `Ecco le esperienze disponibili per ${currentZone.name}! Scorri per vedere tutte le opzioni e scegli quella che preferisci.`,
-          'bot_experience_slider',
+          `Ecco la prima esperienza per ${currentZone.name}! Ti piace?`,
+          'bot_experience_detail',
           {
-            experiences: experiencesToShow,
-            zone: currentZone
+            experience: firstExperience,
+            zone: currentZone,
+            progress: {
+              current: CHAT_FLOW_CONFIG.packages.currentExperienceIndex + 1,
+              total: zoneExperiences.length
+            }
           }
         );
       }, 800);
@@ -721,17 +725,17 @@ export const CHAT_FLOW_CONFIG = {
     onResponse: async ({ value, addUserMessage, addBotMessage, addExperience, goToStep, tripData, store, incrementCounter }) => {
       const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
 
-      // value è l'esperienza selezionata dallo slider
-      if (value && value.id) {
-        const experience = value;
+      // ===== GESTIONE LIKE =====
+      if (value && value.action === 'like') {
+        const experience = value.experience;
 
         // Aggiungi esperienza alle selezionate
         CHAT_FLOW_CONFIG.packages.selectedExperiences.push(experience);
 
-        addUserMessage(`✨ ${experience.nome}`);
-        addBotMessage(`Perfetto! "${experience.nome}" aggiunta al tuo viaggio! (+1 giorno)`);
+        addUserMessage(`❤️ ${experience.nome}`);
+        addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
 
-        // Aggiungi esperienza al trip
+        // Aggiungi esperienza al trip (salva nella timeline)
         addExperience(currentZone.code, experience);
 
         // Calcola giorni totali selezionati
@@ -774,39 +778,93 @@ export const CHAT_FLOW_CONFIG = {
             );
           }
         }, 800);
-      } else if (value === 'another_experience') {
-        addUserMessage(`🎯 Altra esperienza qui`);
+      }
+      // ===== GESTIONE DISLIKE =====
+      else if (value && value.action === 'dislike') {
+        const experience = value.experience;
 
-        // Mostra prossime 3 esperienze
+        addUserMessage(`👎 No, grazie`);
+
+        // Passa alla prossima esperienza
+        CHAT_FLOW_CONFIG.packages.currentExperienceIndex++;
         const allExperiences = CHAT_FLOW_CONFIG.packages.availableExperiences;
-        const selectedCount = CHAT_FLOW_CONFIG.packages.selectedExperiences.length;
 
-        // Calcola quali esperienze mostrare (escludi quelle già selezionate)
-        const selectedIds = new Set(CHAT_FLOW_CONFIG.packages.selectedExperiences.map(e => e.id));
-        const remainingExperiences = allExperiences.filter(e => !selectedIds.has(e.id));
-
-        if (remainingExperiences.length > 0) {
-          const experiencesToShow = remainingExperiences.slice(0, 3);
+        if (CHAT_FLOW_CONFIG.packages.currentExperienceIndex < allExperiences.length) {
+          // Mostra la prossima esperienza
+          const nextExperience = allExperiences[CHAT_FLOW_CONFIG.packages.currentExperienceIndex];
 
           setTimeout(() => {
             addBotMessage(
-              `Ecco altre esperienze disponibili per ${currentZone.name}!`,
-              'bot_experience_slider',
+              `Nessun problema! Che ne dici di questa?`,
+              'bot_experience_detail',
               {
-                experiences: experiencesToShow,
-                zone: currentZone
+                experience: nextExperience,
+                zone: currentZone,
+                progress: {
+                  current: CHAT_FLOW_CONFIG.packages.currentExperienceIndex + 1,
+                  total: allExperiences.length
+                }
               }
             );
           }, 800);
         } else {
           // Finite le esperienze
           addBotMessage(
-            `Hai esplorato tutte le esperienze di ${currentZone.name}! Cosa vuoi fare?`,
+            `Hai visto tutte le esperienze disponibili per ${currentZone.name}! Cosa vuoi fare?`,
             'bot_options',
             {
               options: [
+                { value: 'free_day', label: '🏖️ Giorno libero', emoji: '☀️' },
                 { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
-                { value: 'finish_trip', label: '✅ Completa viaggio', emoji: '👍' }
+                { value: 'finish_trip', label: '✅ Completa così', emoji: '👍' }
+              ]
+            }
+          );
+        }
+      } else if (value === 'another_experience') {
+        addUserMessage(`🎯 Altra esperienza qui`);
+
+        // Trova la prossima esperienza non ancora selezionata
+        const allExperiences = CHAT_FLOW_CONFIG.packages.availableExperiences;
+        const selectedIds = new Set(CHAT_FLOW_CONFIG.packages.selectedExperiences.map(e => e.id));
+
+        // Cerca la prossima esperienza disponibile
+        let nextExperienceIndex = -1;
+        for (let i = 0; i < allExperiences.length; i++) {
+          if (!selectedIds.has(allExperiences[i].id)) {
+            nextExperienceIndex = i;
+            break;
+          }
+        }
+
+        if (nextExperienceIndex >= 0) {
+          const nextExperience = allExperiences[nextExperienceIndex];
+          CHAT_FLOW_CONFIG.packages.currentExperienceIndex = nextExperienceIndex;
+
+          setTimeout(() => {
+            addBotMessage(
+              `Ecco un'altra esperienza disponibile per ${currentZone.name}! Ti piace?`,
+              'bot_experience_detail',
+              {
+                experience: nextExperience,
+                zone: currentZone,
+                progress: {
+                  current: CHAT_FLOW_CONFIG.packages.selectedExperiences.length + 1,
+                  total: allExperiences.length
+                }
+              }
+            );
+          }, 800);
+        } else {
+          // Finite le esperienze
+          addBotMessage(
+            `Hai visto tutte le esperienze disponibili per ${currentZone.name}! Cosa vuoi fare?`,
+            'bot_options',
+            {
+              options: [
+                { value: 'free_day', label: '🏖️ Giorno libero', emoji: '☀️' },
+                { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
+                { value: 'finish_trip', label: '✅ Completa così', emoji: '👍' }
               ]
             }
           );
