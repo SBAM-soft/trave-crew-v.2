@@ -4,6 +4,7 @@ import ChatCard from './ChatCard';
 import ChatMap from './ChatMap';
 import ChatHotelSelector from './ChatHotelSelector';
 import ChatExperienceCard from './ChatExperienceCard';
+import ChatExperienceSlider from './ChatExperienceSlider';
 import styles from './ChatMessage.module.css';
 
 /**
@@ -129,7 +130,44 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
     );
   }
 
-  // Messaggio bot con esperienza singola (swipe style)
+  // Messaggio bot con slider esperienze (3 alla volta)
+  if (type === 'bot_experience_slider') {
+    console.log('🎨 Rendering bot_experience_slider:', {
+      type,
+      hasData: !!data,
+      hasExperiences: !!data?.experiences,
+      experiencesCount: data?.experiences?.length
+    });
+
+    if (!data?.experiences || data.experiences.length === 0) {
+      console.error('❌ Missing experiences data in bot_experience_slider message');
+      return (
+        <div className={`${styles.message} ${styles.bot}`}>
+          <div className={styles.avatar}>🤖</div>
+          <div className={styles.bubble}>
+            <p className={styles.text}>{content}</p>
+            <p style={{ color: 'red' }}>Errore: nessuna esperienza disponibile</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`${styles.message} ${styles.bot}`}>
+        <div className={styles.avatar}>🤖</div>
+        <div className={styles.bubble}>
+          <p className={styles.text}>{content}</p>
+          <ChatExperienceSlider
+            experiences={data.experiences}
+            zone={data.zone}
+            onSelect={onOptionSelect}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Messaggio bot con esperienza singola (swipe style) - deprecato, tenuto per compatibilità
   if (type === 'bot_experience_detail' || type === 'bot_experience_swipe') {
     console.log('🎨 Rendering bot_experience_detail:', {
       type,
