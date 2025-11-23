@@ -1,7 +1,6 @@
 .message {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
   margin-bottom: 20px;
   animation: slideIn 0.3s ease;
 }
@@ -12,13 +11,6 @@
 
 .message.user {
   justify-content: flex-end;
-}
-
-.avatar {
-  font-size: 32px;
-  line-height: 1;
-  flex-shrink: 0;
-  margin-top: 4px;
 }
 
 .bubble {

@@ -31,7 +31,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   if (type === 'bot_options') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           {data?.options && (
@@ -49,7 +48,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   if (type === 'bot_message_with_card') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           {data?.card && (
@@ -68,7 +66,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   if (type === 'bot_cards') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           <div className={styles.cardsContainer}>
@@ -90,7 +87,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   if (type === 'bot_map') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           <div className={styles.mapContainer}>
@@ -113,7 +109,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   if (type === 'bot_hotel_selector') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           {data && (
@@ -143,7 +138,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
       console.error('❌ Missing experiences data in bot_experience_slider message');
       return (
         <div className={`${styles.message} ${styles.bot}`}>
-          <div className={styles.avatar}>🤖</div>
           <div className={styles.bubble}>
             <p className={styles.text}>{content}</p>
             <p style={{ color: 'red' }}>Errore: nessuna esperienza disponibile</p>
@@ -154,7 +148,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
 
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           <ChatExperienceSlider
@@ -180,7 +173,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
       console.error('❌ Missing experience data in bot_experience_detail message');
       return (
         <div className={`${styles.message} ${styles.bot}`}>
-          <div className={styles.avatar}>🤖</div>
           <div className={styles.bubble}>
             <p className={styles.text}>{content}</p>
             <p style={{ color: 'red' }}>Errore: dati esperienza mancanti</p>
@@ -191,7 +183,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
 
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.avatar}>🤖</div>
         <div className={styles.bubble}>
           <p className={styles.text}>{content}</p>
           <ChatExperienceCard
@@ -209,7 +200,6 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
   // Fallback: messaggio bot standard (DEVE essere DOPO tutti i controlli specifici)
   return (
     <div className={`${styles.message} ${styles.bot}`}>
-      <div className={styles.avatar}>🤖</div>
       <div className={styles.bubble}>
         {content}
         {data && (
