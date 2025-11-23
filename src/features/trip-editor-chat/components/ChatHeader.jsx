@@ -70,22 +70,34 @@ function ChatHeader({ wizardData, currentStep, tripData }) {
         </div>
       </div>
 
-      {/* Barra step visuali - mostra solo dopo aver selezionato i giorni */}
+      {/* Timeline giorni - mostra solo dopo aver selezionato i giorni */}
       {tripData?.totalDays && (
         <div className={styles.stepsBar}>
-          {steps.map((step, index) => (
-            <div
-              key={step}
-              className={`${styles.step} ${
-                index < currentIndex ? styles.completed :
-                index === currentIndex ? styles.active :
-                styles.pending
-              }`}
-              title={stepLabels[step]}
-            >
-              {index < currentIndex ? '✓' : index + 1}
-            </div>
-          ))}
+          {Array.from({ length: tripData.totalDays }, (_, index) => {
+            // Calcola quanti giorni sono stati completati (esperienze selezionate)
+            const totalExperiences = tripData.selectedZones?.reduce((sum, zone) => {
+              const zoneExperiences = tripData.experiences?.[zone.code] || [];
+              return sum + zoneExperiences.length;
+            }, 0) || 0;
+
+            const dayNumber = index + 1;
+            const isCompleted = dayNumber <= totalExperiences;
+            const isActive = dayNumber === totalExperiences + 1;
+
+            return (
+              <div
+                key={`day-${index}`}
+                className={`${styles.step} ${
+                  isCompleted ? styles.completed :
+                  isActive ? styles.active :
+                  styles.pending
+                }`}
+                title={`Giorno ${dayNumber}`}
+              >
+                {isCompleted ? '✓' : dayNumber}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
