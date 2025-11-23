@@ -5,6 +5,7 @@ import ChatMap from './ChatMap';
 import ChatHotelSelector from './ChatHotelSelector';
 import ChatExperienceCard from './ChatExperienceCard';
 import ChatExperienceSlider from './ChatExperienceSlider';
+import ChatExperienceCardRow from './ChatExperienceCardRow';
 import styles from './ChatMessage.module.css';
 
 /**
@@ -155,6 +156,41 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             zone={data.zone}
             onSelect={onOptionSelect}
             onCardClick={onCardDetails}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Messaggio bot con 3 experience cards affiancate (Tinder-style)
+  if (type === 'bot_experience_cards_row') {
+    console.log('🎨 Rendering bot_experience_cards_row:', {
+      type,
+      hasData: !!data,
+      hasExperiences: !!data?.experiences,
+      experiencesCount: data?.experiences?.length
+    });
+
+    if (!data?.experiences || data.experiences.length === 0) {
+      console.error('❌ Missing experiences data in bot_experience_cards_row message');
+      return (
+        <div className={`${styles.message} ${styles.bot}`}>
+          <div className={styles.bubble}>
+            <p className={styles.text}>{content}</p>
+            <p style={{ color: 'red' }}>Errore: nessuna esperienza disponibile</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`${styles.message} ${styles.bot}`}>
+        <div className={styles.bubble}>
+          <p className={styles.text}>{content}</p>
+          <ChatExperienceCardRow
+            experiences={data.experiences}
+            zone={data.zone}
+            onSelect={onOptionSelect}
           />
         </div>
       </div>

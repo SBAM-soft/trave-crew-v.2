@@ -697,26 +697,22 @@ export const CHAT_FLOW_CONFIG = {
       // Salva lista esperienze disponibili
       CHAT_FLOW_CONFIG.packages.availableExperiences = zoneExperiences;
 
-      // Mostra la prima esperienza singola con like/dislike
+      // Mostra prime 3 esperienze con like/dislike (cards affiancate)
       setTimeout(() => {
-        const firstExperience = zoneExperiences[0];
+        const experiencesToShow = zoneExperiences.slice(0, 3);
 
-        console.log('📤 Adding bot message with single experience card:', {
-          type: 'bot_experience_detail',
+        console.log('📤 Adding bot message with 3 experience cards:', {
+          type: 'bot_experience_cards_row',
           zoneName: currentZone.name,
-          experienceName: firstExperience.nome
+          experiencesCount: experiencesToShow.length
         });
 
         addBotMessage(
-          `Ecco la prima esperienza per ${currentZone.name}! Ti piace?`,
-          'bot_experience_detail',
+          `Ecco le migliori esperienze per ${currentZone.name}! Scegli quella che ti piace di più:`,
+          'bot_experience_cards_row',
           {
-            experience: firstExperience,
-            zone: currentZone,
-            progress: {
-              current: CHAT_FLOW_CONFIG.packages.currentExperienceIndex + 1,
-              total: zoneExperiences.length
-            }
+            experiences: experiencesToShow,
+            zone: currentZone
           }
         );
       }, 800);
@@ -738,12 +734,8 @@ export const CHAT_FLOW_CONFIG = {
         // Aggiungi esperienza al trip (salva nella timeline)
         addExperience(currentZone.code, experience);
 
-        // Calcola giorni totali selezionati
-        const totalDaysUsed = tripData.selectedZones.reduce((sum, zone) => {
-          const zoneExperiences = tripData.experiences[zone.code] || [];
-          return sum + zoneExperiences.length;
-        }, 0);
-
+        // Calcola giorni totali selezionati (ogni blocco = 1 giorno)
+        const totalDaysUsed = tripData.filledBlocks.length;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);
@@ -783,27 +775,26 @@ export const CHAT_FLOW_CONFIG = {
       else if (value && value.action === 'dislike') {
         const experience = value.experience;
 
-        addUserMessage(`👎 No, grazie`);
+        addUserMessage(`👎 ${experience.nome}`);
 
-        // Passa alla prossima esperienza
-        CHAT_FLOW_CONFIG.packages.currentExperienceIndex++;
+        // Trova le prossime 3 esperienze non ancora viste o selezionate
         const allExperiences = CHAT_FLOW_CONFIG.packages.availableExperiences;
+        const selectedIds = new Set(CHAT_FLOW_CONFIG.packages.selectedExperiences.map(e => e.id));
 
-        if (CHAT_FLOW_CONFIG.packages.currentExperienceIndex < allExperiences.length) {
-          // Mostra la prossima esperienza
-          const nextExperience = allExperiences[CHAT_FLOW_CONFIG.packages.currentExperienceIndex];
+        // Trova esperienze rimanenti (escludi quelle già selezionate)
+        const remainingExperiences = allExperiences.filter(exp => !selectedIds.has(exp.id));
+
+        if (remainingExperiences.length > 0) {
+          // Mostra prossime 3 esperienze
+          const nextExperiences = remainingExperiences.slice(0, 3);
 
           setTimeout(() => {
             addBotMessage(
-              `Nessun problema! Che ne dici di questa?`,
-              'bot_experience_detail',
+              `Nessun problema! Che ne dici di queste altre?`,
+              'bot_experience_cards_row',
               {
-                experience: nextExperience,
-                zone: currentZone,
-                progress: {
-                  current: CHAT_FLOW_CONFIG.packages.currentExperienceIndex + 1,
-                  total: allExperiences.length
-                }
+                experiences: nextExperiences,
+                zone: currentZone
               }
             );
           }, 800);
@@ -824,34 +815,24 @@ export const CHAT_FLOW_CONFIG = {
       } else if (value === 'another_experience') {
         addUserMessage(`🎯 Altra esperienza qui`);
 
-        // Trova la prossima esperienza non ancora selezionata
+        // Trova le prossime 3 esperienze non ancora selezionate
         const allExperiences = CHAT_FLOW_CONFIG.packages.availableExperiences;
         const selectedIds = new Set(CHAT_FLOW_CONFIG.packages.selectedExperiences.map(e => e.id));
 
-        // Cerca la prossima esperienza disponibile
-        let nextExperienceIndex = -1;
-        for (let i = 0; i < allExperiences.length; i++) {
-          if (!selectedIds.has(allExperiences[i].id)) {
-            nextExperienceIndex = i;
-            break;
-          }
-        }
+        // Filtra esperienze rimanenti (escludi quelle già selezionate)
+        const remainingExperiences = allExperiences.filter(exp => !selectedIds.has(exp.id));
 
-        if (nextExperienceIndex >= 0) {
-          const nextExperience = allExperiences[nextExperienceIndex];
-          CHAT_FLOW_CONFIG.packages.currentExperienceIndex = nextExperienceIndex;
+        if (remainingExperiences.length > 0) {
+          // Mostra prossime 3 esperienze
+          const nextExperiences = remainingExperiences.slice(0, 3);
 
           setTimeout(() => {
             addBotMessage(
-              `Ecco un'altra esperienza disponibile per ${currentZone.name}! Ti piace?`,
-              'bot_experience_detail',
+              `Ecco altre esperienze disponibili per ${currentZone.name}!`,
+              'bot_experience_cards_row',
               {
-                experience: nextExperience,
-                zone: currentZone,
-                progress: {
-                  current: CHAT_FLOW_CONFIG.packages.selectedExperiences.length + 1,
-                  total: allExperiences.length
-                }
+                experiences: nextExperiences,
+                zone: currentZone
               }
             );
           }, 800);
@@ -892,12 +873,8 @@ export const CHAT_FLOW_CONFIG = {
         // Aggiungi al trip
         addExperience(currentZone.code, freeDayExperience);
 
-        // Calcola giorni totali
-        const totalDaysUsed = tripData.selectedZones.reduce((sum, zone) => {
-          const zoneExperiences = tripData.experiences[zone.code] || [];
-          return sum + zoneExperiences.length;
-        }, 0);
-
+        // Calcola giorni totali (ogni blocco = 1 giorno)
+        const totalDaysUsed = tripData.filledBlocks.length;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         // Chiedi cosa fare dopo

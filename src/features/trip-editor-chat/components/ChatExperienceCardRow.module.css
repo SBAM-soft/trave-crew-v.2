@@ -1,0 +1,44 @@
+.cardRow {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cardWrapper {
+  flex: 0 0 auto;
+  width: min(320px, 85vw);
+  scroll-snap-align: center;
+}
+
+/* Per schermi grandi, mostra tutte e 3 le card affiancate */
+@media (min-width: 1024px) {
+  .cardRow {
+    justify-content: center;
+    overflow-x: visible;
+  }
+
+  .cardWrapper {
+    width: 300px;
+  }
+}
+
+/* Per tablet, mostra 2 card */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cardWrapper {
+    width: min(340px, 45vw);
+  }
+}
+
+/* Nascondi scrollbar ma mantieni funzionalità */
+.cardRow::-webkit-scrollbar {
+  display: none;
+}
+
+.cardRow {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
