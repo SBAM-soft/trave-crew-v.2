@@ -1,16 +1,91 @@
 CODICE,TIPO,DESTINAZIONE,ZONA,QUARTIERE,BUDGET,SERVIZI_MINIMI
-HTHBALO,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HTHBAME,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHBAHI,H,THAILANDIA,BANGKOK,OLD TOWN | SUKHUMVIT | CITY CENTER,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHCHLO,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HTHCHME,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHCHHI,H,THAILANDIA,CHIANG MAI,OLD TOWN | NIMMANHAEMIN | RIVERSIDE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHPHLO,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HTHPHME,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHPHHI,H,THAILANDIA,PHUKET,PHUKET TOWN | PATONG | KATA E KARON BEACH,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHKOLO,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HTHKOME,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HTHKOHI,H,THAILANDIA,KOH SAMUI,BOPHUT | CHAWENG | LAMAI,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HTHBALO,H,THAILANDIA,BANGKOK,"OLD TOWN
+SUKHUMVIT
+CITY CENTER",LOW,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
+HTHBAME,H,THAILANDIA,BANGKOK,"OLD TOWN
+SUKHUMVIT
+CITY CENTER",MEDIUM,"3 o 4 stelle
+Mono/Doppia/Tripla
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHBAHI,H,THAILANDIA,BANGKOK,"OLD TOWN
+SUKHUMVIT
+CITY CENTER",HIGH,"5 stelle
+Mono/Doppia
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHCHLO,H,THAILANDIA,CHIANG MAI,"OLD TOWN
+NIMMANHAEMIN
+RIVERSIDE",LOW,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
+HTHCHME,H,THAILANDIA,CHIANG MAI,"OLD TOWN
+NIMMANHAEMIN
+RIVERSIDE",MEDIUM,"3 o 4 stelle
+Mono/Doppia/Tripla
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHCHHI,H,THAILANDIA,CHIANG MAI,"OLD TOWN
+NIMMANHAEMIN
+RIVERSIDE",HIGH,"5 stelle
+Mono/Doppia
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHPHLO,H,THAILANDIA,PHUKET,"PHUKET TOWN
+PATONG
+KATA E KARON BEACH",LOW,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
+HTHPHME,H,THAILANDIA,PHUKET,"PHUKET TOWN
+PATONG
+KATA E KARON BEACH",MEDIUM,"3 o 4 stelle
+Mono/Doppia/Tripla
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHPHHI,H,THAILANDIA,PHUKET,"PHUKET TOWN
+PATONG
+KATA E KARON BEACH",HIGH,"5 stelle
+Mono/Doppia
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHKOLO,H,THAILANDIA,KOH SAMUI,"BOPHUT
+CHAWENG
+LAMAI",LOW,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
+HTHKOME,H,THAILANDIA,KOH SAMUI,"BOPHUT
+CHAWENG
+LAMAI",MEDIUM,"3 o 4 stelle
+Mono/Doppia/Tripla
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHKOHI,H,THAILANDIA,KOH SAMUI,"BOPHUT
+CHAWENG
+LAMAI",HIGH,"5 stelle
+Mono/Doppia
+Bagno privato, Aria Cond. e Wi Fi
+Colazione inclusa"
+HTHPALO,H,THAILANDIA,PATTHAYA,"CITY CENTER
+SOUTH CITY",LOW,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
+HTHPAME,H,THAILANDIA,PATTHAYA,"CITY CENTER
+SOUTH CITY",MEDIUM,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
+HTHPAHI,H,THAILANDIA,PATTHAYA,"CITY CENTER
+SOUTH CITY",HIGH,"Max 2 stelle
+Posto letto/Doppia/Tripla
+Bagno in comune o privato
+Aria condizionata e Wi Fi"
 HGRATLO,H,GRECIA,ATENE,PLAKA | MONASTIRAKI | SYNTAGMA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HGRATME,H,GRECIA,ATENE,PLAKA | MONASTIRAKI | SYNTAGMA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HGRATHI,H,GRECIA,ATENE,PLAKA | MONASTIRAKI | SYNTAGMA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
@@ -20,12 +95,12 @@ HGRSAHI,H,GRECIA,SANTORINI,FIRA | OIA | KAMARI,HIGH,5 stelle | Mono/Doppia | Bag
 HGRCRLO,H,GRECIA,CRETA,HERAKLION | CHANIA | RETHYMNO,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HGRCRME,H,GRECIA,CRETA,HERAKLION | CHANIA | RETHYMNO,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HGRCRHI,H,GRECIA,CRETA,HERAKLION | CHANIA | RETHYMNO,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HCUHALO,H,CUBA,L'AVANA,HAVANA VIEJA | VEDADO | MIRAMAR,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HCUHAME,H,CUBA,L'AVANA,HAVANA VIEJA | VEDADO | MIRAMAR,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HCUHAHI,H,CUBA,L'AVANA,HAVANA VIEJA | VEDADO | MIRAMAR,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HCUVILO,H,CUBA,VIÑALES,CENTRO | VALLE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HCUVIME,H,CUBA,VIÑALES,CENTRO | VALLE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HCUVIHI,H,CUBA,VIÑALES,CENTRO | VALLE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUHALO,H,CUBA,HAVANA,HAVANA VIEJA | VEDADO | MIRAMAR,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HCUHAME,H,CUBA,HAVANA,HAVANA VIEJA | VEDADO | MIRAMAR,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUHAHI,H,CUBA,HAVANA,HAVANA VIEJA | VEDADO | MIRAMAR,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUVILO,H,CUBA,VIÃ‘ALES,CENTRO | VALLE,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HCUVIME,H,CUBA,VINALES,CENTRO | VALLE,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HCUVIHI,H,CUBA,VINALES,CENTRO | VALLE,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HCUTRLO,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HCUTRME,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HCUTRHI,H,CUBA,TRINIDAD,CENTRO STORICO | PLAYA ANCON,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
@@ -41,9 +116,9 @@ HMAESHI,H,MAROCCO,ESSAOUIRA,MEDINA | SPIAGGIA,HIGH,5 stelle | Mono/Doppia | Bagn
 HSPBALO,H,SPAGNA,BARCELLONA,GOTHIC QUARTER | EIXAMPLE | GRACIA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HSPBAME,H,SPAGNA,BARCELLONA,GOTHIC QUARTER | EIXAMPLE | GRACIA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HSPBAHI,H,SPAGNA,BARCELLONA,GOTHIC QUARTER | EIXAMPLE | GRACIA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HSPMALO,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÑA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
-HSPMAME,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÑA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
-HSPMAHI,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÑA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPMALO,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÃ‘A,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
+HSPMAME,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÃ‘A,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
+HSPMAHI,H,SPAGNA,MADRID,SOL | GRAN VIA | MALASAÃ‘A,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HSPANLO,H,SPAGNA,ANDALUSIA,GRANADA | SEVILLA | CORDOBA,LOW,Max 2 stelle | Posto letto/Doppia/Tripla | Bagno in comune o privato | Aria condizionata e Wi Fi
 HSPANME,H,SPAGNA,ANDALUSIA,GRANADA | SEVILLA | CORDOBA,MEDIUM,3 o 4 stelle | Mono/Doppia/Tripla | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
 HSPANHI,H,SPAGNA,ANDALUSIA,GRANADA | SEVILLA | CORDOBA,HIGH,5 stelle | Mono/Doppia | Bagno privato Aria Cond. e Wi Fi | Colazione inclusa
