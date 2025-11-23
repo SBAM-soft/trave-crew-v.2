@@ -9,6 +9,7 @@
 .messagesArea {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden; /* Blocca scorrimento orizzontale */
   padding: 24px;
   display: flex;
   flex-direction: column;

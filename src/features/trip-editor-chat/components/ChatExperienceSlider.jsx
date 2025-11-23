@@ -6,7 +6,7 @@ import styles from './ChatExperienceSlider.module.css';
  * Slider orizzontale per mostrare 3 esperienze alla volta
  * Con gesture touch per mobile
  */
-function ChatExperienceSlider({ experiences, zone, onSelect }) {
+function ChatExperienceSlider({ experiences, zone, onSelect, onCardClick }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const sliderRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -44,7 +44,17 @@ function ChatExperienceSlider({ experiences, zone, onSelect }) {
     }
   };
 
-  const handleSelect = (experience, index) => {
+  const handleCardClick = (experience, index, e) => {
+    // Evita che il click sulla card triggheri quando si clicca sul bottone
+    if (e.target.closest('button')) return;
+
+    if (onCardClick) {
+      onCardClick(experience);
+    }
+  };
+
+  const handleSelect = (experience, index, e) => {
+    e.stopPropagation(); // Evita che propaghi al click della card
     setSelectedIndex(index);
 
     // Delay per animazione
@@ -81,7 +91,7 @@ function ChatExperienceSlider({ experiences, zone, onSelect }) {
           <div
             key={exp.id || index}
             className={`${styles.card} ${selectedIndex === index ? styles.selected : ''}`}
-            onClick={() => handleSelect(exp, index)}
+            onClick={(e) => handleCardClick(exp, index, e)}
           >
             <div className={styles.cardHeader}>
               <span className={styles.emoji}>{exp.emoji || '🎯'}</span>
@@ -109,7 +119,10 @@ function ChatExperienceSlider({ experiences, zone, onSelect }) {
                 )}
               </div>
 
-              <button className={styles.selectBtn}>
+              <button
+                className={styles.selectBtn}
+                onClick={(e) => handleSelect(exp, index, e)}
+              >
                 Scegli
               </button>
             </div>
@@ -146,7 +159,8 @@ ChatExperienceSlider.propTypes = {
     code: PropTypes.string,
     name: PropTypes.string
   }),
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
+  onCardClick: PropTypes.func
 };
 
 export default ChatExperienceSlider;

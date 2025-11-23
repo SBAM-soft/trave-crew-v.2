@@ -154,6 +154,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             experiences={data.experiences}
             zone={data.zone}
             onSelect={onOptionSelect}
+            onCardClick={onCardDetails}
           />
         </div>
       </div>

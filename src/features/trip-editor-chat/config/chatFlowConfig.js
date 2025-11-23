@@ -250,6 +250,12 @@ export const CHAT_FLOW_CONFIG = {
               label: '13 notti',
               emoji: '🌏',
               description: 'Viaggio epico (14 giorni)'
+            },
+            {
+              value: 'custom',
+              label: 'Altro...',
+              emoji: '✏️',
+              description: 'Scegli tu il numero di notti'
             }
           ]
         }
@@ -257,6 +263,32 @@ export const CHAT_FLOW_CONFIG = {
     },
 
     onResponse: ({ value, addUserMessage, addBotMessage, setTotalDays, goToStep }) => {
+      // Gestisci opzione "Altro..."
+      if (value === 'custom') {
+        addUserMessage('✏️ Altro...');
+
+        // Mostra opzioni con numeri custom
+        setTimeout(() => {
+          addBotMessage(
+            'Scegli il numero di notti che preferisci:',
+            'bot_options',
+            {
+              options: [
+                { value: 5, label: '4 notti', emoji: '📅' },
+                { value: 7, label: '6 notti', emoji: '📅' },
+                { value: 9, label: '8 notti', emoji: '📅' },
+                { value: 11, label: '10 notti', emoji: '📅' },
+                { value: 12, label: '11 notti', emoji: '📅' },
+                { value: 15, label: '14 notti', emoji: '📅' },
+                { value: 20, label: '19 notti', emoji: '📅' },
+                { value: 30, label: '29 notti', emoji: '📅' }
+              ]
+            }
+          );
+        }, 500);
+        return;
+      }
+
       const days = parseInt(value);
       const nights = days - 1;
       addUserMessage(`${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni)`);
@@ -727,13 +759,14 @@ export const CHAT_FLOW_CONFIG = {
               }
             );
           } else {
-            // Chiedi se vuole un'altra esperienza o cambiare zona
+            // Chiedi se vuole un'altra esperienza, cambiare zona o giorno libero
             addBotMessage(
               `Cosa vuoi fare ora? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
               'bot_options',
               {
                 options: [
                   { value: 'another_experience', label: '🎯 Altra esperienza qui', emoji: '✨' },
+                  { value: 'free_day', label: '🏖️ Giorno libero', emoji: '☀️' },
                   { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
                   { value: 'finish_trip', label: '✅ Completa così', emoji: '👍' }
                 ]
@@ -778,6 +811,67 @@ export const CHAT_FLOW_CONFIG = {
             }
           );
         }
+      } else if (value === 'free_day') {
+        addUserMessage('🏖️ Giorno libero');
+
+        // Crea un'esperienza placeholder per il giorno libero
+        const freeDayExperience = {
+          id: `free_day_${Date.now()}`,
+          nome: 'Giorno libero',
+          descrizione: 'Giornata libera per esplorare o riposare',
+          emoji: '🏖️',
+          slot: 1,
+          prezzo: 0,
+          difficolta: 0,
+          isFreeDay: true
+        };
+
+        // Aggiungi al tracking
+        CHAT_FLOW_CONFIG.packages.selectedExperiences.push(freeDayExperience);
+
+        addBotMessage(`Perfetto! Ho aggiunto un giorno libero al tuo itinerario. (+1 giorno)`);
+
+        // Aggiungi al trip
+        addExperience(currentZone.code, freeDayExperience);
+
+        // Calcola giorni totali
+        const totalDaysUsed = tripData.selectedZones.reduce((sum, zone) => {
+          const zoneExperiences = tripData.experiences[zone.code] || [];
+          return sum + zoneExperiences.length;
+        }, 0);
+
+        const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
+
+        // Chiedi cosa fare dopo
+        setTimeout(() => {
+          if (totalDaysUsed >= daysAvailable) {
+            // Giorni completati → vai al summary
+            addBotMessage(
+              `🎉 Hai completato il tuo itinerario! (${totalDaysUsed} giorni)`,
+              'bot_options',
+              {
+                options: [
+                  { value: 'finish_trip', label: '✅ Completa il viaggio', emoji: '🎊' },
+                  { value: 'add_more', label: '➕ Aggiungi altro giorno', emoji: '📅' }
+                ]
+              }
+            );
+          } else {
+            // Chiedi se vuole continuare
+            addBotMessage(
+              `Cosa vuoi fare ora? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
+              'bot_options',
+              {
+                options: [
+                  { value: 'another_experience', label: '🎯 Altra esperienza qui', emoji: '✨' },
+                  { value: 'free_day', label: '🏖️ Altro giorno libero', emoji: '☀️' },
+                  { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
+                  { value: 'finish_trip', label: '✅ Completa così', emoji: '👍' }
+                ]
+              }
+            );
+          }
+        }, 800);
       } else if (value === 'change_zone') {
         addUserMessage('🗺️ Cambia zona');
         // Reset per nuova zona
