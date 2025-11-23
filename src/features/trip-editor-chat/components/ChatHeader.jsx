@@ -70,22 +70,24 @@ function ChatHeader({ wizardData, currentStep, tripData }) {
         </div>
       </div>
 
-      {/* Barra step visuali */}
-      <div className={styles.stepsBar}>
-        {steps.map((step, index) => (
-          <div
-            key={step}
-            className={`${styles.step} ${
-              index < currentIndex ? styles.completed :
-              index === currentIndex ? styles.active :
-              styles.pending
-            }`}
-            title={stepLabels[step]}
-          >
-            {index < currentIndex ? '✓' : index + 1}
-          </div>
-        ))}
-      </div>
+      {/* Barra step visuali - mostra solo dopo aver selezionato i giorni */}
+      {tripData?.totalDays && (
+        <div className={styles.stepsBar}>
+          {steps.map((step, index) => (
+            <div
+              key={step}
+              className={`${styles.step} ${
+                index < currentIndex ? styles.completed :
+                index === currentIndex ? styles.active :
+                styles.pending
+              }`}
+              title={stepLabels[step]}
+            >
+              {index < currentIndex ? '✓' : index + 1}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
