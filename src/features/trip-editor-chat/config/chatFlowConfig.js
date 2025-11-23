@@ -323,7 +323,7 @@ export const CHAT_FLOW_CONFIG = {
                     code: z.CODICE,
                     name: z.ZONA,
                     description: z.DESCRIZIONE || '',
-                    daysRecommended: parseInt(z.GIORNI_CONSIGLIATI) || 2,
+                    daysRecommended: 1, // Sempre 1 giorno alla volta
                     tipo: z.TIPO_AREA,
                     priorita: parseInt(z.PRIORITA) || 99
                   }
@@ -341,7 +341,7 @@ export const CHAT_FLOW_CONFIG = {
           code: z.CODICE,
           name: z.ZONA,
           description: z.DESCRIZIONE || '',
-          daysRecommended: parseInt(z.GIORNI_CONSIGLIATI) || 2,
+          daysRecommended: 1, // Sempre 1 giorno alla volta
           coordinates: {
             lat: parseFloat(z.COORDINATE_LAT),
             lng: parseFloat(z.COORDINATE_LNG)
@@ -383,8 +383,8 @@ export const CHAT_FLOW_CONFIG = {
               options: [
                 {
                   value: { action: 'stay', zone: value.zone },
-                  label: `🏖️ Fermati e visita (${value.zone.daysRecommended} ${value.zone.daysRecommended === 1 ? 'giorno' : 'giorni'})`,
-                  emoji: '✨'
+                  label: `✨ Scegli un'esperienza`,
+                  emoji: '🎯'
                 },
                 {
                   value: { action: 'transit', zone: value.zone },
@@ -399,8 +399,8 @@ export const CHAT_FLOW_CONFIG = {
 
       } else if (value.action === 'stay') {
         const zone = value.zone;
-        addUserMessage(`🏖️ Fermati e visita ${zone.name}`);
-        addBotMessage(`Perfetto! Trascorrerai ${zone.daysRecommended} ${zone.daysRecommended === 1 ? 'giorno' : 'giorni'} in ${zone.name}.`);
+        addUserMessage(`✨ Scegli un'esperienza in ${zone.name}`);
+        addBotMessage(`Perfetto! Ora seleziona un'esperienza da fare in ${zone.name}.`);
 
         const totalDaysSelected = tripData.selectedZones.reduce((sum, z) => sum + z.daysRecommended, 0);
         const daysAvailable = tripData.totalDays - 2;
@@ -665,26 +665,22 @@ export const CHAT_FLOW_CONFIG = {
       // Salva lista esperienze disponibili
       CHAT_FLOW_CONFIG.packages.availableExperiences = zoneExperiences;
 
-      // Mostra prima esperienza dopo un delay
+      // Mostra prime 3 esperienze in slider
       setTimeout(() => {
-        const firstExperience = zoneExperiences[0];
-        const daysNeeded = parseInt(currentZone.daysRecommended) || 3;
+        const experiencesToShow = zoneExperiences.slice(0, 3); // Prime 3 esperienze
 
-        console.log('📤 Adding bot message with experience:', {
-          type: 'bot_experience_detail',
-          experienceName: firstExperience.nome,
+        console.log('📤 Adding bot message with experience slider:', {
+          type: 'bot_experience_slider',
           zoneName: currentZone.name,
-          progress: { current: 0, total: daysNeeded }
+          experiencesCount: experiencesToShow.length
         });
 
         addBotMessage(
-          `Ecco la prima esperienza! (0/${daysNeeded} giorni completati)`,
-          'bot_experience_detail',
+          `Ecco le esperienze disponibili per ${currentZone.name}! Scorri per vedere tutte le opzioni e scegli quella che preferisci.`,
+          'bot_experience_slider',
           {
-            experience: firstExperience,
-            zone: currentZone,
-            progress: { current: 0, total: daysNeeded },
-            showActions: true
+            experiences: experiencesToShow,
+            zone: currentZone
           }
         );
       }, 800);
@@ -692,119 +688,128 @@ export const CHAT_FLOW_CONFIG = {
 
     onResponse: async ({ value, addUserMessage, addBotMessage, addExperience, goToStep, tripData, store, incrementCounter }) => {
       const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
-      const daysNeeded = parseInt(currentZone?.daysRecommended) || 3;
 
-      // value può essere: { action: 'like'/'dislike', experienceId, experience }
-      if (value.action === 'like' || value.action === 'select') {
-        const experience = value.experience || CHAT_FLOW_CONFIG.packages.availableExperiences.find(e => e.id === value.experienceId);
-
-        if (!experience) {
-          console.error('❌ Esperienza non trovata:', value.experienceId);
-          return;
-        }
+      // value è l'esperienza selezionata dallo slider
+      if (value && value.id) {
+        const experience = value;
 
         // Aggiungi esperienza alle selezionate
         CHAT_FLOW_CONFIG.packages.selectedExperiences.push(experience);
-        const currentCount = CHAT_FLOW_CONFIG.packages.selectedExperiences.length;
 
-        addUserMessage(`❤️ Mi piace!`);
-        addBotMessage(`Perfetto! "${experience.nome}" aggiunta al tuo viaggio! ✨\n\n(${currentCount}/${daysNeeded} giorni completati)`);
+        addUserMessage(`✨ ${experience.nome}`);
+        addBotMessage(`Perfetto! "${experience.nome}" aggiunta al tuo viaggio! (+1 giorno)`);
 
-        // Aggiungi esperienza al trip (non più pacchetto)
+        // Aggiungi esperienza al trip
         addExperience(currentZone.code, experience);
 
-        // Controlla se abbiamo completato i giorni per questa zona
-        if (currentCount >= daysNeeded) {
-          // Zona completata → incrementa contatore e vai alla prossima zona
-          incrementCounter();
-          CHAT_FLOW_CONFIG.packages.currentZoneIndex++;
+        // Calcola giorni totali selezionati
+        const totalDaysUsed = tripData.selectedZones.reduce((sum, zone) => {
+          const zoneExperiences = tripData.experiences[zone.code] || [];
+          return sum + zoneExperiences.length;
+        }, 0);
 
-          if (CHAT_FLOW_CONFIG.packages.currentZoneIndex < tripData.selectedZones.length) {
-            // Altra zona → ripeti step packages
-            setTimeout(() => {
-              addBotMessage(`🎉 ${currentZone.name} completata! Passiamo alla prossima zona.`);
-              setTimeout(() => goToStep('packages'), 1000);
-            }, 1000);
+        const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
+
+        console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);
+
+        // Chiedi cosa fare dopo
+        setTimeout(() => {
+          if (totalDaysUsed >= daysAvailable) {
+            // Giorni completati → vai al summary
+            addBotMessage(
+              `🎉 Hai completato il tuo itinerario! (${totalDaysUsed} giorni)`,
+              'bot_options',
+              {
+                options: [
+                  { value: 'finish_trip', label: '✅ Completa il viaggio', emoji: '🎊' },
+                  { value: 'add_more', label: '➕ Aggiungi altro giorno', emoji: '📅' }
+                ]
+              }
+            );
           } else {
-            // Fine zone → mostra animazione poi vai a summary
-            CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0; // Reset per prossima volta
-            setTimeout(() => {
-              addBotMessage('🎊 Ottimo lavoro! Tutte le zone sono complete!\n\nCreo il tuo itinerario personalizzato...');
-              setTimeout(() => {
-                // Mostra animazione invece di andare direttamente al summary
-                store.setShowItineraryAnimation(true);
-              }, 1000);
-            }, 800);
+            // Chiedi se vuole un'altra esperienza o cambiare zona
+            addBotMessage(
+              `Cosa vuoi fare ora? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
+              'bot_options',
+              {
+                options: [
+                  { value: 'another_experience', label: '🎯 Altra esperienza qui', emoji: '✨' },
+                  { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
+                  { value: 'finish_trip', label: '✅ Completa così', emoji: '👍' }
+                ]
+              }
+            );
           }
-        } else {
-          // Mostra prossima esperienza
-          CHAT_FLOW_CONFIG.packages.currentExperienceIndex++;
-          const nextExperience = CHAT_FLOW_CONFIG.packages.availableExperiences[CHAT_FLOW_CONFIG.packages.currentExperienceIndex];
+        }, 800);
+      } else if (value === 'another_experience') {
+        addUserMessage(`🎯 Altra esperienza qui`);
 
-          if (nextExperience) {
-            setTimeout(() => {
-              addBotMessage(
-                `Ecco un'altra esperienza per te!`,
-                'bot_experience_detail',
-                {
-                  experience: nextExperience,
-                  zone: currentZone,
-                  progress: { current: currentCount, total: daysNeeded },
-                  showActions: true
-                }
-              );
-            }, 800);
-          } else {
-            // Finite le esperienze disponibili ma mancano ancora giorni
-            addBotMessage(`Hai esplorato tutte le esperienze disponibili per ${currentZone.name}.\n\nPer ora hai selezionato ${currentCount} ${currentCount === 1 ? 'esperienza' : 'esperienze'}. Vuoi procedere ugualmente?`, 'bot_options', {
-              options: [
-                { value: 'proceed_anyway', label: '✅ Procedi così', emoji: '👍' },
-                { value: 'change_zone', label: '🔄 Cambia zona', emoji: '🗺️' }
-              ]
-            });
-          }
-        }
-      } else if (value.action === 'dislike') {
-        const experience = value.experience || CHAT_FLOW_CONFIG.packages.availableExperiences.find(e => e.id === value.experienceId);
+        // Mostra prossime 3 esperienze
+        const allExperiences = CHAT_FLOW_CONFIG.packages.availableExperiences;
+        const selectedCount = CHAT_FLOW_CONFIG.packages.selectedExperiences.length;
 
-        addUserMessage(`👎 Non mi interessa`);
+        // Calcola quali esperienze mostrare (escludi quelle già selezionate)
+        const selectedIds = new Set(CHAT_FLOW_CONFIG.packages.selectedExperiences.map(e => e.id));
+        const remainingExperiences = allExperiences.filter(e => !selectedIds.has(e.id));
 
-        // Mostra prossima esperienza senza aggiungere
-        CHAT_FLOW_CONFIG.packages.currentExperienceIndex++;
-        const nextExperience = CHAT_FLOW_CONFIG.packages.availableExperiences[CHAT_FLOW_CONFIG.packages.currentExperienceIndex];
-        const currentCount = CHAT_FLOW_CONFIG.packages.selectedExperiences.length;
+        if (remainingExperiences.length > 0) {
+          const experiencesToShow = remainingExperiences.slice(0, 3);
 
-        if (nextExperience) {
           setTimeout(() => {
             addBotMessage(
-              `Nessun problema! Ecco un'altra opzione:`,
-              'bot_experience_detail',
+              `Ecco altre esperienze disponibili per ${currentZone.name}!`,
+              'bot_experience_slider',
               {
-                experience: nextExperience,
-                zone: currentZone,
-                progress: { current: currentCount, total: daysNeeded },
-                showActions: true
+                experiences: experiencesToShow,
+                zone: currentZone
               }
             );
           }, 800);
         } else {
-          // Finite le esperienze disponibili
-          if (currentCount > 0) {
-            addBotMessage(`Hai esplorato tutte le esperienze disponibili per ${currentZone.name}.\n\nHai selezionato ${currentCount} ${currentCount === 1 ? 'esperienza' : 'esperienze'}. Vuoi procedere?`, 'bot_options', {
+          // Finite le esperienze
+          addBotMessage(
+            `Hai esplorato tutte le esperienze di ${currentZone.name}! Cosa vuoi fare?`,
+            'bot_options',
+            {
               options: [
-                { value: 'proceed_anyway', label: '✅ Procedi così', emoji: '👍' },
-                { value: 'change_zone', label: '🔄 Cambia zona', emoji: '🗺️' }
+                { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
+                { value: 'finish_trip', label: '✅ Completa viaggio', emoji: '👍' }
               ]
-            });
-          } else {
-            addBotMessage(`Non hai selezionato nessuna esperienza per ${currentZone.name}.`, 'bot_options', {
-              options: [
-                { value: 'restart_zone', label: '🔄 Rivedi esperienze', emoji: '🔄' },
-                { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🗺️' }
-              ]
-            });
-          }
+            }
+          );
         }
+      } else if (value === 'change_zone') {
+        addUserMessage('🗺️ Cambia zona');
+        // Reset per nuova zona
+        CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
+        // Torna allo step zones
+        setTimeout(() => {
+          addBotMessage('Perfetto! Scegli una nuova zona da esplorare.');
+          setTimeout(() => goToStep('zones'), 500);
+        }, 500);
+      } else if (value === 'finish_trip') {
+        addUserMessage('✅ Completa viaggio');
+        // Reset e vai al summary
+        CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
+        setTimeout(() => {
+          addBotMessage('🎊 Perfetto! Creo il tuo itinerario personalizzato...');
+          setTimeout(() => {
+            store.setShowItineraryAnimation(true);
+          }, 1000);
+        }, 500);
+      } else if (value === 'add_more') {
+        addUserMessage('➕ Aggiungi altro giorno');
+        // Permette di continuare oltre i giorni disponibili
+        addBotMessage(
+          `Cosa vuoi fare?`,
+          'bot_options',
+          {
+            options: [
+              { value: 'another_experience', label: '🎯 Altra esperienza qui', emoji: '✨' },
+              { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' }
+            ]
+          }
+        );
       } else if (value === 'proceed_anyway') {
         addUserMessage('✅ Procedi così');
         // Incrementa contatore e vai avanti
