@@ -1,35 +1,45 @@
 CODICE,TIPO,DESTINAZIONE,ZONA,ESPERIENZE,DESCRIZIONE
-XTHBA01,X,THAILANDIA,BANGKOK,Tour Privato di Bangkok in auto  (min2),"Tour in auto del Grand Palace, del Wat Pho e del Wat Arun"
+XTHBA01,X,THAILANDIA,BANGKOK,Tour dei Templi,"Un tour di mezza giornata che copre le attrazioni principali come il Palazzo Reale, il Tempio del Buddha di Smeraldo, Wat Trimit (Buddha d'Oro) e Wat Pho"
 XTHBA02,X,THAILANDIA,BANGKOK,Damnoen Saduak e Maeklong,Mercato di Damnoen Saduak e Mercato ferroviario di Maeklong
 XTHBA03,X,THAILANDIA,BANGKOK,Antico Siam,Tour guidato dei templi di Ayutthaya
 XTHBA04,X,THAILANDIA,BANGKOK,Tour Ferrovia della morte,Tour della ferrovia della morte e dell'Hellfire Pass
-XTHBA05,X,THAILANDIA,BANGKOK,Santuario degli Elefanti,Escursione di un giorno al Santuario degli Elefanti Living Green
+XTHBA05,X,THAILANDIA,BANGKOK,Santuario degli Elefanti,Scopri la vita degli elefanti in modo etico con questa escursione di mezza giornata in un santuario degli elefanti nella giungla
 XTHBA06,X,THAILANDIA,BANGKOK,Escursione a Pattaya da Bangkok,Escursione di un giorno a Pattaya Koh Larn e Santuario della Verità
-XTHBA07,X,THAILANDIA,BANGKOK,TBD,TBD
-XTHBA08,X,THAILANDIA,BANGKOK,Tour dei Templi,"Un tour di mezza giornata che copre le attrazioni principali come il Palazzo Reale, il Tempio del Buddha di Smeraldo, Wat Trimit (Buddha d'Oro) e Wat Pho"
-XTHBA09,X,THAILANDIA,BANGKOK,Tuk Tuk Tour,"Esplora la città di notte con un tour in tuk-tuk, che può includere visite ai mercati e assaggi di street food, ad esempio a Chinatown. "
-XTHBA10,X,THAILANDIA,BANGKOK,Mahanakhon SkyWalk,Biglietto d'ingresso per Mahanakhon SkyWalk con opzioni
-XTHBA11,X,THAILANDIA,BANGKOK,Crociera di Lusso,"Crociera di lusso con cena, birra e vino a volontà"
-XTHBA12,X,THAILANDIA,BANGKOK,Coocking Class Thailandese,Corso di cucina tailandese e tour del mercato
+XTHBA07,X,THAILANDIA,BANGKOK,Tour Privato di Bangkok in auto  (min2),"Tour in auto del Grand Palace, del Wat Pho e del Wat Arun"
+XTHBA08,X,THAILANDIA,BANGKOK,Tuk Tuk Tour,"Esplora la città di notte con un tour in tuk-tuk, che può includere visite ai mercati e assaggi di street food, ad esempio a Chinatown. "
+XTHBA09,X,THAILANDIA,BANGKOK,Mahanakhon SkyWalk,Biglietto d'ingresso per Mahanakhon SkyWalk con opzioni
+XTHBA10,X,THAILANDIA,BANGKOK,Crociera di Lusso,"Crociera di lusso con cena, birra e vino a volontà"
+XTHBA11,X,THAILANDIA,BANGKOK,Coocking Class Thailandese,Corso di cucina tailandese e tour del mercato
+XTHBA12,X,THAILANDIA,BANGKOK,Muay Thai Show,Biglietto per lo spettacolo Muay Thai Boxing nel Rajadamnerm Stadium
+XTHBA13,X,THAILANDIA,BANGKOK,Tour dei club di Bangkok,"Scopri i migliori bar e club con gente del posto, espatriati e viaggiatori. Goditi gli shot di benvenuto in una serata sicura, divertente e piena di energia"
 XTHCH01,X,THAILANDIA,CHIANG MAI,Tour dei Templi di Chiang Mai,Tour di mezza giornata del Wat Pha Lat e del Wat Phra That Doi Suthep
 XTHCH02,X,THAILANDIA,CHIANG MAI,Tour dei Templi di Chiang Rai,Escursione di un giorno ai templi di Chiang Rai
 XTHCH03,X,THAILANDIA,CHIANG MAI,Long Neck e Templi,"Templi bianchi, blu e rossi, tour del collo lungo"
-XTHCH04,X,THAILANDIA,CHIANG MAI,Elephant Jungle Sanctuary,TBD
-XTHCH05,X,THAILANDIA,CHIANG MAI,Tour Privato a Pai (min2),Tour ecologico del Parco Nazionale di Doi Inthanon
+XTHCH04,X,THAILANDIA,CHIANG MAI,Elephant Jungle Sanctuary,Scopri la vita degli elefanti in modo etico con questa escursione di mezza giornata in un santuario degli elefanti nella giungla
+XTHCH05,X,THAILANDIA,CHIANG MAI,Tour Privato a Pai (min2),Tour di un giorno ai punti salienti di Pai in auto privata
 XTHCH06,X,THAILANDIA,CHIANG MAI,Doi Inthanon,Tour ecologico del Parco Nazionale di Doi Inthanon
-XTHCH07,X,THAILANDIA,CHIANG MAI,Quad nella Jungla,TBD
-XTHCH08,X,THAILANDIA,CHIANG MAI,Corso di cucina e Tour del mercato,"Corso di cucina, mercato e tour del giardino delle erbe tailandesi"
+XTHCH07,X,THAILANDIA,CHIANG MAI,Quad nella Jungla,Avventura in fuoristrada nella giungla
+XTHCH08,X,THAILANDIA,CHIANG MAI,Coocking Class Thailandese,"Corso di cucina, mercato e tour del giardino delle erbe tailandesi"
 XTHCH09,X,THAILANDIA,CHIANG MAI,ZipLine,Kingkong Smile Zipline con pranzo e trasferimenti
-XTHPH01,X,THAILANDIA,PHUKET,City Tour,Tour guidato della città di Phuket
-XTHPH02,X,THAILANDIA,PHUKET,City Tour e Wat Chalong,TBD
-XTHPH03,X,THAILANDIA,PHUKET,Baia di Phang Nga,Tour della Baia di Phang
-XTHPH04,X,THAILANDIA,PHUKET,Phi Phi e Maya Bay ,Escursione alle isole Phi Phi e Maya Bay
-XTHPH05,X,THAILANDIA,PHUKET,Similan,Escursione di un giorno alle isole Similan
-XTHPH06,X,THAILANDIA,PHUKET,Tour delle isole Khai,Tour delle 3 isole Khai per lo snorkeling e il relax
-XTHPH07,X,THAILANDIA,PHUKET,Fuoristrada e ZipLine,Avventura in fuoristrada e zipline a Phuket
-XTHPH08,X,THAILANDIA,PHUKET,Equitazione a Kamala,Attività di equitazione sulla spiaggia di Kamala
-XTHPH09,X,THAILANDIA,PHUKET,Santuario degli Elefanti,TBD
-XTHKO01,X,THAILANDIA,KOH SAMUI,TBD,TBD
+XTHPH01,X,THAILANDIA,PHUKET,City Tour e dintorni,Tour guidato della città di Phuket e dei punti panoramici dell'isola
+XTHPH02,X,THAILANDIA,PHUKET,Baia di Phang Nga,Tour della Baia di Phang
+XTHPH03,X,THAILANDIA,PHUKET,Phi Phi e Maya Bay ,Escursione alle isole Phi Phi e Maya Bay
+XTHPH04,X,THAILANDIA,PHUKET,Similan,Escursione di un giorno alle isole Similan
+XTHPH05,X,THAILANDIA,PHUKET,Tour delle isole Khai,Tour delle 3 isole Khai per lo snorkeling e il relax
+XTHPH06,X,THAILANDIA,PHUKET,Fuoristrada e ZipLine,Avventura in fuoristrada e zipline a Phuket
+XTHPH07,X,THAILANDIA,PHUKET,Equitazione in spiaggia,Attività di equitazione sulla spiaggia
+XTHPH08,X,THAILANDIA,PHUKET,Santuario degli Elefanti,"Passeggia, dai da mangiare e osserva gli elefanti salvati "
+XTHKO01,X,THAILANDIA,KOH SAMUI,Parco Nazionale Marino di Angthong, Tour in barca del Parco Marino di Angthong
+XTHKO02,X,THAILANDIA,KOH SAMUI,Pig Island e Koh Tan,Snorkeling sull'Isola dei Maiali e tour in motoscafo di Koh Tan
+XTHKO03,X,THAILANDIA,KOH SAMUI,Tour di Koh Samui,Tour di mezza giornata dei punti salienti dell'isola
+XTHKO04,X,THAILANDIA,KOH SAMUI,Tour al santuario degli elefanti,Scopri la vita degli elefanti in modo etico con questa escursione di mezza giornata in un santuario degli elefanti nella giungla
+XTHKO05,X,THAILANDIA,KOH SAMUI,Immersione a Sail Rock,Escursione di un giorno in uno dei siti di immersione più famosi della Thailandia
+XTHPA01,X,THAILANDIA,PATTHAYA,Coral Island,Tour in motoscafo dell'Isola dei Coralli
+XTHPA02,X,THAILANDIA,PATTHAYA,Tour del Grande Buddha e mercato di Pattaya,Visita al Tempio del Grande Buddha e Tour dei mercati di Pattaya
+XTHPA03,X,THAILANDIA,PATTHAYA,Tour del Santuario della Verità,Ingresso al Santuario della Verità con tour guidato
+XTHPA04,X,THAILANDIA,PATTHAYA,Tour al santuario degli elefanti,Scopri la vita degli elefanti in modo etico con questa escursione di mezza giornata in un santuario degli elefanti nella giungla
+XTHPA05,X,THAILANDIA,PATTHAYA,Tour Privato di Pattaya in auto  (min2),Tour privato con guid in inglese delle principali attraazioni della città
+XTHPA06,X,THAILANDIA,PATTHAYA,Vitta Notturna a Pattaya,Scopri la vita notturna di Pattaya con un tour guidato dei bar
 XVIHA01,X,VIETNAM,HANOI,Tour del Quartiere Vecchio,Walking tour del Quartiere Vecchio con street food
 XVIHA02,X,VIETNAM,HANOI,Tempio della Letteratura,Visita al Tempio della Letteratura e Pagoda
 XVIHA03,X,VIETNAM,HANOI,Spettacolo Marionette,Spettacolo tradizionale di marionette sull'acqua

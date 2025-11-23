@@ -20,9 +20,11 @@ COLUMN_MAPPING = {
         "tech": [
             "CODICE", "TIPO", "COORDINATE_LAT", "COORDINATE_LNG",
             "GIORNI_CONSIGLIATI", "VISTO_RICHIESTO", "COSTO_VISTO",
-            "DIFFICOLTA_LINGUA", "BUDGET_MEDIO_GIORNO", "ORDINE",
-            "DEST_ABBINATA_1", "COSTI_ACC_1", "COSTI_ACC_2", "COSTI_ACC_3",
-            "COSTI_ACC_4", "COSTI_ACC_5", "COSTI_ACC_6", "COSTI_ACC_7", "COSTI_ACC_8"
+            "DEST_ABBINATA_1",
+            "COSTI_ACC_1", "COSTI_ACC_2", "COSTI_ACC_3", "COSTI_ACC_4",
+            "COSTI_ACC_5", "COSTI_ACC_6", "COSTI_ACC_7", "COSTI_ACC_8",
+            "COSTI_ACC_9", "COSTI_ACC_10", "COSTI_ACC_11", "COSTI_ACC_12",
+            "COSTI_ACC_13", "COSTI_ACC_14", "COSTI_ACC_15"
         ],
         "copy": [
             "CODICE", "TIPO", "NOME", "NOME_COMPLETO", "CONTINENTE", "EMOJI",
@@ -32,12 +34,16 @@ COLUMN_MAPPING = {
     },
     "zone": {
         "tech": [
-            "CODICE", "TIPO", "DESTINAZIONE", "ZONA", "ORDINE",
+            "CODICE", "TIPO", "DESTINAZIONE", "ZONA",
             "COORDINATE_LAT", "COORDINATE_LNG", "GIORNI_CONSIGLIATI",
             "DISTANZA_CAPITALE_KM", "DESTINAZIONE_COLLEGATA", "PRIORITA",
-            "VOLO_1", "VOLO_2", "HOTEL_1", "HOTEL_2", "HOTEL_3",
-            "COSTI_ACC_1", "COSTI_ACC_2", "COSTI_ACC_3",
-            "EXTRA_1", "EXTRA_2", "EXTRA_3"
+            "VOLO_1", "VOLO_2", "VOLO_3", "VOLO_4", "VOLO_5", "VOLO_6", "VOLO_7", "VOLO_8",
+            "HOTEL_1", "HOTEL_2", "HOTEL_3",
+            "COSTI_ACC_1", "COSTI_ACC_2", "COSTI_ACC_3", "COSTI_ACC_4",
+            "COSTI_ACC_5", "COSTI_ACC_6", "COSTI_ACC_7", "COSTI_ACC_8",
+            "EXTRA_1", "EXTRA_2", "EXTRA_3", "EXTRA_4", "EXTRA_5", "EXTRA_6",
+            "EXTRA_7", "EXTRA_8", "EXTRA_9", "EXTRA_10", "EXTRA_11", "EXTRA_12",
+            "EXTRA_13", "EXTRA_14", "EXTRA_15"
         ],
         "copy": [
             "CODICE", "TIPO", "DESTINAZIONE", "ZONA", "DESCRIZIONE",
@@ -48,9 +54,11 @@ COLUMN_MAPPING = {
     "esperienze": {
         "tech": [
             "CODICE", "TIPO", "DESTINAZIONE", "ZONA", "ZONA_COLLEGATA",
-            "ORDINE", "DIFFICOLTA", "SLOT", "PRX_PAX",
+            "CONTATORE_ZONA", "CATEGORIA_1", "CATEGORIA_2", "CATEGORIA_3",
+            "DIFFICOLTA", "SLOT", "PRX_PAX",
             "EXTRA_1", "EXTRA_2", "EXTRA_3", "EXTRA_4", "EXTRA_5",
-            "EXTRA_6", "EXTRA_7", "EXTRA_8", "EXTRA_9"
+            "EXTRA_6", "EXTRA_7", "EXTRA_8", "EXTRA_9", "EXTRA_10",
+            "EXTRA_11", "EXTRA_12", "EXTRA_13", "EXTRA_14", "EXTRA_15"
         ],
         "copy": [
             "CODICE", "TIPO", "DESTINAZIONE", "ZONA",
@@ -73,19 +81,21 @@ COLUMN_MAPPING = {
     "hotel": {
         "tech": [
             "CODICE", "TIPO", "DESTINAZIONE", "ZONA", "QUARTIERE", "BUDGET",
-            "PRZ_PAX_NIGHT_15_01_2026", "PRZ_PAX_NIGHT_23_01_2026",
-            "PRZ_PAX_NIGHT_12_02_2026", "PRZ_PAX_NIGHT_26_02_2026",
-            "PRZ_PAX_NIGHT_05_03_2026", "PRZ_PAX_NIGHT_20_03_2026",
-            "PRZ_PAX_NIGHT_02_04_2026", "PRZ_PAX_NIGHT_16_04_2026",
-            "PRZ_PAX_NIGHT_07_05_2026", "PRZ_PAX_NIGHT_13_05_2026",
-            "PRZ_PAX_NIGHT_04_06_2026", "PRZ_PAX_NIGHT_18_06_2026",
-            "PRZ_PAX_NIGHT_02_07_2026", "PRZ_PAX_NIGHT_16_07_2026",
-            "PRZ_PAX_NIGHT_06_08_2026", "PRZ_PAX_NIGHT_20_08_2026",
-            "PRZ_PAX_NIGHT_10_09_2026", "PRZ_PAX_NIGHT_17_09_2026",
-            "PRZ_PAX_NIGHT_09_10_2026", "PRZ_PAX_NIGHT_16_10_2026",
-            "PRZ_PAX_NIGHT_11_11_2026", "PRZ_PAX_NIGHT_18_11_2026",
-            "PRZ_PAX_NIGHT_08_12_2026", "PRZ_PAX_NIGHT_15_12_2026",
-            "EXTRA_1", "EXTRA_2", "EXTRA_3", "EXTRA_4", "EXTRA_5", "EXTRA_6", "EXTRA_7"
+            "PRZ_PAX_NIGHT_GENNAIO2", "PRZ_PAX_NIGHT_GENNAIO3",
+            "PRZ_PAX_NIGHT_FEBBRAIO2", "PRZ_PAX_NIGHT_FEBBRAIO4",
+            "PRZ_PAX_NIGHT_MARZO1", "PRZ_PAX_NIGHT_MARZO3",
+            "PRZ_PAX_NIGHT_APRILE1", "PRZ_PAX_NIGHT_APRILE3",
+            "PRZ_PAX_NIGHT_MAGGIO1", "PRZ_PAX_NIGHT_MAGGIO2",
+            "PRZ_PAX_NIGHT_GIUGNO1", "PRZ_PAX_NIGHT_GIUGNO3",
+            "PRZ_PAX_NIGHT_LUGLIO1", "PRZ_PAX_NIGHT_LUGLIO3",
+            "PRZ_PAX_NIGHT_AGOSTO1", "PRZ_PAX_NIGHT_AGOSTO3",
+            "PRZ_PAX_NIGHT_SETTEMBRE2", "PRZ_PAX_NIGHT_SETTEMBRE3",
+            "PRZ_PAX_NIGHT_OTTOBRE2", "PRZ_PAX_NIGHT_OTTOBRE3",
+            "PRZ_PAX_NIGHT_NOVEMBRE2", "PRZ_PAX_NIGHT_NOVEMBRE3",
+            "PRZ_PAX_NIGHT_DICEMBRE2", "PRZ_PAX_NIGHT_DICEMBRE3",
+            "EXTRA_1", "EXTRA_2", "EXTRA_3", "EXTRA_4", "EXTRA_5", "EXTRA_6",
+            "EXTRA_7", "EXTRA_8", "EXTRA_9", "EXTRA_10", "EXTRA_11", "EXTRA_12",
+            "EXTRA_13", "EXTRA_14", "EXTRA_15"
         ],
         "copy": [
             "CODICE", "TIPO", "DESTINAZIONE", "ZONA", "QUARTIERE", "BUDGET",
@@ -117,60 +127,55 @@ def read_csv_smart(csv_path):
 def create_excel_from_csvs():
     """Crea file Excel con 14 fogli da CSV esistenti"""
 
-    print(f"📊 Generazione {EXCEL_FILE} da CSV esistenti\n")
+    print(f"📊 Generazione {EXCEL_FILE} da CSV già separati\n")
 
     # Crea Excel writer
     writer = pd.ExcelWriter(EXCEL_FILE, engine='openpyxl')
 
     sheets_created = 0
 
-    # Processa entità con separazione tech/copy
-    for entity, columns in COLUMN_MAPPING.items():
-        csv_file = os.path.join(CSV_DIR, f"{entity}.csv")
+    # Processa entità con separazione tech/copy (leggi CSV già separati)
+    for entity in COLUMN_MAPPING.keys():
+        # Leggi CSV _tech
+        tech_csv = os.path.join(CSV_DIR, f"{entity}_tech.csv")
+        if os.path.exists(tech_csv):
+            print(f"🔄 Processing: {entity}_tech.csv")
+            df_tech = read_csv_smart(tech_csv)
+            df_tech.to_excel(writer, sheet_name=f"{entity}_tech", index=False)
+            print(f"   ✅ {entity}_tech: {len(df_tech)} righe × {len(df_tech.columns)} colonne")
+            sheets_created += 1
+        else:
+            print(f"⚠️  {tech_csv} non trovato, skip")
 
-        if not os.path.exists(csv_file):
-            print(f"⚠️  {csv_file} non trovato, skip")
-            continue
+        # Leggi CSV _copy
+        copy_csv = os.path.join(CSV_DIR, f"{entity}_copy.csv")
+        if os.path.exists(copy_csv):
+            print(f"🔄 Processing: {entity}_copy.csv")
+            df_copy = read_csv_smart(copy_csv)
+            df_copy.to_excel(writer, sheet_name=f"{entity}_copy", index=False)
+            print(f"   ✅ {entity}_copy: {len(df_copy)} righe × {len(df_copy.columns)} colonne")
+            sheets_created += 1
+        else:
+            print(f"⚠️  {copy_csv} non trovato, skip")
 
-        print(f"🔄 Processing: {entity}.csv")
-
-        # Leggi CSV
-        df = read_csv_smart(csv_file)
-
-        # Crea foglio _tech
-        tech_sheet = f"{entity}_tech"
-        tech_cols = [col for col in columns["tech"] if col in df.columns]
-        df_tech = df[tech_cols]
-        df_tech.to_excel(writer, sheet_name=tech_sheet, index=False)
-        print(f"   ✅ {tech_sheet}: {len(df_tech)} righe × {len(tech_cols)} colonne")
-        sheets_created += 1
-
-        # Crea foglio _copy
-        copy_sheet = f"{entity}_copy"
-        copy_cols = [col for col in columns["copy"] if col in df.columns]
-        df_copy = df[copy_cols]
-        df_copy.to_excel(writer, sheet_name=copy_sheet, index=False)
-        print(f"   ✅ {copy_sheet}: {len(df_copy)} righe × {len(copy_cols)} colonne")
-        sheets_created += 1
         print()
 
     # Processa fogli solo tech
     for entity in TECH_ONLY_SHEETS:
-        csv_file = os.path.join(CSV_DIR, f"{entity}.csv")
+        tech_csv = os.path.join(CSV_DIR, f"{entity}_tech.csv")
 
-        if not os.path.exists(csv_file):
-            print(f"⚠️  {csv_file} non trovato, skip")
+        if not os.path.exists(tech_csv):
+            print(f"⚠️  {tech_csv} non trovato, skip")
             continue
 
-        print(f"🔄 Processing: {entity}.csv (solo tech)")
+        print(f"🔄 Processing: {entity}_tech.csv (solo tech)")
 
         # Leggi CSV
-        df = read_csv_smart(csv_file)
+        df = read_csv_smart(tech_csv)
 
         # Crea foglio _tech
-        tech_sheet = f"{entity}_tech"
-        df.to_excel(writer, sheet_name=tech_sheet, index=False)
-        print(f"   ✅ {tech_sheet}: {len(df)} righe × {len(df.columns)} colonne")
+        df.to_excel(writer, sheet_name=f"{entity}_tech", index=False)
+        print(f"   ✅ {entity}_tech: {len(df)} righe × {len(df.columns)} colonne")
         sheets_created += 1
         print()
 

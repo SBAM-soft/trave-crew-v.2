@@ -8,7 +8,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-EXCEL_FILE = "TravelCrew_Database Edit.xlsx"
+EXCEL_FILE = "TravelCrew_Database Edit 2.xlsx"
 OUTPUT_DIR = "public/data"
 
 # Array dei 12 fogli da convertire (pacchetti_tech e pacchetti_copy rimossi)
