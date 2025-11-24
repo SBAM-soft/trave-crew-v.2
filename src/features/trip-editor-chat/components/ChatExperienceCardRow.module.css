@@ -22,12 +22,14 @@
   .cardRow {
     justify-content: center;
     overflow-x: visible;
-    gap: 1.5rem;
+    gap: 2rem;
+    padding: 1rem 0;
   }
 
   .cardWrapper {
-    width: 320px;
-    min-height: 650px;
+    width: 360px;
+    min-height: 600px;
+    max-height: 700px;
   }
 }
 
