@@ -7,6 +7,15 @@ import { ANIMATION, HOTEL_TIER_PRICES } from '../../../core/constants';
  * CONSTANTS
  */
 const MAX_MESSAGES = 50; // Limite messaggi per prevenire memory leak
+const CACHE_VALIDITY_HOURS = 24; // Cache CSV valida per 24 ore
+
+// Delay constants per setTimeout (evita magic numbers)
+export const DELAY_INSTANT = 100;   // 100ms - Transizioni immediate
+export const DELAY_SHORT = 300;     // 300ms - Animazioni veloci
+export const DELAY_MEDIUM = 500;    // 500ms - Delay standard
+export const DELAY_NORMAL = 600;    // 600ms - Pausa naturale
+export const DELAY_LONG = 800;      // 800ms - Pausa con suspense
+export const DELAY_EXTENDED = 1000; // 1000ms - Pausa lunga
 
 /**
  * Zustand Store per Trip Editor Chat
@@ -126,10 +135,49 @@ const useTripEditorChatStore = create(
           extra: [],
           costi_accessori: []
         },
+        cacheTimestamp: null, // Timestamp ultimo caricamento cache
 
-        setCachedData: (key, data) => set((state) => ({
-          cachedData: { ...state.cachedData, [key]: data }
-        })),
+        setCachedData: (key, data) => {
+          const now = Date.now();
+          set((state) => ({
+            cachedData: { ...state.cachedData, [key]: data },
+            cacheTimestamp: now // Aggiorna timestamp
+          }));
+          console.log(`📦 Cache aggiornata: ${key} (${data.length} items) - timestamp: ${new Date(now).toISOString()}`);
+        },
+
+        // Verifica se la cache è ancora valida
+        isCacheValid: () => {
+          const state = get();
+          if (!state.cacheTimestamp) return false;
+
+          const ageHours = (Date.now() - state.cacheTimestamp) / (1000 * 60 * 60);
+          const isValid = ageHours < CACHE_VALIDITY_HOURS;
+
+          if (!isValid) {
+            console.log(`⚠️ Cache scaduta (${ageHours.toFixed(1)} ore > ${CACHE_VALIDITY_HOURS} ore)`);
+          }
+
+          return isValid;
+        },
+
+        // Invalida manualmente la cache
+        invalidateCache: () => {
+          console.log('🗑️ Invalidazione cache CSV');
+          set({
+            cachedData: {
+              destinazioni: [],
+              zone: [],
+              pacchetti: [],
+              esperienze: [],
+              hotel: [],
+              itinerario: [],
+              extra: [],
+              costi_accessori: []
+            },
+            cacheTimestamp: null
+          });
+        },
 
         // ===== CONTATORE ZONE (logica progressiva) =====
         availableCounter: 1, // Inizia da 1 (zone priorità 1)

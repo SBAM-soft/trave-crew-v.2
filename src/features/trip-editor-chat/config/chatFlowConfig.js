@@ -1,6 +1,7 @@
 import { toast } from 'sonner';
 import { loadEntityData } from '../../../core/utils/dataLoader';
 import { calculateNightsForZone, formatPrice } from '../utils/validators';
+import { DELAY_SHORT, DELAY_MEDIUM, DELAY_NORMAL, DELAY_LONG } from '../store/useTripEditorChatStore';
 
 /**
  * Configurazione completa del flow conversazionale
@@ -121,12 +122,16 @@ export const CHAT_FLOW_CONFIG = {
       const message = getMessage({ wizardData });
       addBotMessage(message.text, 'bot_message_with_card', { card: message.card });
 
-      // Carica dati necessari in cache se non già caricati
+      // Carica dati necessari in cache se non già caricati o se cache scaduta
       const cachedData = store.cachedData || {};
-      const needsDataLoad = !cachedData.zone || cachedData.zone.length === 0;
+      const needsDataLoad = !cachedData.zone || cachedData.zone.length === 0 || !store.isCacheValid();
 
       if (needsDataLoad) {
-        console.log('📥 Caricamento database per destinazione...');
+        if (cachedData.zone && cachedData.zone.length > 0) {
+          console.log('🔄 Cache CSV scaduta, ricaricamento database...');
+        } else {
+          console.log('📥 Caricamento database per destinazione...');
+        }
 
         try {
           const [zone, esperienze, hotel, itinerario, extra, costi_accessori] = await Promise.all([
@@ -184,7 +189,7 @@ export const CHAT_FLOW_CONFIG = {
             ]
           }
         );
-      }, 800);
+      }, DELAY_LONG);
     },
 
     onResponse: ({ value, addUserMessage, goToStep, wizardData, setTotalDays }) => {
@@ -956,7 +961,7 @@ export const CHAT_FLOW_CONFIG = {
         // Torna allo step zones
         setTimeout(() => {
           addBotMessage('Perfetto! Scegli una nuova zona da esplorare.');
-          setTimeout(() => goToStep('zones'), 500);
+          setTimeout(() => goToStep('zones'), DELAY_MEDIUM);
         }, 500);
       } else if (value === 'finish_trip') {
         addUserMessage('✅ Completa viaggio');
