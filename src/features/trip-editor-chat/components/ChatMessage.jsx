@@ -13,10 +13,10 @@ import styles from './ChatMessage.module.css';
  * Componente per renderizzare un singolo messaggio nella chat
  * Gestisce diversi tipi di messaggio: bot, user, options, cards, map, etc.
  */
-function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
+function ChatMessage({ message, isDisabled, onOptionSelect, onCardSelect, onCardDetails }) {
   const { type, content, data, sender } = message;
 
-  console.log('🎨 Rendering message:', { type, content, hasData: !!data, data });
+  console.log('🎨 Rendering message:', { type, content, hasData: !!data, data, isDisabled });
 
   // Messaggio utente
   if (type === 'user' || sender === 'user') {
@@ -39,6 +39,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             <ChatOptions
               options={data.options}
               onSelect={onOptionSelect}
+              disabled={isDisabled}
             />
           )}
         </div>
@@ -77,6 +78,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
                 card={{ ...card, zoneCode: data.zone?.code }}
                 onSelect={onCardSelect}
                 onDetails={onCardDetails}
+                disabled={isDisabled}
               />
             ))}
           </div>
@@ -99,6 +101,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
                 onZoneSelect={onOptionSelect}
                 multiSelect={data.multiSelect}
                 daysAvailable={data.daysAvailable}
+                disabled={isDisabled}
               />
             )}
           </div>
@@ -120,6 +123,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
               tiers={data.tiers}
               extras={data.extras}
               onSelect={onOptionSelect}
+              disabled={isDisabled}
             />
           )}
         </div>
@@ -157,6 +161,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             zone={data.zone}
             onSelect={onOptionSelect}
             onCardClick={onCardDetails}
+            disabled={isDisabled}
           />
         </div>
       </div>
@@ -172,6 +177,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
           <FreeDaySelector
             onConfirm={(days) => onOptionSelect({ action: 'confirm_free_days', days })}
             onCancel={() => onOptionSelect({ action: 'cancel_free_days' })}
+            disabled={isDisabled}
           />
         </div>
       </div>
@@ -207,6 +213,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             experiences={data.experiences}
             zone={data.zone}
             onSelect={onOptionSelect}
+            disabled={isDisabled}
           />
         </div>
       </div>
@@ -244,6 +251,7 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             progress={data.progress}
             onLike={onOptionSelect}
             onDislike={onOptionSelect}
+            disabled={isDisabled}
           />
         </div>
       </div>
@@ -306,6 +314,7 @@ ChatMessage.propTypes = {
     sender: PropTypes.string,
     timestamp: PropTypes.instanceOf(Date)
   }).isRequired,
+  isDisabled: PropTypes.bool,
   onOptionSelect: PropTypes.func,
   onCardSelect: PropTypes.func,
   onCardDetails: PropTypes.func

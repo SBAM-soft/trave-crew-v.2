@@ -8,9 +8,12 @@ import styles from './ChatContainer.module.css';
  * Container principale per la chat
  * Gestisce lo scroll automatico e il rendering dei messaggi
  */
-function ChatContainer({ messages, isTyping, onOptionSelect, onCardSelect, onCardDetails }) {
+function ChatContainer({ messages, isTyping, isProcessing, onOptionSelect, onCardSelect, onCardDetails }) {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
+
+  // Disabilita azioni se il bot sta scrivendo o processando
+  const isDisabled = isTyping || isProcessing;
 
   // Auto-scroll quando arriva un nuovo messaggio
   useEffect(() => {
@@ -34,6 +37,7 @@ function ChatContainer({ messages, isTyping, onOptionSelect, onCardSelect, onCar
           <ChatMessage
             key={msg.id}
             message={msg}
+            isDisabled={isDisabled}
             onOptionSelect={onOptionSelect}
             onCardSelect={onCardSelect}
             onCardDetails={onCardDetails}
@@ -51,6 +55,7 @@ function ChatContainer({ messages, isTyping, onOptionSelect, onCardSelect, onCar
 ChatContainer.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   isTyping: PropTypes.bool,
+  isProcessing: PropTypes.bool,
   onOptionSelect: PropTypes.func,
   onCardSelect: PropTypes.func,
   onCardDetails: PropTypes.func

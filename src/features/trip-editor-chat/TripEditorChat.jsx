@@ -16,10 +16,18 @@ import styles from './TripEditorChat.module.css';
  */
 function TripEditorChat() {
   const location = useLocation();
-  const { messages, isTyping, wizardData, tripData, currentStepId, showItineraryAnimation, setWizardData, setShowItineraryAnimation, reset, goToStep } = useTripEditorChatStore();
+  const { messages, isTyping, isProcessing, wizardData, tripData, currentStepId, showItineraryAnimation, setWizardData, setShowItineraryAnimation, reset, goToStep, clearAllTimeouts } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
   const [error, setError] = useState(null);
   const [fullscreenExperience, setFullscreenExperience] = useState(null);
+
+  // Cleanup timeout quando il componente smonta
+  useEffect(() => {
+    return () => {
+      console.log('🧹 TripEditorChat unmounting - cleaning up timeouts');
+      clearAllTimeouts();
+    };
+  }, [clearAllTimeouts]);
 
   // Handler completamento animazione itinerario
   const handleAnimationComplete = () => {
@@ -118,6 +126,7 @@ function TripEditorChat() {
       <ChatContainer
         messages={messages}
         isTyping={isTyping}
+        isProcessing={isProcessing}
         onOptionSelect={handleOptionSelect}
         onCardSelect={handleCardSelect}
         onCardDetails={handleCardDetails}

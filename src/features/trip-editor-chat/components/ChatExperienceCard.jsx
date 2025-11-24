@@ -7,22 +7,25 @@ import styles from './ChatExperienceCard.module.css';
  * Card per mostrare un'esperienza singola con azioni like/dislike
  * Stile "Tinder-like" per swipe attraverso esperienze
  */
-function ChatExperienceCard({ experience, zone, progress, onLike, onDislike }) {
+function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, disabled = false }) {
   const [showFullscreen, setShowFullscreen] = useState(false);
 
   const handleLike = () => {
+    if (disabled) return;
     if (onLike) {
       onLike({ action: 'like', experience, experienceId: experience.id || experience.code });
     }
   };
 
   const handleDislike = () => {
+    if (disabled) return;
     if (onDislike) {
       onDislike({ action: 'dislike', experience, experienceId: experience.id || experience.code });
     }
   };
 
   const handleShowDetails = () => {
+    if (disabled) return;
     setShowFullscreen(true);
   };
 
@@ -128,7 +131,9 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike }) {
           <button
             className={styles.detailsButton}
             onClick={handleShowDetails}
+            disabled={disabled}
             type="button"
+            style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
           >
             👀 Vedi tutti i dettagli
           </button>
@@ -139,8 +144,10 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike }) {
           <button
             className={styles.dislikeButton}
             onClick={handleDislike}
+            disabled={disabled}
             type="button"
             title="Non mi interessa"
+            style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
           >
             <span className={styles.actionIcon}>👎</span>
             <span className={styles.actionLabel}>Non mi interessa</span>
@@ -148,8 +155,10 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike }) {
           <button
             className={styles.likeButton}
             onClick={handleLike}
+            disabled={disabled}
             type="button"
             title="Aggiungi al viaggio"
+            style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
           >
             <span className={styles.actionIcon}>❤️</span>
             <span className={styles.actionLabel}>Mi piace!</span>
@@ -198,7 +207,8 @@ ChatExperienceCard.propTypes = {
     total: PropTypes.number
   }),
   onLike: PropTypes.func,
-  onDislike: PropTypes.func
+  onDislike: PropTypes.func,
+  disabled: PropTypes.bool
 };
 
 export default ChatExperienceCard;

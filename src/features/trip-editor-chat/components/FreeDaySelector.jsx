@@ -5,28 +5,32 @@ import styles from './FreeDaySelector.module.css';
 /**
  * Componente per selezionare il numero di giorni liberi con + e -
  */
-function FreeDaySelector({ onConfirm, onCancel }) {
+function FreeDaySelector({ onConfirm, onCancel, disabled = false }) {
   const [days, setDays] = useState(1);
 
   const handleIncrement = () => {
+    if (disabled) return;
     if (days < 10) { // Max 10 giorni liberi
       setDays(days + 1);
     }
   };
 
   const handleDecrement = () => {
+    if (disabled) return;
     if (days > 1) { // Min 1 giorno
       setDays(days - 1);
     }
   };
 
   const handleConfirm = () => {
+    if (disabled) return;
     if (onConfirm) {
       onConfirm(days);
     }
   };
 
   const handleCancel = () => {
+    if (disabled) return;
     if (onCancel) {
       onCancel();
     }
@@ -43,8 +47,9 @@ function FreeDaySelector({ onConfirm, onCancel }) {
         <button
           className={styles.button}
           onClick={handleDecrement}
-          disabled={days <= 1}
+          disabled={disabled || days <= 1}
           type="button"
+          style={{ opacity: (disabled || days <= 1) ? 0.5 : 1 }}
         >
           −
         </button>
@@ -57,8 +62,9 @@ function FreeDaySelector({ onConfirm, onCancel }) {
         <button
           className={styles.button}
           onClick={handleIncrement}
-          disabled={days >= 10}
+          disabled={disabled || days >= 10}
           type="button"
+          style={{ opacity: (disabled || days >= 10) ? 0.5 : 1 }}
         >
           +
         </button>
@@ -68,14 +74,18 @@ function FreeDaySelector({ onConfirm, onCancel }) {
         <button
           className={styles.cancelButton}
           onClick={handleCancel}
+          disabled={disabled}
           type="button"
+          style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
         >
           Annulla
         </button>
         <button
           className={styles.confirmButton}
           onClick={handleConfirm}
+          disabled={disabled}
           type="button"
+          style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
         >
           Conferma
         </button>
@@ -86,7 +96,8 @@ function FreeDaySelector({ onConfirm, onCancel }) {
 
 FreeDaySelector.propTypes = {
   onConfirm: PropTypes.func,
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  disabled: PropTypes.bool
 };
 
 export default FreeDaySelector;

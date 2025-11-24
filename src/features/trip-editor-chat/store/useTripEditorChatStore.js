@@ -4,6 +4,11 @@ import { getLastDay, prepareExperienceBlocks, isZoneChange, getPreviousZoneName 
 import { ANIMATION, HOTEL_TIER_PRICES } from '../../../core/constants';
 
 /**
+ * CONSTANTS
+ */
+const MAX_MESSAGES = 50; // Limite messaggi per prevenire memory leak
+
+/**
  * Zustand Store per Trip Editor Chat
  * Gestisce tutto lo state del flow conversazionale
  */
@@ -14,21 +19,40 @@ const useTripEditorChatStore = create(
         // ===== CONVERSAZIONE =====
         messages: [],
         isTyping: false,
+        isProcessing: false, // Flag per prevenire azioni multiple durante operazioni async
+        timeoutIds: [], // Array per tracciare setTimeout e permettere cleanup
 
-        addMessage: (message) => set((state) => ({
-          messages: [...state.messages, {
+        addMessage: (message) => set((state) => {
+          const newMessage = {
             ...message,
             id: `msg-${Date.now()}-${Math.random()}`,
             timestamp: new Date()
-          }]
-        })),
+          };
+
+          // Mantieni solo gli ultimi MAX_MESSAGES messaggi per prevenire memory leak
+          const updatedMessages = [...state.messages, newMessage];
+          if (updatedMessages.length > MAX_MESSAGES) {
+            console.log(`⚠️ Limite messaggi raggiunto (${MAX_MESSAGES}), rimuovo i più vecchi`);
+            return { messages: updatedMessages.slice(-MAX_MESSAGES) };
+          }
+
+          return { messages: updatedMessages };
+        }),
 
         addBotMessage: (content, type = 'bot', data = null) => {
           set({ isTyping: true });
-          setTimeout(() => {
+          const timeoutId = setTimeout(() => {
             get().addMessage({ type, content, data, sender: 'bot' });
             set({ isTyping: false });
+            // Rimuovi timeout dall'array dopo l'esecuzione
+            set((state) => ({
+              timeoutIds: state.timeoutIds.filter(id => id !== timeoutId)
+            }));
           }, ANIMATION.TYPING_DELAY_MIN + Math.random() * (ANIMATION.TYPING_DELAY_MAX - ANIMATION.TYPING_DELAY_MIN));
+          // Aggiungi timeout all'array per cleanup
+          set((state) => ({
+            timeoutIds: [...state.timeoutIds, timeoutId]
+          }));
         },
 
         addUserMessage: (content, selectedData) => {
@@ -40,7 +64,20 @@ const useTripEditorChatStore = create(
           });
         },
 
-        clearMessages: () => set({ messages: [] }),
+        clearMessages: () => {
+          console.log('🧹 Pulizia messaggi chat');
+          set({ messages: [] });
+        },
+
+        setProcessing: (isProcessing) => set({ isProcessing }),
+
+        // Cleanup tutti i timeout pendenti
+        clearAllTimeouts: () => {
+          const state = get();
+          console.log(`🧹 Cancellazione ${state.timeoutIds.length} timeout pendenti`);
+          state.timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+          set({ timeoutIds: [] });
+        },
 
         // ===== FLOW CONTROL =====
         currentStepId: null, // Inizia null, viene settato dopo il caricamento wizardData
@@ -301,21 +338,27 @@ const useTripEditorChatStore = create(
           return totalDays - 2 - filledBlocks.length;
         },
 
-        reset: () => set({
-          messages: [],
-          isTyping: false,
-          currentStepId: null, // Inizia da null per permettere riattivazione
-          stepHistory: [],
-          wizardData: {},
-          availableCounter: 1,
-          tripData: {
-            totalDays: null,
-            selectedZones: [],
-            filledBlocks: [],
-            hotels: [],
-            costs: { experiences: 0, hotels: 0, hotelExtras: 0, accessories: 0, total: 0 }
-          }
-        })
+        reset: () => {
+          // Cancella tutti i timeout prima del reset
+          get().clearAllTimeouts();
+          set({
+            messages: [],
+            isTyping: false,
+            isProcessing: false,
+            timeoutIds: [],
+            currentStepId: null, // Inizia da null per permettere riattivazione
+            stepHistory: [],
+            wizardData: {},
+            availableCounter: 1,
+            tripData: {
+              totalDays: null,
+              selectedZones: [],
+              filledBlocks: [],
+              hotels: [],
+              costs: { experiences: 0, hotels: 0, hotelExtras: 0, accessories: 0, total: 0 }
+            }
+          });
+        }
       }),
       {
         name: 'trip-editor-chat-storage',
