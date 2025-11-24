@@ -4,10 +4,14 @@ import styles from './ChatOptions.module.css';
 /**
  * Componente per renderizzare opzioni/bottoni cliccabili
  */
-function ChatOptions({ options, onSelect, multiSelect = false }) {
-  console.log('🔘 ChatOptions rendering:', { optionsCount: options?.length, hasOnSelect: !!onSelect, options });
+function ChatOptions({ options, onSelect, multiSelect = false, disabled = false }) {
+  console.log('🔘 ChatOptions rendering:', { optionsCount: options?.length, hasOnSelect: !!onSelect, disabled, options });
 
   const handleClick = (optionValue) => {
+    if (disabled) {
+      console.log('🔘 Option click blocked (disabled)');
+      return;
+    }
     console.log('🔘 Option clicked:', optionValue);
     if (onSelect) {
       onSelect(optionValue);
@@ -28,7 +32,9 @@ function ChatOptions({ options, onSelect, multiSelect = false }) {
           key={option.value || index}
           className={styles.optionButton}
           onClick={() => handleClick(option.value)}
+          disabled={disabled}
           type="button"
+          style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
         >
           {option.emoji && (
             <span className={styles.emoji}>{option.emoji}</span>
@@ -53,7 +59,8 @@ ChatOptions.propTypes = {
     description: PropTypes.string
   })).isRequired,
   onSelect: PropTypes.func.isRequired,
-  multiSelect: PropTypes.bool
+  multiSelect: PropTypes.bool,
+  disabled: PropTypes.bool
 };
 
 export default ChatOptions;

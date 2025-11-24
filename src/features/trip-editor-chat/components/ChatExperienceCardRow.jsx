@@ -6,8 +6,9 @@ import styles from './ChatExperienceCardRow.module.css';
  * Componente che mostra 3 ChatExperienceCard affiancate
  * Stile "Tinder-like" ma con 3 esperienze visibili contemporaneamente
  */
-function ChatExperienceCardRow({ experiences, zone, onSelect }) {
+function ChatExperienceCardRow({ experiences, zone, onSelect, disabled = false }) {
   const handleSelect = (value) => {
+    if (disabled) return;
     // Quando l'utente seleziona (like o dislike), passa il valore al parent
     if (onSelect) {
       onSelect(value);
@@ -26,6 +27,7 @@ function ChatExperienceCardRow({ experiences, zone, onSelect }) {
             zone={zone}
             onLike={handleSelect}
             onDislike={handleSelect}
+            disabled={disabled}
           />
         </div>
       ))}
@@ -54,7 +56,8 @@ ChatExperienceCardRow.propTypes = {
     code: PropTypes.string,
     name: PropTypes.string
   }),
-  onSelect: PropTypes.func
+  onSelect: PropTypes.func,
+  disabled: PropTypes.bool
 };
 
 export default ChatExperienceCardRow;
