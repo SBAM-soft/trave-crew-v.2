@@ -73,28 +73,26 @@ function ChatHeader({ wizardData, currentStep, tripData }) {
       {/* Timeline giorni - mostra solo dopo aver selezionato i giorni */}
       {tripData?.totalDays && (
         <div className={styles.stepsBar}>
-          {Array.from({ length: tripData.totalDays }, (_, index) => {
-            // Calcola quanti giorni sono stati completati (esperienze selezionate)
-            const totalExperiences = tripData.selectedZones?.reduce((sum, zone) => {
-              const zoneExperiences = tripData.experiences?.[zone.code] || [];
-              return sum + zoneExperiences.length;
-            }, 0) || 0;
+          {Array.from({ length: tripData.totalDays - 2 }, (_, index) => {
+            // Calcola quanti giorni sono stati riempiti usando filledBlocks
+            const filledDays = tripData.filledBlocks?.length || 0;
+            const availableDays = tripData.totalDays - 2; // -2 per arrivo/partenza
 
-            const dayNumber = index + 1;
-            const isCompleted = dayNumber <= totalExperiences;
-            const isActive = dayNumber === totalExperiences + 1;
+            const blockNumber = index + 1;
+            const isFilled = blockNumber <= filledDays;
+            const isActive = blockNumber === filledDays + 1;
 
             return (
               <div
-                key={`day-${index}`}
+                key={`block-${index}`}
                 className={`${styles.step} ${
-                  isCompleted ? styles.completed :
+                  isFilled ? styles.completed :
                   isActive ? styles.active :
                   styles.pending
                 }`}
-                title={`Giorno ${dayNumber}`}
+                title={`Giorno ${blockNumber + 1} - ${isFilled ? 'Completato' : isActive ? 'In corso' : 'Da pianificare'}`}
               >
-                {isCompleted ? '✓' : dayNumber}
+                {isFilled ? '✓' : blockNumber}
               </div>
             );
           })}
