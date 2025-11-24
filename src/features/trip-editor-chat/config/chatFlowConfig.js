@@ -853,25 +853,38 @@ export const CHAT_FLOW_CONFIG = {
       } else if (value === 'free_day') {
         addUserMessage('🏖️ Giorno libero');
 
-        // Crea un'esperienza placeholder per il giorno libero
-        const freeDayExperience = {
-          id: `free_day_${Date.now()}`,
-          nome: 'Giorno libero',
-          descrizione: 'Giornata libera per esplorare o riposare',
-          emoji: '🏖️',
-          slot: 1,
-          prezzo: 0,
-          difficolta: 0,
-          isFreeDay: true
-        };
+        // Mostra il selettore per scegliere quanti giorni liberi
+        setTimeout(() => {
+          addBotMessage(
+            `Perfetto! Seleziona quanti giorni liberi vuoi aggiungere:`,
+            'bot_free_day_selector'
+          );
+        }, 500);
+      } else if (value && value.action === 'confirm_free_days') {
+        // L'utente ha confermato i giorni liberi dal selettore
+        const numDays = value.days || 1;
 
-        // Aggiungi al tracking
-        CHAT_FLOW_CONFIG.packages.selectedExperiences.push(freeDayExperience);
+        // Aggiungi N giorni liberi
+        for (let i = 0; i < numDays; i++) {
+          const freeDayExperience = {
+            id: `free_day_${Date.now()}_${i}`,
+            nome: 'Giorno libero',
+            descrizione: 'Giornata libera per esplorare o riposare',
+            emoji: '🏖️',
+            slot: 1,
+            prezzo: 0,
+            difficolta: 0,
+            isFreeDay: true
+          };
 
-        addBotMessage(`Perfetto! Ho aggiunto un giorno libero al tuo itinerario. (+1 giorno)`);
+          // Aggiungi al tracking
+          CHAT_FLOW_CONFIG.packages.selectedExperiences.push(freeDayExperience);
 
-        // Aggiungi al trip
-        addExperience(currentZone.code, freeDayExperience);
+          // Aggiungi al trip
+          addExperience(currentZone.code, freeDayExperience);
+        }
+
+        addBotMessage(`Perfetto! Ho aggiunto ${numDays} ${numDays === 1 ? 'giorno libero' : 'giorni liberi'} al tuo itinerario! 🎉`);
 
         // Calcola giorni totali (ogni blocco = 1 giorno)
         const totalDaysUsed = tripData.filledBlocks.length;
@@ -907,6 +920,28 @@ export const CHAT_FLOW_CONFIG = {
             );
           }
         }, 800);
+      } else if (value && value.action === 'cancel_free_days') {
+        // L'utente ha annullato il selettore giorni liberi
+        addUserMessage('❌ Annullato');
+
+        // Torna alle opzioni precedenti
+        setTimeout(() => {
+          const totalDaysUsed = tripData.filledBlocks.length;
+          const daysAvailable = tripData.totalDays - 2;
+
+          addBotMessage(
+            `Nessun problema! Cosa vuoi fare? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
+            'bot_options',
+            {
+              options: [
+                { value: 'another_experience', label: '🎯 Altra esperienza qui', emoji: '✨' },
+                { value: 'free_day', label: '🏖️ Giorno libero', emoji: '☀️' },
+                { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' },
+                { value: 'finish_trip', label: '✅ Completa così', emoji: '👍' }
+              ]
+            }
+          );
+        }, 500);
       } else if (value === 'change_zone') {
         addUserMessage('🗺️ Cambia zona');
         // Reset per nuova zona

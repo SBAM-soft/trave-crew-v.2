@@ -6,6 +6,7 @@ import ChatHotelSelector from './ChatHotelSelector';
 import ChatExperienceCard from './ChatExperienceCard';
 import ChatExperienceSlider from './ChatExperienceSlider';
 import ChatExperienceCardRow from './ChatExperienceCardRow';
+import FreeDaySelector from './FreeDaySelector';
 import styles from './ChatMessage.module.css';
 
 /**
@@ -156,6 +157,21 @@ function ChatMessage({ message, onOptionSelect, onCardSelect, onCardDetails }) {
             zone={data.zone}
             onSelect={onOptionSelect}
             onCardClick={onCardDetails}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Messaggio bot con free day selector
+  if (type === 'bot_free_day_selector') {
+    return (
+      <div className={`${styles.message} ${styles.bot}`}>
+        <div className={styles.bubble}>
+          <p className={styles.text}>{content}</p>
+          <FreeDaySelector
+            onConfirm={(days) => onOptionSelect({ action: 'confirm_free_days', days })}
+            onCancel={() => onOptionSelect({ action: 'cancel_free_days' })}
           />
         </div>
       </div>
