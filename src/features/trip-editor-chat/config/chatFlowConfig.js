@@ -729,13 +729,15 @@ export const CHAT_FLOW_CONFIG = {
         CHAT_FLOW_CONFIG.packages.selectedExperiences.push(experience);
 
         addUserMessage(`❤️ ${experience.nome}`);
-        addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
 
         // Aggiungi esperienza al trip (salva nella timeline)
         addExperience(currentZone.code, experience);
 
+        addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
+
         // Calcola giorni totali selezionati (ogni blocco = 1 giorno)
-        const totalDaysUsed = tripData.filledBlocks.length;
+        // +1 perché addExperience è asincrono e lo stato potrebbe non essere ancora aggiornato
+        const totalDaysUsed = tripData.filledBlocks.length + 1;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);
@@ -887,7 +889,8 @@ export const CHAT_FLOW_CONFIG = {
         addBotMessage(`Perfetto! Ho aggiunto ${numDays} ${numDays === 1 ? 'giorno libero' : 'giorni liberi'} al tuo itinerario! 🎉`);
 
         // Calcola giorni totali (ogni blocco = 1 giorno)
-        const totalDaysUsed = tripData.filledBlocks.length;
+        // +numDays perché addExperience è asincrono e lo stato potrebbe non essere ancora aggiornato
+        const totalDaysUsed = tripData.filledBlocks.length + numDays;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         // Chiedi cosa fare dopo
@@ -946,6 +949,10 @@ export const CHAT_FLOW_CONFIG = {
         addUserMessage('🗺️ Cambia zona');
         // Reset per nuova zona
         CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
+        // Incrementa counter per sbloccare tutte le zone se necessario
+        if (store.availableCounter === 1) {
+          incrementCounter();
+        }
         // Torna allo step zones
         setTimeout(() => {
           addBotMessage('Perfetto! Scegli una nuova zona da esplorare.');
@@ -1001,6 +1008,10 @@ export const CHAT_FLOW_CONFIG = {
       } else if (value === 'change_zone') {
         addUserMessage('🔄 Cambia zona');
         CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
+        // Incrementa counter per sbloccare tutte le zone se necessario
+        if (store.availableCounter === 1) {
+          incrementCounter();
+        }
         goToStep('zones');
       }
     },
