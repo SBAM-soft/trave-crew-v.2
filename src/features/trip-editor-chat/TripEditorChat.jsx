@@ -33,10 +33,10 @@ function TripEditorChat() {
   const handleAnimationComplete = () => {
     // Nascondi animazione
     setShowItineraryAnimation(false);
-    // Vai allo step summary
+    // Vai allo step summary (usa delay corto per transizione fluida)
     setTimeout(() => {
       goToStep('summary_before_hotels');
-    }, 300);
+    }, 300); // Manteniamo 300ms qui per sincronizzazione con animazione
   };
 
   // Carica dati wizard da navigation state e inizializza conversazione
