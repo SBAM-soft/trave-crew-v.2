@@ -55,26 +55,6 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike }) {
   return (
     <>
       <div className={styles.card}>
-        {/* Header con progresso */}
-        {progress && (
-          <div className={styles.header}>
-            <span className={styles.zoneName}>{zone?.name || 'Zona'}</span>
-            <span className={styles.progress}>
-              {progress.current}/{progress.total} giorni
-            </span>
-          </div>
-        )}
-
-        {/* Progress bar */}
-        {progress && (
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${(progress.current / progress.total) * 100}%` }}
-            />
-          </div>
-        )}
-
         {/* Immagine principale */}
         {experience.immagini && experience.immagini.length > 0 ? (
           <div className={styles.imageContainer}>
