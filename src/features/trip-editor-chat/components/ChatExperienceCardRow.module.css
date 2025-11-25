@@ -20,19 +20,18 @@
 /* Per schermi grandi (desktop), mostra tutte e 3 le card affiancate SENZA SCROLL */
 @media (min-width: 1024px) {
   .cardRow {
-    justify-content: center;
-    overflow-x: hidden; /* Disabilita scroll su desktop */
-    overflow-y: visible;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     padding: 1rem 0;
-    flex-wrap: nowrap; /* Non permettere wrap */
+    overflow: visible;
+    max-width: 1400px;
+    margin: 0 auto;
   }
 
   .cardWrapper {
-    flex: 0 0 calc(33.333% - 1rem); /* 3 card perfettamente distribuite */
-    max-width: 380px;
-    min-width: 300px;
-    width: auto;
+    width: 100%;
+    min-width: 0; /* Permette al grid di comprimere se necessario */
     min-height: 600px;
     max-height: 700px;
   }
