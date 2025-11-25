@@ -335,11 +335,11 @@ export const CHAT_FLOW_CONFIG = {
       addBotMessage(getMessage({ wizardData, tripData, availableCounter }));
 
       // SOLUZIONE SEMPLIFICATA: Mostra zone in base alla PRIORITA, non all'itinerario
-      // Priorità 1 (01) al primo giro, poi tutte le altre
+      // Priorità 1 (01) al primo giro, poi TUTTE le zone disponibili
       const allZones = cachedData.zone || [];
       const availableZones = availableCounter === 1
-        ? allZones.filter(z => parseInt(z.PRIORITA) === 1)
-        : allZones.filter(z => parseInt(z.PRIORITA) > 1);
+        ? allZones.filter(z => parseInt(z.PRIORITA) === 1)  // Prima scelta: solo priorità 1
+        : allZones;  // Dopo: tutte le zone (incluse quelle priorità 1 come Phuket)
 
       console.log('📍 Available zones:', availableZones.length, availableZones.map(z => z.ZONA));
 
