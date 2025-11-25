@@ -1178,7 +1178,7 @@ export const CHAT_FLOW_CONFIG = {
       ];
 
       // Extra hotel disponibili
-      const hotelExtras = extra
+      const hotelExtras = (extra || [])
         .filter(e => e.TIPO?.toLowerCase() === 'hotel')
         .map(e => ({
           id: e.CODICE,
