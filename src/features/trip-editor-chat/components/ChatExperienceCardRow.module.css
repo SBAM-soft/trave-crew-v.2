@@ -17,17 +17,22 @@
   min-height: 600px;
 }
 
-/* Per schermi grandi, mostra tutte e 3 le card affiancate */
+/* Per schermi grandi (desktop), mostra tutte e 3 le card affiancate SENZA SCROLL */
 @media (min-width: 1024px) {
   .cardRow {
     justify-content: center;
-    overflow-x: visible;
-    gap: 2rem;
+    overflow-x: hidden; /* Disabilita scroll su desktop */
+    overflow-y: visible;
+    gap: 1.5rem;
     padding: 1rem 0;
+    flex-wrap: nowrap; /* Non permettere wrap */
   }
 
   .cardWrapper {
-    width: 360px;
+    flex: 0 0 calc(33.333% - 1rem); /* 3 card perfettamente distribuite */
+    max-width: 380px;
+    min-width: 300px;
+    width: auto;
     min-height: 600px;
     max-height: 700px;
   }
