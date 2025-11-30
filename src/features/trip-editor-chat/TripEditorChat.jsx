@@ -8,6 +8,7 @@ import ChatHeader from './components/ChatHeader';
 import ExperienceDetailFullscreen from './components/ExperienceDetailFullscreen';
 import ItineraryBuildingAnimation from './components/ItineraryBuildingAnimation';
 import ErrorFallback from '../../shared/ErrorFallback';
+import { loadEntityData } from '../../core/utils/dataLoader';
 import styles from './TripEditorChat.module.css';
 
 /**
@@ -152,9 +153,8 @@ function TripEditorChat() {
 
       if (needsDataLoading) {
         console.log('⚠️ CachedData vuoto, carico dati prima di andare a', initialStep);
-        // Carica i dati necessari (importa loadEntityData localmente)
+        // Carica i dati necessari
         try {
-          const { loadEntityData } = await import('../../../core/utils/dataLoader');
           const [zone, esperienze, hotel, itinerario, extra, costi] = await Promise.all([
             loadEntityData('zone', true),
             loadEntityData('esperienze', true),
