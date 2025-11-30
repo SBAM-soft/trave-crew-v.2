@@ -36,11 +36,25 @@ function TripEditorChat() {
       console.log('🚀 Navigating to landing page with updated trip data');
       // Reset flag
       setNavigateToLandingPage(false);
+
+      // Determina se serve ancora selezione hotel
+      const needsHotels = tripData.selectedZones && tripData.selectedZones.length > 0 &&
+                         (!tripData.hotels || tripData.hotels.length === 0);
+
+      // Costruisci zoneVisitate da selectedZones (formato richiesto dalla landing page)
+      const zoneVisitate = (tripData.selectedZones || []).map(zone => ({
+        nome: zone.name,
+        code: zone.code,
+        giorni: zone.days || zone.daysRecommended || 1
+      }));
+
       // Naviga alla landing page con dati aggiornati
       navigate('/trip-summary', {
         state: {
           ...tripData,
-          wizardData
+          wizardData,
+          needsHotelSelection: needsHotels,
+          zoneVisitate
         }
       });
     }
@@ -53,10 +67,23 @@ function TripEditorChat() {
     // Naviga direttamente alla landing page di riepilogo (FUORI DALLA CHAT)
     // Principio: DECISIONI = CHAT, RIEPILOGHI = LANDING PAGE
     setTimeout(() => {
+      // Determina se serve selezione hotel
+      const needsHotels = tripData.selectedZones && tripData.selectedZones.length > 0 &&
+                         (!tripData.hotels || tripData.hotels.length === 0);
+
+      // Costruisci zoneVisitate da selectedZones (formato richiesto dalla landing page)
+      const zoneVisitate = (tripData.selectedZones || []).map(zone => ({
+        nome: zone.name,
+        code: zone.code,
+        giorni: zone.days || zone.daysRecommended || 1
+      }));
+
       navigate('/trip-summary', {
         state: {
           ...tripData,      // Spread di tutti i dati del trip (filledBlocks, totalDays, etc.)
-          wizardData        // Aggiungi wizardData separatamente
+          wizardData,       // Aggiungi wizardData separatamente
+          needsHotelSelection: needsHotels,  // Flag per mostrare bottone selezione hotel
+          zoneVisitate      // Zone in formato richiesto dalla landing page
         }
       });
     }, 300); // Manteniamo 300ms qui per transizione fluida
