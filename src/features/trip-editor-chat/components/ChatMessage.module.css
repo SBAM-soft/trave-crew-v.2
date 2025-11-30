@@ -55,6 +55,26 @@
   }
 }
 
+/* Bubble per mappa zone - sfrutta larghezza schermo su desktop */
+.bubbleMap {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border-top-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+  max-width: 95%; /* Su mobile limita larghezza */
+}
+
+/* Su desktop rimuovi limiti di larghezza per la mappa */
+@media (min-width: 1024px) {
+  .bubbleMap {
+    max-width: none;
+    width: 100%;
+  }
+}
+
 .text {
   margin: 0;
   white-space: pre-wrap;
@@ -148,6 +168,13 @@
   margin-top: 16px;
   width: 100%;
   max-width: 800px;
+}
+
+/* Su desktop rimuovi limite larghezza per mappa fullscreen */
+@media (min-width: 1024px) {
+  .mapContainer {
+    max-width: none;
+  }
 }
 
 .placeholder {
