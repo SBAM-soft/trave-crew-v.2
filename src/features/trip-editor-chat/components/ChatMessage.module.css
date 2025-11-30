@@ -35,6 +35,26 @@
   line-height: 1.5;
 }
 
+/* Bubble per experience cards - sfrutta larghezza schermo su desktop */
+.bubbleExperienceCards {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border-top-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+  max-width: 95%; /* Su mobile limita larghezza */
+}
+
+/* Su desktop rimuovi limiti di larghezza per sfruttare tutto lo schermo */
+@media (min-width: 1024px) {
+  .bubbleExperienceCards {
+    max-width: none;
+    width: 100%;
+  }
+}
+
 .text {
   margin: 0;
   white-space: pre-wrap;

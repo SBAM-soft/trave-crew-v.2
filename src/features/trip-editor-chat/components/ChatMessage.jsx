@@ -169,7 +169,7 @@ function ChatMessage({ message, isDisabled, onOptionSelect, onCardSelect, onCard
 
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.bubble}>
+        <div className={styles.bubbleExperienceCards}>
           <p className={styles.text}>{content}</p>
           <ChatExperienceCardRow
             experiences={data.experiences}
