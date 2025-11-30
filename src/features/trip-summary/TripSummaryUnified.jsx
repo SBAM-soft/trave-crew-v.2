@@ -684,7 +684,7 @@ function TripSummaryUnified() {
           </div>
         </motion.div>
 
-        {/* Pulsante Scegli Hotel - Espandibile */}
+        {/* Pulsante Scegli Hotel - Naviga alla CHAT per selezione */}
         {needsHotelSelection && selectedHotels.length === 0 && (
           <motion.div
             className={styles.hotelCTA}
@@ -696,11 +696,24 @@ function TripSummaryUnified() {
               variant="primary"
               size="lg"
               onClick={() => {
-                setShowHotelSelection(!showHotelSelection);
-                if (!showHotelSelection) loadHotelData();
+                // Naviga alla CHAT per la selezione hotel (DECISIONI = CHAT, RIEPILOGHI = LANDING)
+                console.log('🏨 Navigating to chat for hotel selection');
+                navigate('/trip-editor-chat', {
+                  state: {
+                    wizardData,
+                    initialStep: 'hotels',
+                    tripData: {
+                      selectedZones: tripData.selectedZones || [],
+                      filledBlocks: tripData.filledBlocks || filledBlocks,
+                      totalDays: tripData.totalDays || totalDays,
+                      hotels: tripData.hotels || [],
+                      costs: tripData.costs || {}
+                    }
+                  }
+                });
               }}
             >
-              {showHotelSelection ? '🔼 Chiudi Selezione Hotel' : '🏨 Scegli Hotel'}
+              🏨 Scegli Hotel nella Chat
             </Button>
           </motion.div>
         )}

@@ -17,7 +17,7 @@ import styles from './TripEditorChat.module.css';
 function TripEditorChat() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { messages, isTyping, isProcessing, wizardData, tripData, currentStepId, showItineraryAnimation, setWizardData, setShowItineraryAnimation, reset, goToStep, clearAllTimeouts } = useTripEditorChatStore();
+  const { messages, isTyping, isProcessing, wizardData, tripData, currentStepId, showItineraryAnimation, navigateToLandingPage, setWizardData, setShowItineraryAnimation, setNavigateToLandingPage, reset, goToStep, clearAllTimeouts } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
   const [error, setError] = useState(null);
   const [fullscreenExperience, setFullscreenExperience] = useState(null);
@@ -29,6 +29,22 @@ function TripEditorChat() {
       clearAllTimeouts();
     };
   }, [clearAllTimeouts]);
+
+  // Monitora flag per navigare alla landing page (es. dopo selezione hotel)
+  useEffect(() => {
+    if (navigateToLandingPage) {
+      console.log('🚀 Navigating to landing page with updated trip data');
+      // Reset flag
+      setNavigateToLandingPage(false);
+      // Naviga alla landing page con dati aggiornati
+      navigate('/trip-summary', {
+        state: {
+          ...tripData,
+          wizardData
+        }
+      });
+    }
+  }, [navigateToLandingPage, tripData, wizardData, navigate, setNavigateToLandingPage]);
 
   // Handler completamento animazione itinerario
   const handleAnimationComplete = () => {
@@ -49,6 +65,8 @@ function TripEditorChat() {
   // Carica dati wizard da navigation state e inizializza conversazione
   useEffect(() => {
     const wizardData = location.state?.wizardData;
+    const initialStep = location.state?.initialStep; // Step iniziale da cui partire (es. 'hotels')
+    const existingTripData = location.state?.tripData; // Dati trip esistenti se ritorniamo dalla landing
 
     if (!wizardData) {
       console.error('❌ Nessun dato wizard trovato in navigation state');
@@ -64,6 +82,8 @@ function TripEditorChat() {
     }
 
     console.log('📥 Wizard data ricevuto:', wizardData);
+    console.log('📥 Initial step:', initialStep);
+    console.log('📥 Existing trip data:', existingTripData);
 
     // Reset completo (pulisce tutto)
     reset();
@@ -71,11 +91,30 @@ function TripEditorChat() {
     // Setta wizard data
     setWizardData(wizardData);
 
+    // Se ci sono dati trip esistenti, ripristinali (utile quando si torna dalla landing per selezionare hotel)
+    if (existingTripData) {
+      const store = useTripEditorChatStore.getState();
+      // Ripristina selectedZones, filledBlocks, etc.
+      if (existingTripData.selectedZones) {
+        existingTripData.selectedZones.forEach(zone => store.addZone(zone));
+      }
+      if (existingTripData.filledBlocks) {
+        existingTripData.filledBlocks.forEach(block => {
+          if (block.experience) {
+            store.addExperience(block.zona, block.experience);
+          }
+        });
+      }
+      if (existingTripData.totalDays) {
+        store.tripData.totalDays = existingTripData.totalDays;
+      }
+    }
+
     // IMPORTANTE: Forza riavvio del flow facendo un cambio di step
-    // Vai temporaneamente a null e poi torna a welcome per far scattare l'useEffect
+    // Se c'è un initialStep, vai lì; altrimenti vai a 'welcome'
     setTimeout(() => {
       const store = useTripEditorChatStore.getState();
-      store.goToStep('welcome');
+      store.goToStep(initialStep || 'welcome');
     }, 100);
   }, [location.state, setWizardData, reset]);
 
