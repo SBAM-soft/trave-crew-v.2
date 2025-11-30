@@ -112,8 +112,12 @@ function TripEditorChat() {
     console.log('📥 Initial step:', initialStep);
     console.log('📥 Existing trip data:', existingTripData);
 
-    // Reset completo (pulisce tutto)
-    reset();
+    // Se torniamo dalla landing page con existingTripData, NON fare reset completo
+    // Il reset cancellerebbe il cachedData necessario per lo step hotels
+    if (!initialStep || !existingTripData) {
+      // Reset completo solo per nuove chat
+      reset();
+    }
 
     // Setta wizard data
     setWizardData(wizardData);
@@ -138,10 +142,47 @@ function TripEditorChat() {
     }
 
     // IMPORTANTE: Forza riavvio del flow facendo un cambio di step
-    // Se c'è un initialStep, vai lì; altrimenti vai a 'welcome'
-    setTimeout(() => {
+    // Se c'è un initialStep, verifica prima che cachedData sia caricato
+    setTimeout(async () => {
       const store = useTripEditorChatStore.getState();
-      store.goToStep(initialStep || 'welcome');
+
+      // Se viene richiesto uno step specifico ma cachedData è vuoto, carica i dati prima
+      const needsDataLoading = initialStep &&
+                              (!store.cachedData || !store.cachedData.hotel || !store.cachedData.esperienze);
+
+      if (needsDataLoading) {
+        console.log('⚠️ CachedData vuoto, carico dati prima di andare a', initialStep);
+        // Carica i dati necessari (importa loadEntityData localmente)
+        try {
+          const { loadEntityData } = await import('../../../core/utils/dataLoader');
+          const [zone, esperienze, hotel, itinerario, extra, costi] = await Promise.all([
+            loadEntityData('zone', true),
+            loadEntityData('esperienze', true),
+            loadEntityData('hotel', true),
+            loadEntityData('itinerario', false),
+            loadEntityData('extra', false),
+            loadEntityData('costi_accessori', false)
+          ]);
+
+          // Salva nel cachedData
+          store.setCachedData('zone', zone);
+          store.setCachedData('esperienze', esperienze);
+          store.setCachedData('hotel', hotel);
+          store.setCachedData('itinerario', itinerario);
+          store.setCachedData('extra', extra);
+          store.setCachedData('costi_accessori', costi);
+
+          console.log('✅ Dati caricati, procedo a step:', initialStep);
+          store.goToStep(initialStep);
+        } catch (error) {
+          console.error('❌ Errore nel caricamento dati:', error);
+          // Fallback: vai a welcome che gestirà il caricamento
+          store.goToStep('welcome');
+        }
+      } else {
+        // CachedData esiste o non è richiesto initialStep, procedi normalmente
+        store.goToStep(initialStep || 'welcome');
+      }
     }, 100);
   }, [location.state, setWizardData, reset]);
 
