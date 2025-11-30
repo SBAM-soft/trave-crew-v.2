@@ -442,14 +442,17 @@ export const CHAT_FLOW_CONFIG = {
         const totalDaysSelected = tripData.selectedZones.reduce((sum, z) => sum + z.daysRecommended, 0);
         const daysAvailable = tripData.totalDays - 2;
 
-        // Se primo contatore (priorità 1), vai subito ai pacchetti
-        if (availableCounter === 1) {
+        // Se hai già esperienze/giorni liberi (filledBlocks), stai cambiando zona → vai direttamente a packages
+        const hasExistingBlocks = tripData.filledBlocks && tripData.filledBlocks.length > 0;
+
+        if (availableCounter === 1 || hasExistingBlocks) {
+          // Primo giro o cambio zona durante selezione esperienze → vai subito a packages
           setTimeout(() => {
             addBotMessage('Ora selezioniamo le esperienze per questa zona! ✨');
             goToStep('packages');
           }, 1000);
         } else {
-          // Contatori successivi - chiedi se proseguire o aggiungere zone
+          // Contatori successivi durante setup iniziale - chiedi se proseguire o aggiungere zone
           if (totalDaysSelected >= daysAvailable) {
             setTimeout(() => {
               addBotMessage(
