@@ -90,7 +90,7 @@ function ChatMessage({ message, isDisabled, onOptionSelect, onCardSelect, onCard
   if (type === 'bot_map') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.bubble}>
+        <div className={styles.bubbleMap}>
           <p className={styles.text}>{content}</p>
           <div className={styles.mapContainer}>
             {data?.zones && (
