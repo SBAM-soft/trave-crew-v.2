@@ -147,12 +147,28 @@ function TripEditorChat() {
     setTimeout(async () => {
       const store = useTripEditorChatStore.getState();
 
-      // Se viene richiesto uno step specifico ma cachedData è vuoto, carica i dati prima
-      const needsDataLoading = initialStep &&
-                              (!store.cachedData || !store.cachedData.hotel || !store.cachedData.esperienze);
+      // Controllo robusto: verifica che cachedData contenga array validi con dati
+      const needsDataLoading = initialStep && (
+        !store.cachedData ||
+        !Array.isArray(store.cachedData.zone) ||
+        !Array.isArray(store.cachedData.hotel) ||
+        !Array.isArray(store.cachedData.esperienze) ||
+        !Array.isArray(store.cachedData.extra) ||
+        store.cachedData.zone.length === 0 ||
+        store.cachedData.hotel.length === 0 ||
+        store.cachedData.esperienze.length === 0
+      );
 
       if (needsDataLoading) {
-        console.log('⚠️ CachedData vuoto, carico dati prima di andare a', initialStep);
+        console.log('⚠️ CachedData non valido, carico dati prima di andare a', initialStep);
+        console.log('📊 Stato cachedData:', {
+          exists: !!store.cachedData,
+          zone: Array.isArray(store.cachedData?.zone) ? `${store.cachedData.zone.length} items` : 'invalid',
+          hotel: Array.isArray(store.cachedData?.hotel) ? `${store.cachedData.hotel.length} items` : 'invalid',
+          esperienze: Array.isArray(store.cachedData?.esperienze) ? `${store.cachedData.esperienze.length} items` : 'invalid',
+          extra: Array.isArray(store.cachedData?.extra) ? `${store.cachedData.extra.length} items` : 'invalid'
+        });
+
         // Carica i dati necessari
         try {
           const [zone, esperienze, hotel, itinerario, extra, costi] = await Promise.all([
@@ -172,7 +188,14 @@ function TripEditorChat() {
           store.setCachedData('extra', extra);
           store.setCachedData('costi_accessori', costi);
 
-          console.log('✅ Dati caricati, procedo a step:', initialStep);
+          console.log('✅ Dati caricati con successo:', {
+            zone: zone.length,
+            esperienze: esperienze.length,
+            hotel: hotel.length,
+            extra: extra.length
+          });
+          console.log('✅ Procedo a step:', initialStep);
+
           store.goToStep(initialStep);
         } catch (error) {
           console.error('❌ Errore nel caricamento dati:', error);
@@ -180,7 +203,8 @@ function TripEditorChat() {
           store.goToStep('welcome');
         }
       } else {
-        // CachedData esiste o non è richiesto initialStep, procedi normalmente
+        console.log('✅ CachedData già valido, procedo a step:', initialStep || 'welcome');
+        // CachedData esiste ed è valido, procedi normalmente
         store.goToStep(initialStep || 'welcome');
       }
     }, 100);
