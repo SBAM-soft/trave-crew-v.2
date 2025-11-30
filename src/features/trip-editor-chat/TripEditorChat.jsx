@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import useTripEditorChatStore from './store/useTripEditorChatStore';
 import useChatFlow from './hooks/useChatFlow';
@@ -16,6 +16,7 @@ import styles from './TripEditorChat.module.css';
  */
 function TripEditorChat() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { messages, isTyping, isProcessing, wizardData, tripData, currentStepId, showItineraryAnimation, setWizardData, setShowItineraryAnimation, reset, goToStep, clearAllTimeouts } = useTripEditorChatStore();
   const { handleUserResponse } = useChatFlow();
   const [error, setError] = useState(null);
@@ -33,10 +34,16 @@ function TripEditorChat() {
   const handleAnimationComplete = () => {
     // Nascondi animazione
     setShowItineraryAnimation(false);
-    // Vai allo step summary (usa delay corto per transizione fluida)
+    // Naviga direttamente alla landing page di riepilogo (FUORI DALLA CHAT)
+    // Principio: DECISIONI = CHAT, RIEPILOGHI = LANDING PAGE
     setTimeout(() => {
-      goToStep('summary_before_hotels');
-    }, 300); // Manteniamo 300ms qui per sincronizzazione con animazione
+      navigate('/trip-summary', {
+        state: {
+          ...tripData,      // Spread di tutti i dati del trip (filledBlocks, totalDays, etc.)
+          wizardData        // Aggiungi wizardData separatamente
+        }
+      });
+    }, 300); // Manteniamo 300ms qui per transizione fluida
   };
 
   // Carica dati wizard da navigation state e inizializza conversazione
