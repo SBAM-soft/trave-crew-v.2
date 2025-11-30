@@ -193,6 +193,11 @@ const useTripEditorChatStore = create(
 
         setShowItineraryAnimation: (show) => set({ showItineraryAnimation: show }),
 
+        // Flag per navigare alla landing page dopo completamento (es. selezione hotel)
+        navigateToLandingPage: false,
+
+        setNavigateToLandingPage: (shouldNavigate) => set({ navigateToLandingPage: shouldNavigate }),
+
         // ===== ACTIONS DATI VIAGGIO =====
         setWizardData: (data) => set({ wizardData: data }),
 

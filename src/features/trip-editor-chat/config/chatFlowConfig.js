@@ -1220,7 +1220,11 @@ export const CHAT_FLOW_CONFIG = {
         setTimeout(() => goToStep('hotels'), 1000);
       } else {
         CHAT_FLOW_CONFIG.hotels.currentZoneIndex = 0; // Reset
-        setTimeout(() => goToStep('final_summary'), 1500);
+        // Torna alla landing page invece di andare a final_summary (DECISIONI = CHAT, RIEPILOGHI = LANDING)
+        setTimeout(() => {
+          addBotMessage('✅ Hotel selezionati! Ti sto portando al riepilogo completo...');
+          setTimeout(() => store.setNavigateToLandingPage(true), 800);
+        }, 800);
       }
     },
 
