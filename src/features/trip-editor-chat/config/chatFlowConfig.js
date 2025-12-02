@@ -751,15 +751,16 @@ export const CHAT_FLOW_CONFIG = {
 
         addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
 
-        // Calcola giorni totali selezionati (ogni blocco = 1 giorno)
-        // Calcola quanti blocchi verranno aggiunti in base a cambio zona
+        // Calcola giorni totali selezionati (ogni blocco experience = 1 giorno)
+        // NON contare i blocchi logistics (trasferimento/sistemazione) come nel primo giorno di arrivo
+        const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience');
         const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
         const isZoneChange = lastBlock && lastBlock.zoneCode !== currentZone.code;
         let blocksToAdd = 1; // di default solo l'esperienza
         if (isZoneChange) {
-          blocksToAdd = 2; // logistics (trasferimento + sistemazione) + experience
+          blocksToAdd = 1; // solo experience (il logistics non conta)
         }
-        const totalDaysUsed = tripData.filledBlocks.length + blocksToAdd;
+        const totalDaysUsed = experienceBlocks.length + blocksToAdd;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);
@@ -910,9 +911,10 @@ export const CHAT_FLOW_CONFIG = {
 
         addBotMessage(`Perfetto! Ho aggiunto ${numDays} ${numDays === 1 ? 'giorno libero' : 'giorni liberi'} al tuo itinerario! 🎉`);
 
-        // Calcola giorni totali (ogni blocco = 1 giorno)
+        // Calcola giorni totali (solo blocchi experience + free, NON logistics)
         // +numDays perché addExperience è asincrono e lo stato potrebbe non essere ancora aggiornato
-        const totalDaysUsed = tripData.filledBlocks.length + numDays;
+        const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
+        const totalDaysUsed = experienceBlocks.length + numDays;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         // Chiedi cosa fare dopo
@@ -951,7 +953,8 @@ export const CHAT_FLOW_CONFIG = {
 
         // Torna alle opzioni precedenti
         setTimeout(() => {
-          const totalDaysUsed = tripData.filledBlocks.length;
+          const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
+          const totalDaysUsed = experienceBlocks.length;
           const daysAvailable = tripData.totalDays - 2;
 
           addBotMessage(
@@ -1274,10 +1277,12 @@ export const CHAT_FLOW_CONFIG = {
       addBotMessage(getMessage());
 
       setTimeout(() => {
+        // Conta solo esperienze vere, non blocchi logistics
+        const experienceCount = tripData.filledBlocks.filter(b => b.type === 'experience').length;
         const summary = `
 📍 Destinazione: ${tripData.selectedZones.map(z => z.name).join(', ')}
 🗓️ Durata: ${tripData.totalDays} giorni
-🎯 Esperienze: ${tripData.filledBlocks.length}
+🎯 Esperienze: ${experienceCount}
 🏨 Hotel: ${tripData.hotels.length} zone
 
 💰 COSTO TOTALE: €${tripData.costs.total}
