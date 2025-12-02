@@ -113,6 +113,17 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, dis
             {experience.descrizione || experience.descrizioneEstesa}
           </p>
 
+          {/* Tags / Interessi */}
+          {experience.tags && experience.tags.length > 0 && (
+            <div className={styles.tags}>
+              {experience.tags.map((tag, idx) => (
+                <span key={idx} className={styles.tag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Highlights */}
           {experience.highlights && experience.highlights.length > 0 && (
             <div className={styles.highlights}>
