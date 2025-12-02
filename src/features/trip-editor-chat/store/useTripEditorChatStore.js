@@ -210,40 +210,54 @@ const useTripEditorChatStore = create(
           const exists = state.tripData.selectedZones.some(z => z.code === zone.code);
           if (exists) return state;
 
-          // Calcola lastDay per il nuovo blocco logistics
-          const lastDay = getLastDay(state.tripData.filledBlocks);
           const isFirstZone = state.tripData.filledBlocks.length === 0;
-          const previousZone = isFirstZone ? null : getPreviousZoneName(state.tripData.filledBlocks);
 
-          // Crea blocco logistics per arrivo/trasferimento
-          const logisticsBlock = {
-            day: lastDay + 1,
-            type: 'logistics',
-            zoneCode: zone.code,
-            zoneName: zone.name,
-            experience: {
-              nome: isFirstZone
-                ? `Arrivo e sistemazione a ${zone.name}`
-                : `Trasferimento e sistemazione a ${zone.name}`,
-              descrizione: isFirstZone
-                ? `Giorno logistico per arrivo dall'Italia, check-in hotel e orientamento a ${zone.name}`
-                : `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zone.name}`,
-              type: 'logistics'
-            }
-          };
+          // LOGICA AGGIORNATA: blocco logistics SOLO per zone successive (trasferimento)
+          // La prima zona NON crea blocco logistics (le esperienze partono da Day 1)
+          if (!isFirstZone) {
+            // Calcola lastDay per il nuovo blocco logistics
+            const lastDay = getLastDay(state.tripData.filledBlocks);
+            const previousZone = getPreviousZoneName(state.tripData.filledBlocks);
 
-          console.log(`🏨 Zona selezionata: ${zone.name} - Creato blocco logistics (Day ${lastDay + 1})`);
+            // Crea blocco logistics per trasferimento
+            const logisticsBlock = {
+              day: lastDay + 1,
+              type: 'logistics',
+              zoneCode: zone.code,
+              zoneName: zone.name,
+              experience: {
+                nome: `Trasferimento e sistemazione a ${zone.name}`,
+                descrizione: `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zone.name}`,
+                type: 'logistics'
+              }
+            };
 
-          return {
-            tripData: {
-              ...state.tripData,
-              selectedZones: [...state.tripData.selectedZones, {
-                ...zone,
-                order: state.tripData.selectedZones.length + 1
-              }],
-              filledBlocks: [...state.tripData.filledBlocks, logisticsBlock]
-            }
-          };
+            console.log(`🚗 Cambio zona: ${previousZone} → ${zone.name} - Creato blocco logistics (Day ${lastDay + 1})`);
+
+            return {
+              tripData: {
+                ...state.tripData,
+                selectedZones: [...state.tripData.selectedZones, {
+                  ...zone,
+                  order: state.tripData.selectedZones.length + 1
+                }],
+                filledBlocks: [...state.tripData.filledBlocks, logisticsBlock]
+              }
+            };
+          } else {
+            // Prima zona: nessun blocco logistics
+            console.log(`🎯 Prima zona selezionata: ${zone.name} - Nessun blocco logistics creato`);
+
+            return {
+              tripData: {
+                ...state.tripData,
+                selectedZones: [...state.tripData.selectedZones, {
+                  ...zone,
+                  order: state.tripData.selectedZones.length + 1
+                }]
+              }
+            };
+          }
         }),
 
         removeZone: (zoneCode) => set((state) => ({
@@ -419,8 +433,13 @@ const useTripEditorChatStore = create(
           const state = get();
           const { totalDays, filledBlocks } = state.tripData;
           if (!totalDays) return 0;
-          // -1 per giorno arrivo, -1 per giorno partenza
-          return totalDays - 2 - filledBlocks.length;
+          // LOGICA CORRETTA:
+          // - filledBlocks contiene tutti i giorni programmati (esperienze + trasferimenti zone)
+          // - Prima zona NON crea blocco logistics, le esperienze partono da Day 1
+          // - Zone successive creano blocco logistics per trasferimento
+          // - Ultimo giorno (partenza) NON è in filledBlocks
+          // Esempio 10 giorni: Day 1-9 disponibili per blocchi, Day 10 partenza
+          return totalDays - 1 - filledBlocks.length;
         },
 
         reset: () => {
