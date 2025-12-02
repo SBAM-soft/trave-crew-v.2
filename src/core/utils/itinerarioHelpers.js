@@ -15,13 +15,15 @@ export const findItinerarioByZone = (zoneSelezionate, itinerari) => {
   }
 
   return itinerari.find(it => {
-    // Estrai zone dell'itinerario (ZONA_1 ... ZONA_4)
+    // Estrai zone dell'itinerario (ZONA_1 ... ZONA_6)
     const zoneItinerario = [
       it.ZONA_1,
       it.ZONA_2,
       it.ZONA_3,
-      it.ZONA_4
-    ].filter(z => z && z !== '' && z !== 'None' && !isNaN(z) === false);
+      it.ZONA_4,
+      it.ZONA_5,
+      it.ZONA_6
+    ].filter(z => z && z !== '' && z !== 'None' && z !== 'nd');
 
     // Ordina entrambi gli array per confronto
     const zoneSel = [...zoneSelezionate].sort();
@@ -52,8 +54,17 @@ export const getCodiciCostiAccessori = (itinerario) => {
     itinerario.COSTI_ACC_3,
     itinerario.COSTI_ACC_4,
     itinerario.COSTI_ACC_5,
-    itinerario.COSTI_ACC_6
-  ].filter(c => c && c !== '' && c !== 'None' && !isNaN(c) === false);
+    itinerario.COSTI_ACC_6,
+    itinerario.COSTI_ACC_7,
+    itinerario.COSTI_ACC_8,
+    itinerario.COSTI_ACC_9,
+    itinerario.COSTI_ACC_10,
+    itinerario.COSTI_ACC_11,
+    itinerario.COSTI_ACC_12,
+    itinerario.COSTI_ACC_13,
+    itinerario.COSTI_ACC_14,
+    itinerario.COSTI_ACC_15
+  ].filter(c => c && c !== '' && c !== 'None' && c !== 'nd');
 };
 
 /**
@@ -88,8 +99,16 @@ export const getCodiciExtra = (itinerario) => {
     itinerario.EXTRA_4,
     itinerario.EXTRA_5,
     itinerario.EXTRA_6,
-    itinerario.EXTRA_7
-  ].filter(e => e && e !== '' && e !== 'None' && !isNaN(e) === false);
+    itinerario.EXTRA_7,
+    itinerario.EXTRA_8,
+    itinerario.EXTRA_9,
+    itinerario.EXTRA_10,
+    itinerario.EXTRA_11,
+    itinerario.EXTRA_12,
+    itinerario.EXTRA_13,
+    itinerario.EXTRA_14,
+    itinerario.EXTRA_15
+  ].filter(e => e && e !== '' && e !== 'None' && e !== 'nd');
 };
 
 /**
@@ -121,8 +140,10 @@ export const getZoneItinerario = (itinerario) => {
     itinerario.ZONA_1,
     itinerario.ZONA_2,
     itinerario.ZONA_3,
-    itinerario.ZONA_4
-  ].filter(z => z && z !== '' && z !== 'None' && !isNaN(z) === false);
+    itinerario.ZONA_4,
+    itinerario.ZONA_5,
+    itinerario.ZONA_6
+  ].filter(z => z && z !== '' && z !== 'None' && z !== 'nd');
 };
 
 /**
