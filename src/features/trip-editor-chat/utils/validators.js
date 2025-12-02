@@ -10,11 +10,12 @@ export const validateDays = (days) => {
   return { valid: true };
 };
 
-export const validateZoneSelection = (zones, totalDays) => {
+export const validateZoneSelection = (zones, totalDays, filledBlocks = []) => {
   if (zones.length === 0) return { valid: false, error: 'Seleziona almeno una zona' };
 
   const totalDaysNeeded = zones.reduce((sum, z) => sum + (z.daysRecommended || 2), 0);
-  const availableDays = totalDays - 2; // -2 per arrivo/partenza
+  // LOGICA AGGIORNATA: -1 per partenza, -filledBlocks già occupati
+  const availableDays = totalDays - 1 - filledBlocks.length;
 
   if (totalDaysNeeded > availableDays) {
     return {

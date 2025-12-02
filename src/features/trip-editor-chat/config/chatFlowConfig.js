@@ -301,7 +301,7 @@ export const CHAT_FLOW_CONFIG = {
 
       // Messaggio di conferma
       addBotMessage(
-        `Perfetto! Con ${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni totali) potrai esplorare diverse zone senza fretta.\n\nIl primo giorno sarà dedicato all'arrivo e sistemazione, quindi avrai circa ${days - 2} giorni pieni per le esperienze! 🎉`
+        `Perfetto! Con ${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni totali) potrai esplorare diverse zone senza fretta.\n\nAvrai ${days - 1} giorni pieni per le esperienze (l'ultimo giorno è dedicato alla partenza)! 🎉`
       );
 
       // Vai al prossimo step
@@ -316,8 +316,9 @@ export const CHAT_FLOW_CONFIG = {
     id: 'zones',
     type: 'bot_map',
 
-    getMessage: ({ wizardData = {}, tripData, availableCounter }) => {
-      const daysAvailable = tripData.totalDays - 2;
+    getMessage: ({ wizardData = {}, tripData, availableCounter, store }) => {
+      // Usa getDaysRemaining() per calcolo corretto che considera filledBlocks
+      const daysAvailable = store ? store.getDaysRemaining() : tripData.totalDays - 1 - (tripData.filledBlocks?.length || 0);
 
       if (availableCounter === 1) {
         return `Iniziamo con la zona di arrivo! ✈️\n\nSeleziona l'aeroporto dove vuoi iniziare il tuo viaggio in ${wizardData.destinazioneNome || wizardData.destinazione || 'questa destinazione'}.\n\n💡 Altre zone si sbloccheranno dopo la selezione del primo pacchetto.`;
@@ -394,7 +395,7 @@ export const CHAT_FLOW_CONFIG = {
             {
               zones,
               multiSelect: true,
-              daysAvailable: tripData.totalDays - 2
+              daysAvailable: store.getDaysRemaining()
             }
           );
         }, 600);
@@ -407,7 +408,7 @@ export const CHAT_FLOW_CONFIG = {
       if (value.action === 'add') {
         addZone(value.zone);
         const totalDaysSelected = tripData.selectedZones.reduce((sum, z) => sum + z.daysRecommended, 0) + value.zone.daysRecommended;
-        const daysAvailable = tripData.totalDays - 2;
+        const daysAvailable = store.getDaysRemaining();
 
         addUserMessage(`📍 ${value.zone.name}`);
 
@@ -440,7 +441,7 @@ export const CHAT_FLOW_CONFIG = {
         addBotMessage(`Perfetto! Ora seleziona un'esperienza da fare in ${zone.name}.`);
 
         const totalDaysSelected = tripData.selectedZones.reduce((sum, z) => sum + z.daysRecommended, 0);
-        const daysAvailable = tripData.totalDays - 2;
+        const daysAvailable = store.getDaysRemaining();
 
         // Se hai già esperienze/giorni liberi (filledBlocks), stai cambiando zona → vai direttamente a packages
         const hasExistingBlocks = tripData.filledBlocks && tripData.filledBlocks.length > 0;
@@ -494,7 +495,7 @@ export const CHAT_FLOW_CONFIG = {
         const totalDaysSelected = tripData.selectedZones
           .filter(z => !z.isTransit)
           .reduce((sum, z) => sum + z.daysRecommended, 0);
-        const daysAvailable = tripData.totalDays - 2;
+        const daysAvailable = store.getDaysRemaining();
 
         // Chiedi se aggiungere altre zone
         setTimeout(() => {
@@ -761,7 +762,7 @@ export const CHAT_FLOW_CONFIG = {
           blocksToAdd = 1; // solo experience/free (il logistics non conta)
         }
         const totalDaysUsed = experienceBlocks.length + blocksToAdd;
-        const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
+        const daysAvailable = store.getDaysRemaining(); // -2 per arrivo/partenza
 
         console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);
 
@@ -915,7 +916,7 @@ export const CHAT_FLOW_CONFIG = {
         // +numDays perché addExperience è asincrono e lo stato potrebbe non essere ancora aggiornato
         const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
         const totalDaysUsed = experienceBlocks.length + numDays;
-        const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
+        const daysAvailable = store.getDaysRemaining(); // -2 per arrivo/partenza
 
         // Chiedi cosa fare dopo
         setTimeout(() => {
@@ -955,7 +956,7 @@ export const CHAT_FLOW_CONFIG = {
         setTimeout(() => {
           const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
           const totalDaysUsed = experienceBlocks.length;
-          const daysAvailable = tripData.totalDays - 2;
+          const daysAvailable = store.getDaysRemaining();
 
           addBotMessage(
             `Nessun problema! Cosa vuoi fare? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
