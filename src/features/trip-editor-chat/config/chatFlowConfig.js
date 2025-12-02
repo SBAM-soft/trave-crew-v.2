@@ -744,8 +744,17 @@ export const CHAT_FLOW_CONFIG = {
         addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
 
         // Calcola giorni totali selezionati (ogni blocco = 1 giorno)
-        // +1 perché addExperience è asincrono e lo stato potrebbe non essere ancora aggiornato
-        const totalDaysUsed = tripData.filledBlocks.length + 1;
+        // Calcola quanti blocchi verranno aggiunti in base a cambio zona
+        const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
+        const isZoneChange = lastBlock && lastBlock.zoneCode !== currentZone.code;
+        const isFirstBlock = tripData.filledBlocks.length === 0;
+        let blocksToAdd = 1; // almeno l'esperienza
+        if (isZoneChange) {
+          blocksToAdd = 3; // transfer + logistics + experience
+        } else if (isFirstBlock) {
+          blocksToAdd = 2; // logistics + experience
+        }
+        const totalDaysUsed = tripData.filledBlocks.length + blocksToAdd;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
 
         console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);

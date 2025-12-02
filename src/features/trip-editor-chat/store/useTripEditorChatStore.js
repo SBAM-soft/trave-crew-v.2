@@ -265,13 +265,48 @@ const useTripEditorChatStore = create(
           const zoneName = zone?.name || experience.ZONA || 'Zona';
 
           // Usa tripBuilderService per calcolare lastDay e verificare cambio zona
-          const lastDay = getLastDay(state.tripData.filledBlocks);
+          let lastDay = getLastDay(state.tripData.filledBlocks);
           const hasZoneChange = isZoneChange(state.tripData.filledBlocks, zoneCode);
           const previousZone = hasZoneChange ? getPreviousZoneName(state.tripData.filledBlocks) : null;
 
-          // Crea il blocco per l'esperienza singola
-          const newBlock = {
+          const newBlocks = [];
+
+          // Se è un cambio zona, aggiungi blocco transfer
+          if (hasZoneChange && previousZone) {
+            newBlocks.push({
+              day: lastDay + 1,
+              type: 'transfer',
+              zoneCode,
+              zoneName,
+              experience: {
+                nome: `Spostamento verso ${zoneName}`,
+                descrizione: `Giorno dedicato al trasferimento da ${previousZone} a ${zoneName}`,
+                type: 'transfer'
+              }
+            });
+            lastDay++;
+          }
+
+          // Se è primo blocco o cambio zona, aggiungi giorno logistico arrivo
+          if (state.tripData.filledBlocks.length === 0 || hasZoneChange) {
+            newBlocks.push({
+              day: lastDay + 1,
+              type: 'logistics',
+              zoneCode,
+              zoneName,
+              experience: {
+                nome: `Arrivo e sistemazione a ${zoneName}`,
+                descrizione: `Giorno logistico per check-in hotel e orientamento`,
+                type: 'logistics'
+              }
+            });
+            lastDay++;
+          }
+
+          // Crea il blocco per l'esperienza
+          newBlocks.push({
             day: lastDay + 1,
+            type: 'experience',
             zoneCode,
             zoneName,
             experience: {
@@ -294,12 +329,12 @@ const useTripEditorChatStore = create(
             },
             hasZoneChange,
             previousZone
-          };
+          });
 
           return {
             tripData: {
               ...state.tripData,
-              filledBlocks: [...state.tripData.filledBlocks, newBlock]
+              filledBlocks: [...state.tripData.filledBlocks, ...newBlocks]
             }
           };
         }),
