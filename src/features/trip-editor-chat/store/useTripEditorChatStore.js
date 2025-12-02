@@ -260,6 +260,11 @@ const useTripEditorChatStore = create(
         }),
 
         // Aggiunge una singola esperienza (per il nuovo flow swipe)
+        // LOGICA BLOCCHI:
+        // 1. PRIMO ARRIVO: crea blocco logistics "Arrivo e sistemazione" (occupa 1 slot ma NON conta nei giorni disponibili)
+        // 2. CAMBIO ZONA: crea blocco logistics "Trasferimento e sistemazione" (occupa 1 slot ma NON conta nei giorni disponibili)
+        // 3. ESPERIENZA/FREE DAY: crea blocco experience o free (occupa 1 slot e CONTA nei giorni disponibili)
+        // Giorni disponibili = totalDays - 2 (arrivo dall'Italia + partenza finale)
         addExperience: (zoneCode, experience) => set((state) => {
           const zone = state.tripData.selectedZones.find(z => z.code === zoneCode);
           const zoneName = zone?.name || experience.ZONA || 'Zona';
@@ -271,8 +276,27 @@ const useTripEditorChatStore = create(
 
           const newBlocks = [];
 
+          // Se è il primo blocco (arrivo dall'Italia), aggiungi blocco logistics per arrivo e sistemazione
+          // Questo blocco occupa 1 slot (Day 1) ma NON conta nei giorni disponibili per le esperienze
+          if (state.tripData.filledBlocks.length === 0) {
+            console.log(`🏨 Creazione blocco LOGISTICS: Arrivo dall'Italia a ${zoneName} (Day ${lastDay + 1})`);
+            newBlocks.push({
+              day: lastDay + 1,
+              type: 'logistics',
+              zoneCode,
+              zoneName,
+              experience: {
+                nome: `Arrivo e sistemazione a ${zoneName}`,
+                descrizione: `Giorno logistico per arrivo dall'Italia, check-in hotel e orientamento a ${zoneName}`,
+                type: 'logistics'
+              }
+            });
+            lastDay++;
+          }
           // Se è un cambio zona, aggiungi 1 blocco che include trasferimento e sistemazione
-          if (hasZoneChange && previousZone) {
+          // Questo blocco occupa 1 slot ma NON conta nei giorni disponibili (come il primo arrivo)
+          else if (hasZoneChange && previousZone) {
+            console.log(`🏨 Creazione blocco LOGISTICS: Trasferimento da ${previousZone} a ${zoneName} (Day ${lastDay + 1})`);
             newBlocks.push({
               day: lastDay + 1,
               type: 'logistics',
@@ -287,10 +311,13 @@ const useTripEditorChatStore = create(
             lastDay++;
           }
 
-          // Crea il blocco per l'esperienza
+          // Crea il blocco per l'esperienza o giorno libero
+          const blockType = experience.isFreeDay ? 'free' : 'experience';
+          const emoji = blockType === 'free' ? '🏖️' : '🎯';
+          console.log(`${emoji} Creazione blocco ${blockType.toUpperCase()}: ${experience.nome} (Day ${lastDay + 1})`);
           newBlocks.push({
             day: lastDay + 1,
-            type: 'experience',
+            type: blockType,
             zoneCode,
             zoneName,
             experience: {
@@ -309,7 +336,8 @@ const useTripEditorChatStore = create(
               nonIncluso: experience.nonIncluso,
               note: experience.note,
               slot: experience.slot,
-              rating: experience.rating
+              rating: experience.rating,
+              isFreeDay: experience.isFreeDay
             },
             hasZoneChange,
             previousZone

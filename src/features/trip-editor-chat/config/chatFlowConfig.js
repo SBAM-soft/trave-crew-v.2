@@ -751,14 +751,14 @@ export const CHAT_FLOW_CONFIG = {
 
         addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
 
-        // Calcola giorni totali selezionati (ogni blocco experience = 1 giorno)
+        // Calcola giorni totali selezionati (ogni blocco experience o free = 1 giorno)
         // NON contare i blocchi logistics (trasferimento/sistemazione) come nel primo giorno di arrivo
-        const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience');
+        const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
         const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
         const isZoneChange = lastBlock && lastBlock.zoneCode !== currentZone.code;
-        let blocksToAdd = 1; // di default solo l'esperienza
+        let blocksToAdd = 1; // di default solo l'esperienza o free day
         if (isZoneChange) {
-          blocksToAdd = 1; // solo experience (il logistics non conta)
+          blocksToAdd = 1; // solo experience/free (il logistics non conta)
         }
         const totalDaysUsed = experienceBlocks.length + blocksToAdd;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza
