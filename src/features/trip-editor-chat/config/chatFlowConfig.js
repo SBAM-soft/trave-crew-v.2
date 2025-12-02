@@ -747,12 +747,9 @@ export const CHAT_FLOW_CONFIG = {
         // Calcola quanti blocchi verranno aggiunti in base a cambio zona
         const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
         const isZoneChange = lastBlock && lastBlock.zoneCode !== currentZone.code;
-        const isFirstBlock = tripData.filledBlocks.length === 0;
-        let blocksToAdd = 1; // almeno l'esperienza
+        let blocksToAdd = 1; // di default solo l'esperienza
         if (isZoneChange) {
           blocksToAdd = 3; // transfer + logistics + experience
-        } else if (isFirstBlock) {
-          blocksToAdd = 2; // logistics + experience
         }
         const totalDaysUsed = tripData.filledBlocks.length + blocksToAdd;
         const daysAvailable = tripData.totalDays - 2; // -2 per arrivo/partenza

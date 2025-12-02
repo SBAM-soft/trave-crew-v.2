@@ -271,8 +271,9 @@ const useTripEditorChatStore = create(
 
           const newBlocks = [];
 
-          // Se è un cambio zona, aggiungi blocco transfer
+          // Se è un cambio zona, aggiungi blocco transfer e logistics
           if (hasZoneChange && previousZone) {
+            // Blocco transfer
             newBlocks.push({
               day: lastDay + 1,
               type: 'transfer',
@@ -285,10 +286,8 @@ const useTripEditorChatStore = create(
               }
             });
             lastDay++;
-          }
 
-          // Se è primo blocco o cambio zona, aggiungi giorno logistico arrivo
-          if (state.tripData.filledBlocks.length === 0 || hasZoneChange) {
+            // Blocco logistics per arrivo nella nuova zona
             newBlocks.push({
               day: lastDay + 1,
               type: 'logistics',
