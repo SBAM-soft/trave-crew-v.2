@@ -955,8 +955,14 @@ export const CHAT_FLOW_CONFIG = {
         }, 500);
       } else if (value === 'change_zone') {
         addUserMessage('🗺️ Cambia zona');
+        // Rimuovi la zona corrente da selectedZones
+        const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
+        if (currentZone) {
+          store.removeZone(currentZone.code);
+        }
         // Reset per nuova zona
         CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
+        CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
         // Incrementa counter per sbloccare tutte le zone se necessario
         if (store.availableCounter === 1) {
           incrementCounter();
@@ -1015,6 +1021,11 @@ export const CHAT_FLOW_CONFIG = {
         goToStep('packages');
       } else if (value === 'change_zone') {
         addUserMessage('🔄 Cambia zona');
+        // Rimuovi la zona corrente da selectedZones
+        const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
+        if (currentZone) {
+          store.removeZone(currentZone.code);
+        }
         CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
         // Incrementa counter per sbloccare tutte le zone se necessario
         if (store.availableCounter === 1) {
