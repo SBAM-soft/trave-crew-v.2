@@ -9,6 +9,7 @@ import ExperienceDetailFullscreen from './components/ExperienceDetailFullscreen'
 import ItineraryBuildingAnimation from './components/ItineraryBuildingAnimation';
 import ErrorFallback from '../../shared/ErrorFallback';
 import { loadEntityData } from '../../core/utils/dataLoader';
+import { getZoneVisitate, findItinerarioByZone, getCostiAccessoriItinerario, getExtraSuggeriti } from '../../core/utils/itinerarioHelpers';
 import styles from './TripEditorChat.module.css';
 
 /**
@@ -49,25 +50,68 @@ function TripEditorChat() {
         giorni: zone.days || zone.daysRecommended || 1
       }));
 
+      // NUOVO: Calcola itinerario pre-compilato dal CSV basandosi sulle zone selezionate
+      let itinerario = null;
+      let costiAccessoriItinerario = [];
+      let extraSuggeriti = [];
+
+      const store = useTripEditorChatStore.getState();
+      const cachedData = store.cachedData || {};
+
+      if (tripData.filledBlocks && tripData.filledBlocks.length > 0) {
+        // Estrai zone visitate dai blocchi
+        const zoneVisitateFromBlocks = getZoneVisitate(tripData.filledBlocks);
+        const codiciZone = zoneVisitateFromBlocks.map(z => z.codice);
+
+        console.log('🔍 Cerca itinerario per zone:', codiciZone);
+
+        // Cerca itinerario matching nel CSV
+        itinerario = findItinerarioByZone(codiciZone, cachedData.itinerario || []);
+
+        if (itinerario) {
+          console.log('✅ Itinerario trovato:', itinerario.CODICE);
+
+          // Carica costi accessori e extra dell'itinerario
+          costiAccessoriItinerario = getCostiAccessoriItinerario(
+            itinerario,
+            cachedData.costi_accessori || []
+          );
+
+          extraSuggeriti = getExtraSuggeriti(
+            itinerario,
+            cachedData.extra || []
+          );
+
+          console.log('💰 Costi accessori:', costiAccessoriItinerario.length);
+          console.log('✨ Extra suggeriti:', extraSuggeriti.length);
+        } else {
+          console.log('⚠️ Nessun itinerario pre-compilato per questa combinazione di zone');
+        }
+      }
+
       // Naviga alla landing page con dati aggiornati
       navigate('/trip-summary', {
         state: {
           ...tripData,
           wizardData,
           needsHotelSelection: needsHotels,
-          zoneVisitate
+          zoneVisitate,
+          itinerario,       // Itinerario pre-compilato dal CSV
+          costiAccessori: costiAccessoriItinerario,  // Costi accessori dall'itinerario
+          extraSuggeriti,   // Extra suggeriti dall'itinerario
+          plus: cachedData.extra || []  // Database extra per gli hotel
         }
       });
     }
   }, [navigateToLandingPage, tripData, wizardData, navigate, setNavigateToLandingPage]);
 
   // Handler completamento animazione itinerario
-  const handleAnimationComplete = () => {
+  const handleAnimationComplete = async () => {
     // Nascondi animazione
     setShowItineraryAnimation(false);
     // Naviga direttamente alla landing page di riepilogo (FUORI DALLA CHAT)
     // Principio: DECISIONI = CHAT, RIEPILOGHI = LANDING PAGE
-    setTimeout(() => {
+    setTimeout(async () => {
       // Determina se serve selezione hotel
       const needsHotels = tripData.selectedZones && tripData.selectedZones.length > 0 &&
                          (!tripData.hotels || tripData.hotels.length === 0);
@@ -79,12 +123,55 @@ function TripEditorChat() {
         giorni: zone.days || zone.daysRecommended || 1
       }));
 
+      // NUOVO: Calcola itinerario pre-compilato dal CSV basandosi sulle zone selezionate
+      let itinerario = null;
+      let costiAccessoriItinerario = [];
+      let extraSuggeriti = [];
+
+      const store = useTripEditorChatStore.getState();
+      const cachedData = store.cachedData || {};
+
+      if (tripData.filledBlocks && tripData.filledBlocks.length > 0) {
+        // Estrai zone visitate dai blocchi
+        const zoneVisitateFromBlocks = getZoneVisitate(tripData.filledBlocks);
+        const codiciZone = zoneVisitateFromBlocks.map(z => z.codice);
+
+        console.log('🔍 Cerca itinerario per zone:', codiciZone);
+
+        // Cerca itinerario matching nel CSV
+        itinerario = findItinerarioByZone(codiciZone, cachedData.itinerario || []);
+
+        if (itinerario) {
+          console.log('✅ Itinerario trovato:', itinerario.CODICE);
+
+          // Carica costi accessori e extra dell'itinerario
+          costiAccessoriItinerario = getCostiAccessoriItinerario(
+            itinerario,
+            cachedData.costi_accessori || []
+          );
+
+          extraSuggeriti = getExtraSuggeriti(
+            itinerario,
+            cachedData.extra || []
+          );
+
+          console.log('💰 Costi accessori:', costiAccessoriItinerario.length);
+          console.log('✨ Extra suggeriti:', extraSuggeriti.length);
+        } else {
+          console.log('⚠️ Nessun itinerario pre-compilato per questa combinazione di zone');
+        }
+      }
+
       navigate('/trip-summary', {
         state: {
           ...tripData,      // Spread di tutti i dati del trip (filledBlocks, totalDays, etc.)
           wizardData,       // Aggiungi wizardData separatamente
           needsHotelSelection: needsHotels,  // Flag per mostrare bottone selezione hotel
-          zoneVisitate      // Zone in formato richiesto dalla landing page
+          zoneVisitate,     // Zone in formato richiesto dalla landing page
+          itinerario,       // Itinerario pre-compilato dal CSV
+          costiAccessori: costiAccessoriItinerario,  // Costi accessori dall'itinerario
+          extraSuggeriti,   // Extra suggeriti dall'itinerario
+          plus: cachedData.extra || []  // Database extra per gli hotel
         }
       });
     }, 300); // Manteniamo 300ms qui per transizione fluida
