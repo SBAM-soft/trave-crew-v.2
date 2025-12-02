@@ -623,6 +623,12 @@ export const CHAT_FLOW_CONFIG = {
             return '🎯';
           };
 
+          // Raccogli tag dalle categorie
+          const tags = [];
+          if (exp.CATEGORIA_1) tags.push(exp.CATEGORIA_1);
+          if (exp.CATEGORIA_2) tags.push(exp.CATEGORIA_2);
+          if (exp.CATEGORIA_3) tags.push(exp.CATEGORIA_3);
+
           return {
             id: exp.CODICE,
             code: exp.CODICE,
@@ -640,7 +646,7 @@ export const CHAT_FLOW_CONFIG = {
             nonIncluso: [],
             note: '',
             rating: 4.5,
-            tags: [],
+            tags: tags,
             slot: slot,
             rawData: exp
           };
@@ -648,12 +654,12 @@ export const CHAT_FLOW_CONFIG = {
 
       // Filtra per interessi dell'utente se presenti
       const userInterests = wizardData.interessi || [];
-      if (userInterests.length > 0 && zoneExperiences.length > 5) {
+      if (userInterests.length > 0) {
         const interestKeywords = userInterests.map(i => i.toLowerCase());
 
         // Prima prova con tag esatti
         let filtered = zoneExperiences.filter(exp =>
-          exp.tags.some(tag => interestKeywords.some(interest => tag.includes(interest)))
+          exp.tags.some(tag => interestKeywords.some(interest => tag.toLowerCase().includes(interest)))
         );
 
         // Se non trova nulla, prova con nome e descrizione
@@ -664,10 +670,12 @@ export const CHAT_FLOW_CONFIG = {
           });
         }
 
-        // Se ha trovato esperienze filtrate, usali; altrimenti mostra tutte
-        if (filtered.length > 0) {
+        // Usa esperienze filtrate solo se ci sono almeno 3, altrimenti mostra tutte
+        if (filtered.length >= 3) {
           zoneExperiences = filtered;
           console.log(`🎯 Esperienze filtrate per interessi [${userInterests.join(', ')}]:`, zoneExperiences.length);
+        } else {
+          console.log(`⚠️ Solo ${filtered.length} esperienze filtrate per interessi, mostro tutte (${zoneExperiences.length})`);
         }
       }
 
