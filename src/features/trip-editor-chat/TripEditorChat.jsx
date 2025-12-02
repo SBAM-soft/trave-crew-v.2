@@ -9,7 +9,7 @@ import ExperienceDetailFullscreen from './components/ExperienceDetailFullscreen'
 import ItineraryBuildingAnimation from './components/ItineraryBuildingAnimation';
 import ErrorFallback from '../../shared/ErrorFallback';
 import { loadEntityData } from '../../core/utils/dataLoader';
-import { getZoneVisitate, findItinerarioByZone, getCostiAccessoriItinerario, getExtraSuggeriti } from '../../core/utils/itinerarioHelpers';
+import { getZoneVisitate, findItinerarioByZone, getCostiAccessoriItinerario, getExtraSuggeriti, riordinaZoneSecondoItinerario } from '../../core/utils/itinerarioHelpers';
 import styles from './TripEditorChat.module.css';
 
 /**
@@ -58,6 +58,10 @@ function TripEditorChat() {
       const store = useTripEditorChatStore.getState();
       const cachedData = store.cachedData || {};
 
+      // Dati che verranno eventualmente riordinati
+      let selectedZones = tripData.selectedZones;
+      let filledBlocks = tripData.filledBlocks;
+
       if (tripData.filledBlocks && tripData.filledBlocks.length > 0) {
         // Estrai zone visitate dai blocchi
         const zoneVisitateFromBlocks = getZoneVisitate(tripData.filledBlocks);
@@ -70,6 +74,17 @@ function TripEditorChat() {
 
         if (itinerario) {
           console.log('✅ Itinerario trovato:', itinerario.CODICE);
+
+          // RIORDINA zone e blocchi secondo l'ordine ottimale del CSV
+          const datiRiordinati = riordinaZoneSecondoItinerario(
+            tripData.selectedZones,
+            tripData.filledBlocks,
+            itinerario,
+            cachedData
+          );
+
+          selectedZones = datiRiordinati.selectedZones;
+          filledBlocks = datiRiordinati.filledBlocks;
 
           // Carica costi accessori e extra dell'itinerario
           costiAccessoriItinerario = getCostiAccessoriItinerario(
@@ -89,10 +104,12 @@ function TripEditorChat() {
         }
       }
 
-      // Naviga alla landing page con dati aggiornati
+      // Naviga alla landing page con dati aggiornati (zone e blocchi riordinati)
       navigate('/trip-summary', {
         state: {
           ...tripData,
+          selectedZones,    // Zone riordinate secondo CSV
+          filledBlocks,     // Blocchi riordinati secondo CSV
           wizardData,
           needsHotelSelection: needsHotels,
           zoneVisitate,
@@ -131,6 +148,10 @@ function TripEditorChat() {
       const store = useTripEditorChatStore.getState();
       const cachedData = store.cachedData || {};
 
+      // Dati che verranno eventualmente riordinati
+      let selectedZones = tripData.selectedZones;
+      let filledBlocks = tripData.filledBlocks;
+
       if (tripData.filledBlocks && tripData.filledBlocks.length > 0) {
         // Estrai zone visitate dai blocchi
         const zoneVisitateFromBlocks = getZoneVisitate(tripData.filledBlocks);
@@ -143,6 +164,17 @@ function TripEditorChat() {
 
         if (itinerario) {
           console.log('✅ Itinerario trovato:', itinerario.CODICE);
+
+          // RIORDINA zone e blocchi secondo l'ordine ottimale del CSV
+          const datiRiordinati = riordinaZoneSecondoItinerario(
+            tripData.selectedZones,
+            tripData.filledBlocks,
+            itinerario,
+            cachedData
+          );
+
+          selectedZones = datiRiordinati.selectedZones;
+          filledBlocks = datiRiordinati.filledBlocks;
 
           // Carica costi accessori e extra dell'itinerario
           costiAccessoriItinerario = getCostiAccessoriItinerario(
@@ -164,7 +196,9 @@ function TripEditorChat() {
 
       navigate('/trip-summary', {
         state: {
-          ...tripData,      // Spread di tutti i dati del trip (filledBlocks, totalDays, etc.)
+          ...tripData,      // Spread di tutti i dati del trip
+          selectedZones,    // Zone riordinate secondo CSV
+          filledBlocks,     // Blocchi riordinati secondo CSV
           wizardData,       // Aggiungi wizardData separatamente
           needsHotelSelection: needsHotels,  // Flag per mostrare bottone selezione hotel
           zoneVisitate,     // Zone in formato richiesto dalla landing page

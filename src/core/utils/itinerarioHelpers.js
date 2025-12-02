@@ -369,6 +369,107 @@ export const sortPacchettiByRelevance = (pacchetti, interessi = [], currentPEXP 
 };
 
 /**
+ * Riordina zone selezionate e filledBlocks secondo l'ordine ottimale del CSV
+ * @param {Array} selectedZones - Array zone selezionate dall'utente
+ * @param {Array} filledBlocks - Array blocchi giorno confermati
+ * @param {Object} itinerario - Itinerario trovato dal CSV
+ * @param {Object} cachedData - Dati cached (zone, esperienze, etc.)
+ * @returns {Object} - { selectedZones: [...], filledBlocks: [...] } riordinati
+ */
+export const riordinaZoneSecondoItinerario = (selectedZones, filledBlocks, itinerario, cachedData) => {
+  if (!itinerario || !selectedZones || selectedZones.length === 0) {
+    return { selectedZones, filledBlocks };
+  }
+
+  // Estrai ordine zone dal CSV
+  const ordineZoneCSV = getZoneItinerario(itinerario);
+
+  console.log('🔄 Riordino zone secondo CSV:', ordineZoneCSV);
+  console.log('📝 Zone utente (ordine originale):', selectedZones.map(z => z.code));
+
+  // Crea mappa zone selezionate per codice
+  const zoneMap = new Map();
+  selectedZones.forEach(zona => {
+    zoneMap.set(zona.code, zona);
+  });
+
+  // Riordina zone secondo CSV
+  const zoneRiordinate = ordineZoneCSV
+    .map(codiceZona => zoneMap.get(codiceZona))
+    .filter(Boolean)
+    .map((zona, index) => ({
+      ...zona,
+      order: index + 1
+    }));
+
+  console.log('✅ Zone riordinate:', zoneRiordinate.map(z => z.code));
+
+  // Raggruppa filledBlocks per zona
+  const blocchiPerZona = {};
+  filledBlocks.forEach(block => {
+    const codiceZona = block.codiceZona || block.zoneCode;
+    if (codiceZona) {
+      if (!blocchiPerZona[codiceZona]) {
+        blocchiPerZona[codiceZona] = [];
+      }
+      blocchiPerZona[codiceZona].push(block);
+    }
+  });
+
+  // Ricostruisci filledBlocks nell'ordine corretto
+  let dayCounter = 1;
+  const blocchiRiordinati = [];
+
+  ordineZoneCSV.forEach((codiceZona, zoneIndex) => {
+    const blocchiZona = blocchiPerZona[codiceZona] || [];
+
+    // Se non è la prima zona, aggiungi blocco logistics per trasferimento
+    if (zoneIndex > 0) {
+      const zona = zoneMap.get(codiceZona);
+      const zonaPrecedente = zoneMap.get(ordineZoneCSV[zoneIndex - 1]);
+
+      if (zona && zonaPrecedente) {
+        blocchiRiordinati.push({
+          day: dayCounter++,
+          type: 'logistics',
+          zoneCode: codiceZona,
+          codiceZona: codiceZona,
+          zoneName: zona.name,
+          zona: zona.name,
+          experience: {
+            nome: `Trasferimento e sistemazione a ${zona.name}`,
+            descrizione: `Giorno dedicato al trasferimento da ${zonaPrecedente.name} e sistemazione a ${zona.name}`,
+            type: 'logistics'
+          }
+        });
+      }
+    }
+
+    // Aggiungi blocchi esperienza della zona
+    blocchiZona.forEach(block => {
+      // Salta blocchi logistics originali (verranno ricreati sopra)
+      if (block.type === 'logistics') {
+        return;
+      }
+
+      blocchiRiordinati.push({
+        ...block,
+        day: dayCounter++,
+        codiceZona: codiceZona,
+        zoneCode: codiceZona
+      });
+    });
+  });
+
+  console.log(`📊 Blocchi riordinati: ${blocchiRiordinati.length} blocchi`);
+
+  return {
+    selectedZones: zoneRiordinate,
+    filledBlocks: blocchiRiordinati
+  };
+};
+
+/**
  * Calcola il numero di notti per ogni zona dai blocchi confermati
  * @param {Array} filledBlocks - Array di blocchi giorno confermati
  * @param {Array} zoneVisitate - Array di zone visitate { codice, nome }
