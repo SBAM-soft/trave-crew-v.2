@@ -43,13 +43,6 @@ function TripEditorChat() {
       const needsHotels = tripData.selectedZones && tripData.selectedZones.length > 0 &&
                          (!tripData.hotels || tripData.hotels.length === 0);
 
-      // Costruisci zoneVisitate da selectedZones (formato richiesto dalla landing page)
-      const zoneVisitate = (tripData.selectedZones || []).map(zone => ({
-        nome: zone.name,
-        code: zone.code,
-        giorni: zone.days || zone.daysRecommended || 1
-      }));
-
       // NUOVO: Calcola itinerario pre-compilato dal CSV basandosi sulle zone selezionate
       let itinerario = null;
       let costiAccessoriItinerario = [];
@@ -104,6 +97,13 @@ function TripEditorChat() {
         }
       }
 
+      // Costruisci zoneVisitate DOPO il riordino (così usa selectedZones riordinate)
+      const zoneVisitate = (selectedZones || []).map(zone => ({
+        nome: zone.name,
+        code: zone.code,
+        giorni: zone.days || zone.daysRecommended || 1
+      }));
+
       // Naviga alla landing page con dati aggiornati (zone e blocchi riordinati)
       navigate('/trip-summary', {
         state: {
@@ -112,7 +112,7 @@ function TripEditorChat() {
           filledBlocks,     // Blocchi riordinati secondo CSV
           wizardData,
           needsHotelSelection: needsHotels,
-          zoneVisitate,
+          zoneVisitate,     // Zone visitate riordinate
           itinerario,       // Itinerario pre-compilato dal CSV
           costiAccessori: costiAccessoriItinerario,  // Costi accessori dall'itinerario
           extraSuggeriti,   // Extra suggeriti dall'itinerario
@@ -133,13 +133,6 @@ function TripEditorChat() {
       const needsHotels = tripData.selectedZones && tripData.selectedZones.length > 0 &&
                          (!tripData.hotels || tripData.hotels.length === 0);
 
-      // Costruisci zoneVisitate da selectedZones (formato richiesto dalla landing page)
-      const zoneVisitate = (tripData.selectedZones || []).map(zone => ({
-        nome: zone.name,
-        code: zone.code,
-        giorni: zone.days || zone.daysRecommended || 1
-      }));
-
       // NUOVO: Calcola itinerario pre-compilato dal CSV basandosi sulle zone selezionate
       let itinerario = null;
       let costiAccessoriItinerario = [];
@@ -194,6 +187,13 @@ function TripEditorChat() {
         }
       }
 
+      // Costruisci zoneVisitate DOPO il riordino (così usa selectedZones riordinate)
+      const zoneVisitate = (selectedZones || []).map(zone => ({
+        nome: zone.name,
+        code: zone.code,
+        giorni: zone.days || zone.daysRecommended || 1
+      }));
+
       navigate('/trip-summary', {
         state: {
           ...tripData,      // Spread di tutti i dati del trip
@@ -201,7 +201,7 @@ function TripEditorChat() {
           filledBlocks,     // Blocchi riordinati secondo CSV
           wizardData,       // Aggiungi wizardData separatamente
           needsHotelSelection: needsHotels,  // Flag per mostrare bottone selezione hotel
-          zoneVisitate,     // Zone in formato richiesto dalla landing page
+          zoneVisitate,     // Zone visitate riordinate
           itinerario,       // Itinerario pre-compilato dal CSV
           costiAccessori: costiAccessoriItinerario,  // Costi accessori dall'itinerario
           extraSuggeriti,   // Extra suggeriti dall'itinerario
