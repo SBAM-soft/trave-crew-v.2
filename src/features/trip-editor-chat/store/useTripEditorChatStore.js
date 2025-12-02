@@ -419,8 +419,10 @@ const useTripEditorChatStore = create(
           const state = get();
           const { totalDays, filledBlocks } = state.tripData;
           if (!totalDays) return 0;
-          // -1 per giorno arrivo, -1 per giorno partenza
-          return totalDays - 2 - filledBlocks.length;
+          // LOGICA AGGIORNATA:
+          // - I blocchi logistics sono già contati in filledBlocks quando si seleziona una zona
+          // - Serve solo sottrarre 1 giorno per la partenza finale
+          return totalDays - 1 - filledBlocks.length;
         },
 
         reset: () => {
