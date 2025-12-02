@@ -4,8 +4,9 @@
  */
 
 /**
- * Trova itinerario che matcha le zone selezionate
- * @param {string[]} zoneSelezionate - Array codici zona (es: ['ZTHBA01', 'ZTHPH03'])
+ * Trova itinerario che contiene tutte le zone selezionate
+ * L'ordine delle zone è quello definito nel CSV (ottimizzato), non quello di selezione dell'utente
+ * @param {string[]} zoneSelezionate - Array codici zona (es: ['ZTHBA', 'ZTHPH', 'ZTHCH'])
  * @param {Object[]} itinerari - Array itinerari dal CSV
  * @returns {Object|null} - Itinerario matching o null
  */
@@ -13,6 +14,9 @@ export const findItinerarioByZone = (zoneSelezionate, itinerari) => {
   if (!zoneSelezionate || !itinerari || zoneSelezionate.length === 0) {
     return null;
   }
+
+  // Crea un Set delle zone selezionate per lookup veloce
+  const zoneSelSet = new Set(zoneSelezionate);
 
   return itinerari.find(it => {
     // Estrai zone dell'itinerario (ZONA_1 ... ZONA_6)
@@ -25,16 +29,14 @@ export const findItinerarioByZone = (zoneSelezionate, itinerari) => {
       it.ZONA_6
     ].filter(z => z && z !== '' && z !== 'None' && z !== 'nd');
 
-    // Ordina entrambi gli array per confronto
-    const zoneSel = [...zoneSelezionate].sort();
-    const zoneIti = [...zoneItinerario].sort();
-
-    // Match: stesso numero di zone e stesse zone
-    if (zoneSel.length !== zoneIti.length) {
+    // Match: l'itinerario deve contenere ESATTAMENTE le stesse zone (stesso numero e stesse zone)
+    // L'ordine è quello del CSV, non quello di selezione
+    if (zoneSelSet.size !== zoneItinerario.length) {
       return false;
     }
 
-    return zoneSel.every((zona, index) => zona === zoneIti[index]);
+    // Verifica che ogni zona dell'itinerario sia nelle zone selezionate
+    return zoneItinerario.every(zona => zoneSelSet.has(zona));
   });
 };
 

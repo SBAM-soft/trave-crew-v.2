@@ -210,13 +210,38 @@ const useTripEditorChatStore = create(
           const exists = state.tripData.selectedZones.some(z => z.code === zone.code);
           if (exists) return state;
 
+          // Calcola lastDay per il nuovo blocco logistics
+          const lastDay = getLastDay(state.tripData.filledBlocks);
+          const isFirstZone = state.tripData.filledBlocks.length === 0;
+          const previousZone = isFirstZone ? null : getPreviousZoneName(state.tripData.filledBlocks);
+
+          // Crea blocco logistics per arrivo/trasferimento
+          const logisticsBlock = {
+            day: lastDay + 1,
+            type: 'logistics',
+            zoneCode: zone.code,
+            zoneName: zone.name,
+            experience: {
+              nome: isFirstZone
+                ? `Arrivo e sistemazione a ${zone.name}`
+                : `Trasferimento e sistemazione a ${zone.name}`,
+              descrizione: isFirstZone
+                ? `Giorno logistico per arrivo dall'Italia, check-in hotel e orientamento a ${zone.name}`
+                : `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zone.name}`,
+              type: 'logistics'
+            }
+          };
+
+          console.log(`🏨 Zona selezionata: ${zone.name} - Creato blocco logistics (Day ${lastDay + 1})`);
+
           return {
             tripData: {
               ...state.tripData,
               selectedZones: [...state.tripData.selectedZones, {
                 ...zone,
                 order: state.tripData.selectedZones.length + 1
-              }]
+              }],
+              filledBlocks: [...state.tripData.filledBlocks, logisticsBlock]
             }
           };
         }),
@@ -260,68 +285,24 @@ const useTripEditorChatStore = create(
         }),
 
         // Aggiunge una singola esperienza (per il nuovo flow swipe)
-        // LOGICA BLOCCHI:
-        // 1. PRIMO ARRIVO: crea blocco logistics "Arrivo e sistemazione" (occupa 1 slot ma NON conta nei giorni disponibili)
-        // 2. CAMBIO ZONA: crea blocco logistics "Trasferimento e sistemazione" (occupa 1 slot ma NON conta nei giorni disponibili)
-        // 3. ESPERIENZA/FREE DAY: crea blocco experience o free (occupa 1 slot e CONTA nei giorni disponibili)
-        // Giorni disponibili = totalDays - 2 (arrivo dall'Italia + partenza finale)
+        // LOGICA BLOCCHI SEMPLIFICATA:
+        // - Il blocco logistics viene creato quando si seleziona una zona (funzione addZone)
+        // - Questa funzione aggiunge solo il blocco esperienza/free day
         addExperience: (zoneCode, experience) => set((state) => {
           console.log(`📌 addExperience chiamato:`, { zoneCode, experienceName: experience.nome, currentBlocks: state.tripData.filledBlocks.length });
 
           const zone = state.tripData.selectedZones.find(z => z.code === zoneCode);
           const zoneName = zone?.name || experience.ZONA || 'Zona';
 
-          // Usa tripBuilderService per calcolare lastDay e verificare cambio zona
-          let lastDay = getLastDay(state.tripData.filledBlocks);
-          const hasZoneChange = isZoneChange(state.tripData.filledBlocks, zoneCode);
-          const previousZone = hasZoneChange ? getPreviousZoneName(state.tripData.filledBlocks) : null;
-
-          console.log(`🔍 Analisi stato:`, { lastDay, hasZoneChange, previousZone, totalBlocks: state.tripData.filledBlocks.length });
-
-          const newBlocks = [];
-
-          // Se è il primo blocco (arrivo dall'Italia), aggiungi blocco logistics per arrivo e sistemazione
-          // Questo blocco occupa 1 slot (Day 1) ma NON conta nei giorni disponibili per le esperienze
-          if (state.tripData.filledBlocks.length === 0) {
-            console.log(`🏨 Creazione blocco LOGISTICS: Arrivo dall'Italia a ${zoneName} (Day ${lastDay + 1})`);
-            console.log(`📍 Stato attuale filledBlocks:`, state.tripData.filledBlocks.length);
-            newBlocks.push({
-              day: lastDay + 1,
-              type: 'logistics',
-              zoneCode,
-              zoneName,
-              experience: {
-                nome: `Arrivo e sistemazione a ${zoneName}`,
-                descrizione: `Giorno logistico per arrivo dall'Italia, check-in hotel e orientamento a ${zoneName}`,
-                type: 'logistics'
-              }
-            });
-            lastDay++;
-            console.log(`✅ Blocco logistics creato per Day ${lastDay}`);
-          }
-          // Se è un cambio zona, aggiungi 1 blocco che include trasferimento e sistemazione
-          // Questo blocco occupa 1 slot ma NON conta nei giorni disponibili (come il primo arrivo)
-          else if (hasZoneChange && previousZone) {
-            console.log(`🏨 Creazione blocco LOGISTICS: Trasferimento da ${previousZone} a ${zoneName} (Day ${lastDay + 1})`);
-            newBlocks.push({
-              day: lastDay + 1,
-              type: 'logistics',
-              zoneCode,
-              zoneName,
-              experience: {
-                nome: `Trasferimento e sistemazione a ${zoneName}`,
-                descrizione: `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zoneName}`,
-                type: 'logistics'
-              }
-            });
-            lastDay++;
-          }
+          // Calcola lastDay per il nuovo blocco
+          const lastDay = getLastDay(state.tripData.filledBlocks);
 
           // Crea il blocco per l'esperienza o giorno libero
           const blockType = experience.isFreeDay ? 'free' : 'experience';
           const emoji = blockType === 'free' ? '🏖️' : '🎯';
           console.log(`${emoji} Creazione blocco ${blockType.toUpperCase()}: ${experience.nome} (Day ${lastDay + 1})`);
-          newBlocks.push({
+
+          const experienceBlock = {
             day: lastDay + 1,
             type: blockType,
             zoneCode,
@@ -344,15 +325,13 @@ const useTripEditorChatStore = create(
               slot: experience.slot,
               rating: experience.rating,
               isFreeDay: experience.isFreeDay
-            },
-            hasZoneChange,
-            previousZone
-          });
+            }
+          };
 
           return {
             tripData: {
               ...state.tripData,
-              filledBlocks: [...state.tripData.filledBlocks, ...newBlocks]
+              filledBlocks: [...state.tripData.filledBlocks, experienceBlock]
             }
           };
         }),
