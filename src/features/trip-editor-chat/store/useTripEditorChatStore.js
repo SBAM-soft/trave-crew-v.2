@@ -271,31 +271,16 @@ const useTripEditorChatStore = create(
 
           const newBlocks = [];
 
-          // Se è un cambio zona, aggiungi blocco transfer e logistics
+          // Se è un cambio zona, aggiungi 1 blocco che include trasferimento e sistemazione
           if (hasZoneChange && previousZone) {
-            // Blocco transfer
-            newBlocks.push({
-              day: lastDay + 1,
-              type: 'transfer',
-              zoneCode,
-              zoneName,
-              experience: {
-                nome: `Spostamento verso ${zoneName}`,
-                descrizione: `Giorno dedicato al trasferimento da ${previousZone} a ${zoneName}`,
-                type: 'transfer'
-              }
-            });
-            lastDay++;
-
-            // Blocco logistics per arrivo nella nuova zona
             newBlocks.push({
               day: lastDay + 1,
               type: 'logistics',
               zoneCode,
               zoneName,
               experience: {
-                nome: `Arrivo e sistemazione a ${zoneName}`,
-                descrizione: `Giorno logistico per check-in hotel e orientamento`,
+                nome: `Trasferimento e sistemazione a ${zoneName}`,
+                descrizione: `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zoneName}`,
                 type: 'logistics'
               }
             });
