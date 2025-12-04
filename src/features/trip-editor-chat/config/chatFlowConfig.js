@@ -1196,8 +1196,8 @@ export const CHAT_FLOW_CONFIG = {
         }
       ];
 
-      // Extra hotel disponibili
-      const hotelExtras = (extra || [])
+      // Extra hotel disponibili - GESTISCE CASO extra non array
+      const hotelExtras = (Array.isArray(extra) ? extra : [])
         .filter(e => e.TIPO?.toLowerCase() === 'hotel')
         .map(e => ({
           id: e.CODICE,
