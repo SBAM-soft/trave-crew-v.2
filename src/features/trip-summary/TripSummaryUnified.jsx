@@ -80,13 +80,15 @@ function TripSummaryUnified() {
     return Array.from({ length: totalDays }, (_, i) => {
       const day = i + 1;
 
-      if (day === 1) {
+      // Giorno di partenza (ultimo giorno)
+      if (day === totalDays) {
         return {
-          day: 1,
-          type: 'arrival',
-          title: 'Arrivo',
-          subtitle: wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione',
-          icon: '✈️',
+          day: totalDays,
+          type: 'departure',
+          title: 'Partenza',
+          subtitle: `Check-out e viaggio di ritorno da ${wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione'}`,
+          description: 'Mattinata per ultimi acquisti o relax, poi trasferimento in aeroporto per il volo di ritorno',
+          icon: '🛫',
           color: '#667eea'
         };
       }
@@ -100,8 +102,8 @@ function TripSummaryUnified() {
             day,
             type: 'transfer',
             title: block.experience.nome || 'Spostamento',
-            subtitle: block.zona || '',
-            description: block.experience.descrizione || '',
+            subtitle: `Trasferimento verso ${block.zona || ''}`,
+            description: block.experience.descrizione || `Giornata dedicata al trasferimento. Check-out dalla struttura precedente, viaggio verso ${block.zona || 'la prossima destinazione'} e check-in nel nuovo alloggio.`,
             icon: '🚗',
             color: '#f59e0b'
           };
@@ -111,11 +113,25 @@ function TripSummaryUnified() {
           return {
             day,
             type: 'logistics',
-            title: block.experience.nome || 'Giorno logistico',
-            subtitle: block.zona || '',
-            description: block.experience.descrizione || '',
+            title: block.experience.nome || 'Trasferimento e Sistemazione',
+            subtitle: `${block.zona || ''} - Giorno di arrivo`,
+            description: block.experience.descrizione || `Giornata dedicata al trasferimento e alla sistemazione. Tempo per ambientarsi nella nuova zona, esplorare i dintorni e rilassarsi dopo il viaggio.`,
             icon: '🏨',
             color: '#8b5cf6'
+          };
+        }
+
+        // Esperienza normale o free day
+        if (block.type === 'free') {
+          const zona = block.zona || block.experience.zona || '';
+          return {
+            day,
+            type: 'free',
+            title: `Giorno libero${zona ? ' a ' + zona : ''}`,
+            subtitle: 'Tempo libero per esplorare in autonomia',
+            description: `Giornata senza attività programmate. Ideale per esplorare a proprio ritmo, scoprire luoghi nascosti, fare shopping o semplicemente rilassarsi${zona ? ' nella zona di ' + zona : ''}.`,
+            icon: '🏖️',
+            color: '#f59e0b'
           };
         }
 
@@ -124,9 +140,9 @@ function TripSummaryUnified() {
           day,
           type: 'experience',
           title: block.experience.nome || block.experience.ESPERIENZE,
-          subtitle: block.zona || block.experience.zona,
-          description: block.experience.descrizione || block.experience.DESCRIZIONE,
-          duration: block.experience.durata || `${block.experience.SLOT || 1} notti`,
+          subtitle: `${block.zona || block.experience.zona || ''}${block.experience.durata ? ' • ' + block.experience.durata : ''}`,
+          description: block.experience.descrizione || block.experience.DESCRIZIONE || `Esperienza programmata${block.zona ? ' nella zona di ' + block.zona : ''}. Un'attività selezionata appositamente per rendere il tuo viaggio indimenticabile.`,
+          duration: block.experience.durata || `${block.experience.SLOT || 1} slot`,
           price: block.experience.prezzo || block.experience.PRX_PAX,
           difficulty: block.experience.difficolta || block.experience.DIFFICOLTA,
           icon: '🎯',
@@ -135,11 +151,23 @@ function TripSummaryUnified() {
         };
       }
 
+      // Giorno senza blocco (default: giorno libero)
+      // Cerca la zona corrente basandosi sui blocchi precedenti
+      let currentZone = '';
+      for (let prevDay = day - 1; prevDay >= 1; prevDay--) {
+        const prevBlock = filledBlocks.find(b => b.day === prevDay);
+        if (prevBlock && prevBlock.zona) {
+          currentZone = prevBlock.zona;
+          break;
+        }
+      }
+
       return {
         day,
         type: 'free',
-        title: 'Giorno libero',
-        subtitle: 'Relax o esplorazione personale',
+        title: `Giorno libero${currentZone ? ' a ' + currentZone : ''}`,
+        subtitle: 'Tempo libero per esplorare in autonomia',
+        description: `Giornata senza attività programmate. Ideale per esplorare a proprio ritmo, scoprire luoghi nascosti, fare shopping o semplicemente rilassarsi${currentZone ? ' nella zona di ' + currentZone : ''}.`,
         icon: '🏖️',
         color: '#f59e0b'
       };
