@@ -770,13 +770,13 @@ export const CHAT_FLOW_CONFIG = {
         setTimeout(() => {
           if (totalDaysUsed >= daysAvailable) {
             // Giorni completati → vai al summary
+            const { totalDays } = tripData;
             addBotMessage(
-              `🎉 Hai completato il tuo itinerario! (${totalDaysUsed} giorni)`,
+              `🎉 Perfetto! Hai riempito tutti i ${daysAvailable} giorni disponibili!\n\n(Il giorno ${totalDays} è riservato alla partenza)`,
               'bot_options',
               {
                 options: [
-                  { value: 'finish_trip', label: '✅ Completa il viaggio', emoji: '🎊' },
-                  { value: 'add_more', label: '➕ Aggiungi altro giorno', emoji: '📅' }
+                  { value: 'finish_trip', label: '✅ Completa il viaggio', emoji: '🎊' }
                 ]
               }
             );
@@ -922,13 +922,13 @@ export const CHAT_FLOW_CONFIG = {
         setTimeout(() => {
           if (totalDaysUsed >= daysAvailable) {
             // Giorni completati → vai al summary
+            const { totalDays } = tripData;
             addBotMessage(
-              `🎉 Hai completato il tuo itinerario! (${totalDaysUsed} giorni)`,
+              `🎉 Perfetto! Hai riempito tutti i ${daysAvailable} giorni disponibili!\n\n(Il giorno ${totalDays} è riservato alla partenza)`,
               'bot_options',
               {
                 options: [
-                  { value: 'finish_trip', label: '✅ Completa il viaggio', emoji: '🎊' },
-                  { value: 'add_more', label: '➕ Aggiungi altro giorno', emoji: '📅' }
+                  { value: 'finish_trip', label: '✅ Completa il viaggio', emoji: '🎊' }
                 ]
               }
             );
@@ -1000,19 +1000,6 @@ export const CHAT_FLOW_CONFIG = {
             store.setShowItineraryAnimation(true);
           }, 1000);
         }, 500);
-      } else if (value === 'add_more') {
-        addUserMessage('➕ Aggiungi altro giorno');
-        // Permette di continuare oltre i giorni disponibili
-        addBotMessage(
-          `Cosa vuoi fare?`,
-          'bot_options',
-          {
-            options: [
-              { value: 'another_experience', label: '🎯 Altra esperienza qui', emoji: '✨' },
-              { value: 'change_zone', label: '🗺️ Cambia zona', emoji: '🚀' }
-            ]
-          }
-        );
       } else if (value === 'proceed_anyway') {
         addUserMessage('✅ Procedi così');
         // Incrementa contatore e vai avanti
