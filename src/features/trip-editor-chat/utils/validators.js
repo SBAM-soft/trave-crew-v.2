@@ -34,6 +34,11 @@ export const validateHotelSelection = (tier, zona) => {
 };
 
 export const calculateNightsForZone = (zoneCode, filledBlocks) => {
+  // Gestisce caso filledBlocks non array
+  if (!Array.isArray(filledBlocks)) {
+    console.warn('⚠️ calculateNightsForZone: filledBlocks non è un array', filledBlocks);
+    return 0;
+  }
   const zoneBlocks = filledBlocks.filter(b => b.zoneCode === zoneCode);
   return zoneBlocks.length; // 1 blocco = 1 notte
 };

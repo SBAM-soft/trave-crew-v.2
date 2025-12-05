@@ -1157,7 +1157,7 @@ export const CHAT_FLOW_CONFIG = {
 
     onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store }) => {
       const zone = tripData.selectedZones[CHAT_FLOW_CONFIG.hotels.currentZoneIndex];
-      const notti = calculateNightsForZone(zone.code, tripData);
+      const notti = calculateNightsForZone(zone.code, tripData.filledBlocks);
 
       addBotMessage(getMessage({ tripData }));
 
@@ -1223,7 +1223,7 @@ export const CHAT_FLOW_CONFIG = {
     onResponse: ({ value, addUserMessage, addBotMessage, selectHotel, goToStep, tripData, store }) => {
       // value = { tier, extras[], note }
       const zone = tripData.selectedZones[CHAT_FLOW_CONFIG.hotels.currentZoneIndex];
-      const notti = calculateNightsForZone(zone.code, tripData);
+      const notti = calculateNightsForZone(zone.code, tripData.filledBlocks);
 
       selectHotel(zone.code, value.tier, notti, value.extras, value.note);
 
