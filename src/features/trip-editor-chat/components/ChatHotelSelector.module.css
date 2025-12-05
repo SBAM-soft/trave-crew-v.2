@@ -24,9 +24,42 @@
 }
 
 .tiersGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  align-items: stretch;
+}
+
+/* Per schermi grandi (desktop), mostra tutte e 3 le card affiancate */
+@media (min-width: 1024px) {
+  .tiersGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 1rem;
+    overflow: visible;
+  }
+}
+
+/* Per tablet, mostra scroll orizzontale */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tiersGrid {
+    gap: 1.5rem;
+  }
+}
+
+/* Nascondi scrollbar ma mantieni funzionalità */
+.tiersGrid::-webkit-scrollbar {
+  display: none;
+}
+
+.tiersGrid {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .tierCard {
@@ -38,6 +71,17 @@
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  flex: 0 0 auto;
+  width: min(280px, 85vw);
+  scroll-snap-align: center;
+}
+
+/* Su desktop, le card prendono larghezza 100% del grid */
+@media (min-width: 1024px) {
+  .tierCard {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .tierCard:hover {

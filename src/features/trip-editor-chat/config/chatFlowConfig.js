@@ -1156,6 +1156,10 @@ export const CHAT_FLOW_CONFIG = {
     },
 
     onEnter: ({ addBotMessage, getMessage, tripData, wizardData, store }) => {
+      // Pulisci la chat quando entri nello step hotels
+      console.log('🏨 Step hotels - Pulizia chat');
+      store.clearMessages();
+
       const zone = tripData.selectedZones[CHAT_FLOW_CONFIG.hotels.currentZoneIndex];
       const notti = calculateNightsForZone(zone.code, tripData.filledBlocks);
 
