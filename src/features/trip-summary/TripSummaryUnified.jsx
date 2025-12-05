@@ -10,6 +10,7 @@ import { generateMediaForExperience } from '../../core/utils/mediaHelpers';
 import { useCostiAccessori, calcolaCostiApplicabili } from '../../hooks/useCostiAccessori';
 import { loadEntityData } from '../../core/utils/dataLoader';
 import { groupHotelsByZoneAndBudget, getHotelExtras, calcolaNottiPerZona } from '../../core/utils/itinerarioHelpers';
+import { BLOCK_TYPE, BLOCK_CONFIG } from '../../core/constants';
 import Button from '../../shared/Button';
 import Breadcrumb from '../../shared/Breadcrumb';
 import Checkout from '../wallet/Checkout';
@@ -80,74 +81,67 @@ function TripSummaryUnified() {
     return Array.from({ length: totalDays }, (_, i) => {
       const day = i + 1;
 
-      // Giorno di partenza (ultimo giorno)
+      // Giorno di partenza (ultimo giorno) - BLOCCO TECNICO
       if (day === totalDays) {
+        const lastZone = filledBlocks[filledBlocks.length - 1]?.zona || wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione';
         return {
           day: totalDays,
-          type: 'departure',
-          title: 'Partenza',
-          subtitle: `Check-out e viaggio di ritorno da ${wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione'}`,
-          description: 'Mattinata per ultimi acquisti o relax, poi trasferimento in aeroporto per il volo di ritorno',
-          icon: '🛫',
-          color: '#667eea'
+          type: BLOCK_TYPE.DEPARTURE,
+          title: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].label,
+          subtitle: `Check-out e viaggio di ritorno da ${lastZone}`,
+          description: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].description(lastZone) || 'Mattinata per ultimi acquisti o relax, poi trasferimento in aeroporto per il volo di ritorno',
+          icon: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].icon,
+          color: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].color,
+          isTechnical: true
         };
       }
 
       const block = filledBlocks.find(b => b.day === day);
 
       if (block && block.experience) {
-        // Gestisci diversi tipi di blocchi
-        if (block.type === 'transfer') {
+        // Blocco LOGISTICS (trasferimento interno) - BLOCCO TECNICO
+        if (block.type === BLOCK_TYPE.LOGISTICS || block.type === 'transfer') {
           return {
             day,
-            type: 'transfer',
-            title: block.experience.nome || 'Spostamento',
-            subtitle: `Trasferimento verso ${block.zona || ''}`,
-            description: block.experience.descrizione || `Giornata dedicata al trasferimento. Check-out dalla struttura precedente, viaggio verso ${block.zona || 'la prossima destinazione'} e check-in nel nuovo alloggio.`,
-            icon: '🚗',
-            color: '#f59e0b'
-          };
-        }
-
-        if (block.type === 'logistics') {
-          return {
-            day,
-            type: 'logistics',
-            title: block.experience.nome || 'Trasferimento e Sistemazione',
-            subtitle: `${block.zona || ''} - Giorno di arrivo`,
+            type: BLOCK_TYPE.LOGISTICS,
+            title: block.experience.nome || BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].label,
+            subtitle: `${block.zona || ''} - Trasferimento e sistemazione`,
             description: block.experience.descrizione || `Giornata dedicata al trasferimento e alla sistemazione. Tempo per ambientarsi nella nuova zona, esplorare i dintorni e rilassarsi dopo il viaggio.`,
-            icon: '🏨',
-            color: '#8b5cf6'
+            icon: BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].icon,
+            color: BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].color,
+            isTechnical: true
           };
         }
 
-        // Esperienza normale o free day
-        if (block.type === 'free') {
+        // Giorno libero
+        if (block.type === BLOCK_TYPE.FREE) {
           const zona = block.zona || block.experience.zona || '';
           return {
             day,
-            type: 'free',
+            type: BLOCK_TYPE.FREE,
             title: `Giorno libero${zona ? ' a ' + zona : ''}`,
-            subtitle: 'Tempo libero per esplorare in autonomia',
-            description: `Giornata senza attività programmate. Ideale per esplorare a proprio ritmo, scoprire luoghi nascosti, fare shopping o semplicemente rilassarsi${zona ? ' nella zona di ' + zona : ''}.`,
-            icon: '🏖️',
-            color: '#f59e0b'
+            subtitle: BLOCK_CONFIG[BLOCK_TYPE.FREE].label,
+            description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description() || `Giornata senza attività programmate. Ideale per esplorare a proprio ritmo, scoprire luoghi nascosti, fare shopping o semplicemente rilassarsi${zona ? ' nella zona di ' + zona : ''}.`,
+            icon: BLOCK_CONFIG[BLOCK_TYPE.FREE].icon,
+            color: BLOCK_CONFIG[BLOCK_TYPE.FREE].color,
+            isTechnical: false
           };
         }
 
         // Esperienza normale
         return {
           day,
-          type: 'experience',
+          type: BLOCK_TYPE.EXPERIENCE,
           title: block.experience.nome || block.experience.ESPERIENZE,
           subtitle: `${block.zona || block.experience.zona || ''}${block.experience.durata ? ' • ' + block.experience.durata : ''}`,
           description: block.experience.descrizione || block.experience.DESCRIZIONE || `Esperienza programmata${block.zona ? ' nella zona di ' + block.zona : ''}. Un'attività selezionata appositamente per rendere il tuo viaggio indimenticabile.`,
           duration: block.experience.durata || `${block.experience.SLOT || 1} slot`,
           price: block.experience.prezzo || block.experience.PRX_PAX,
           difficulty: block.experience.difficolta || block.experience.DIFFICOLTA,
-          icon: '🎯',
-          color: '#10b981',
-          image: block.experience.immagine
+          icon: BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE].icon,
+          color: BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE].color,
+          image: block.experience.immagine,
+          isTechnical: false
         };
       }
 
@@ -164,12 +158,13 @@ function TripSummaryUnified() {
 
       return {
         day,
-        type: 'free',
+        type: BLOCK_TYPE.FREE,
         title: `Giorno libero${currentZone ? ' a ' + currentZone : ''}`,
-        subtitle: 'Tempo libero per esplorare in autonomia',
-        description: `Giornata senza attività programmate. Ideale per esplorare a proprio ritmo, scoprire luoghi nascosti, fare shopping o semplicemente rilassarsi${currentZone ? ' nella zona di ' + currentZone : ''}.`,
-        icon: '🏖️',
-        color: '#f59e0b'
+        subtitle: BLOCK_CONFIG[BLOCK_TYPE.FREE].label,
+        description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description() || `Giornata senza attività programmate. Ideale per esplorare a proprio ritmo, scoprire luoghi nascosti, fare shopping o semplicemente rilassarsi${currentZone ? ' nella zona di ' + currentZone : ''}.`,
+        icon: BLOCK_CONFIG[BLOCK_TYPE.FREE].icon,
+        color: BLOCK_CONFIG[BLOCK_TYPE.FREE].color,
+        isTechnical: false
       };
     });
   }, [totalDays, filledBlocks, wizardData]);
@@ -184,7 +179,7 @@ function TripSummaryUnified() {
 
   const experienceImages = useMemo(() => {
     // Filtra solo blocchi di tipo 'experience' per le immagini
-    const realExperiences = filledBlocks.filter(b => b.type === 'experience');
+    const realExperiences = filledBlocks.filter(b => b.type === BLOCK_TYPE.EXPERIENCE);
     return realExperiences.slice(0, 6).map((block, index) => {
       const exp = block.experience;
       if (!exp) return null;

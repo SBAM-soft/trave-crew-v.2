@@ -3,6 +3,8 @@
  * Parte del sistema database Travel Crew v2.0
  */
 
+import { BLOCK_TYPE } from '../constants';
+
 /**
  * Trova itinerario che contiene tutte le zone selezionate
  * L'ordine delle zone è quello definito nel CSV (ottimizzato), non quello di selezione dell'utente
@@ -431,7 +433,7 @@ export const riordinaZoneSecondoItinerario = (selectedZones, filledBlocks, itine
       if (zona && zonaPrecedente) {
         blocchiRiordinati.push({
           day: dayCounter++,
-          type: 'logistics',
+          type: BLOCK_TYPE.LOGISTICS,
           zoneCode: codiceZona,
           codiceZona: codiceZona,
           zoneName: zona.name,
@@ -439,7 +441,7 @@ export const riordinaZoneSecondoItinerario = (selectedZones, filledBlocks, itine
           experience: {
             nome: `Trasferimento e sistemazione a ${zona.name}`,
             descrizione: `Giorno dedicato al trasferimento da ${zonaPrecedente.name} e sistemazione a ${zona.name}`,
-            type: 'logistics'
+            type: BLOCK_TYPE.LOGISTICS
           }
         });
       }

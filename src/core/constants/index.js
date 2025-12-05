@@ -101,3 +101,80 @@ export const HOTEL_TIER_PRICES = {
   HIGH: 150,
   LUXURY: 150,
 };
+
+/**
+ * TIMELINE BLOCK TYPES
+ *
+ * Logica timeline definitiva:
+ * - Conteggio commerciale: sempre in NOTTI
+ * - Visualizzazione: sempre in GIORNI (notti + 1) per semplicità UX
+ * - Formula: totalDays = notti + 1
+ *
+ * Esempio: 7 notti in Thailand = 8 giorni
+ * - Giorno 1: Arrivo e sistemazione (BLOCCO TECNICO)
+ * - Giorni 2-3: Esperienze zona 1
+ * - Giorno 4: Cambio zona (BLOCCO TECNICO)
+ * - Giorni 5-7: Esperienze zona 2 + giorno libero
+ * - Giorno 8: Ritorno in Italia (BLOCCO TECNICO)
+ */
+export const BLOCK_TYPE = {
+  // BLOCCHI TECNICI (non commerciali, necessari per logistica)
+  ARRIVAL: 'arrival',        // Arrivo dall'Italia (sempre giorno 1)
+  LOGISTICS: 'logistics',    // Spostamento interno tra zone
+  DEPARTURE: 'departure',    // Partenza/ritorno (sempre ultimo giorno)
+
+  // BLOCCHI COMMERCIALI (esperienze vendibili)
+  EXPERIENCE: 'experience',  // Esperienza programmata
+  FREE: 'free',              // Giorno libero scelto dall'utente
+
+  // UTILITY
+  EMPTY: 'empty',            // Placeholder per giorno non ancora pianificato
+};
+
+/**
+ * Configurazione visualizzazione blocchi timeline
+ */
+export const BLOCK_CONFIG = {
+  [BLOCK_TYPE.ARRIVAL]: {
+    icon: '✈️',
+    color: '#fbbf24',
+    label: 'Arrivo',
+    isTechnical: true,
+    description: (zone) => `Arrivo a ${zone} e sistemazione in hotel`
+  },
+  [BLOCK_TYPE.LOGISTICS]: {
+    icon: '🚗',
+    color: '#f59e0b',
+    label: 'Trasferimento',
+    isTechnical: true,
+    description: (fromZone, toZone) => `Trasferimento da ${fromZone} a ${toZone} e sistemazione`
+  },
+  [BLOCK_TYPE.DEPARTURE]: {
+    icon: '🛫',
+    color: '#ef4444',
+    label: 'Partenza',
+    isTechnical: true,
+    description: (zone) => `Check-out e partenza da ${zone}`
+  },
+  [BLOCK_TYPE.EXPERIENCE]: {
+    icon: '⭐',
+    color: '#667eea',
+    label: 'Esperienza',
+    isTechnical: false,
+    description: null // Descrizione viene dall'esperienza stessa
+  },
+  [BLOCK_TYPE.FREE]: {
+    icon: '🏖️',
+    color: '#10b981',
+    label: 'Giorno libero',
+    isTechnical: false,
+    description: () => 'Tempo libero per esplorare in autonomia'
+  },
+  [BLOCK_TYPE.EMPTY]: {
+    icon: '📅',
+    color: '#9ca3af',
+    label: 'Da pianificare',
+    isTechnical: false,
+    description: () => 'Giorno ancora da definire'
+  }
+};

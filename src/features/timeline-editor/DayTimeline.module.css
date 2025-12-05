@@ -114,8 +114,15 @@
 
 .dayHeaderLeft {
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.dayTitleRow {
+  display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
@@ -127,12 +134,52 @@
   letter-spacing: -0.01em;
 }
 
+.technicalBadge {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(234, 88, 12, 0.15) 100%);
+  color: #f59e0b;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dayMetaInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+}
+
+.nightInfo {
+  color: #6b7280;
+  font-weight: 600;
+  background: rgba(107, 114, 128, 0.1);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+}
+
+.zoneInfo {
+  color: #667eea;
+  font-weight: 600;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+}
+
 .packageBadge {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
   color: #667eea;
-  padding: 0.35rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.8125rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
   font-weight: 600;
   border: 1px solid rgba(102, 126, 234, 0.3);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);

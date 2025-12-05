@@ -6,6 +6,7 @@ import DayTimeline from './DayTimeline';
 // import AnimazioneAI from '../trip-editor/AnimazioneAI'; // DEPRECATED - moved to archive
 import { downloadAsText, downloadAsJSON, downloadAsPDF, copyToClipboard, generateShareLink } from '../../core/utils/exportHelpers';
 import { toPrice } from '../../core/utils/typeHelpers';
+import { BLOCK_TYPE, BLOCK_CONFIG } from '../../core/constants';
 import styles from './TimelineEditor.module.css';
 
 function TimelineEditor() {
@@ -34,28 +35,34 @@ function TimelineEditor() {
 
   const buildTimeline = () => {
     const days = [];
+    const firstZone = filledBlocks[0]?.zoneName || wizardData.destinazione;
+    const lastBlock = filledBlocks[filledBlocks.length - 1];
+    const lastZone = lastBlock?.zoneName || firstZone;
 
-    // Giorno 1 - Arrivo
+    // Giorno 1 - Arrivo (BLOCCO TECNICO)
     days.push({
       dayNumber: 1,
-      type: 'arrival',
-      title: '✈️ Arrivo',
-      description: `Arrivo a ${wizardData.destinazione}. Sistemazione in hotel e relax.`,
+      type: BLOCK_TYPE.ARRIVAL,
+      title: `${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].icon} ${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].label}`,
+      description: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].description(firstZone),
+      zoneName: firstZone,
       experiences: [],
       notes: 'Check-in hotel, orientamento nella zona'
     });
 
-    // Giorni con esperienze
-    for (let i = 2; i <= totalDays; i++) {
+    // Giorni intermedi (2 a totalDays-1)
+    for (let i = 2; i < totalDays; i++) {
       const block = filledBlocks.find(b =>
         typeof b === 'object' ? b.day === i : b === i
       );
 
       if (block && typeof block === 'object' && block.experience) {
+        const blockConfig = BLOCK_CONFIG[block.type] || BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE];
         days.push({
           dayNumber: i,
-          type: 'experience',
-          title: `Giorno ${i}`,
+          type: block.type,
+          title: `${blockConfig.icon} Giorno ${i}`,
+          zoneName: block.zoneName || block.zona,
           experiences: [block.experience],
           packageName: block.packageName || '',
           notes: ''
@@ -63,23 +70,35 @@ function TimelineEditor() {
       } else if (block) {
         days.push({
           dayNumber: i,
-          type: 'free',
-          title: `Giorno ${i}`,
-          description: 'Giorno libero o esperienza da definire',
+          type: BLOCK_TYPE.FREE,
+          title: `${BLOCK_CONFIG[BLOCK_TYPE.FREE].icon} Giorno ${i} - Giorno libero`,
+          zoneName: block.zoneName,
+          description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description(),
           experiences: [],
           notes: ''
         });
       } else {
         days.push({
           dayNumber: i,
-          type: 'empty',
+          type: BLOCK_TYPE.EMPTY,
           title: `Giorno ${i}`,
-          description: 'Da pianificare',
+          description: BLOCK_CONFIG[BLOCK_TYPE.EMPTY].description(),
           experiences: [],
           notes: ''
         });
       }
     }
+
+    // Ultimo giorno - Partenza (BLOCCO TECNICO)
+    days.push({
+      dayNumber: totalDays,
+      type: BLOCK_TYPE.DEPARTURE,
+      title: `${BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].icon} ${BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].label}`,
+      description: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].description(lastZone),
+      zoneName: lastZone,
+      experiences: [],
+      notes: 'Check-out hotel e trasferimento aeroporto'
+    });
 
     setTimeline(days);
   };
@@ -224,7 +243,7 @@ function TimelineEditor() {
   };
 
   const totalCost = calculateTotalCost();
-  const experienceDays = timeline.filter(d => d.type === 'experience').length;
+  const experienceDays = timeline.filter(d => d.type === BLOCK_TYPE.EXPERIENCE).length;
 
   return (
     <div className={styles.timelineEditor}>
@@ -307,6 +326,7 @@ function TimelineEditor() {
             day={day}
             isFirst={index === 0}
             isLast={index === timeline.length - 1}
+            totalDays={totalDays}
             onAddNote={handleAddNote}
           />
         ))}
