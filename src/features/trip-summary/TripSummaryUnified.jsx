@@ -99,13 +99,27 @@ function TripSummaryUnified() {
       const block = filledBlocks.find(b => b.day === day);
 
       if (block && block.experience) {
+        // Blocco ARRIVAL (arrivo) - BLOCCO TECNICO
+        if (block.type === BLOCK_TYPE.ARRIVAL) {
+          return {
+            day,
+            type: BLOCK_TYPE.ARRIVAL,
+            title: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].label,
+            subtitle: `${block.zoneName || block.zona || ''} - Arrivo e sistemazione`,
+            description: block.experience.descrizione || BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].description(block.zoneName || block.zona),
+            icon: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].icon,
+            color: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].color,
+            isTechnical: true
+          };
+        }
+
         // Blocco LOGISTICS (trasferimento interno) - BLOCCO TECNICO
         if (block.type === BLOCK_TYPE.LOGISTICS || block.type === 'transfer') {
           return {
             day,
             type: BLOCK_TYPE.LOGISTICS,
             title: block.experience.nome || BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].label,
-            subtitle: `${block.zona || ''} - Trasferimento e sistemazione`,
+            subtitle: `${block.zoneName || block.zona || ''} - Trasferimento e sistemazione`,
             description: block.experience.descrizione || `Giornata dedicata al trasferimento e alla sistemazione. Tempo per ambientarsi nella nuova zona, esplorare i dintorni e rilassarsi dopo il viaggio.`,
             icon: BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].icon,
             color: BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].color,

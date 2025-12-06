@@ -210,12 +210,39 @@ const useTripEditorChatStore = create(
           const exists = state.tripData.selectedZones.some(z => z.code === zone.code);
           if (exists) return state;
 
-          // LOGICA CORRETTA: la prima zona NON crea blocco logistics
-          // Ogni zona successiva crea blocco logistics per trasferimento
+          // LOGICA DEFINITIVA:
+          // - Prima zona: crea blocco ARRIVAL (giorno 1)
+          // - Zone successive: crea blocco LOGISTICS (trasferimento)
           const isFirstZone = state.tripData.selectedZones.length === 0;
 
-          // Blocco logistics SOLO per zone successive (trasferimento)
-          if (!isFirstZone) {
+          if (isFirstZone) {
+            // PRIMA ZONA: crea blocco ARRIVAL (giorno 1)
+            const arrivalBlock = {
+              day: 1,
+              type: BLOCK_TYPE.ARRIVAL,
+              zoneCode: zone.code,
+              zoneName: zone.name,
+              experience: {
+                nome: `Arrivo a ${zone.name}`,
+                descrizione: `Arrivo e sistemazione a ${zone.name}`,
+                type: BLOCK_TYPE.ARRIVAL
+              }
+            };
+
+            console.log(`✈️ Prima zona selezionata: ${zone.name} - Creato blocco ARRIVAL (Day 1)`);
+
+            return {
+              tripData: {
+                ...state.tripData,
+                selectedZones: [...state.tripData.selectedZones, {
+                  ...zone,
+                  order: 1
+                }],
+                filledBlocks: [arrivalBlock]
+              }
+            };
+          } else {
+            // ZONE SUCCESSIVE: crea blocco LOGISTICS
             // Calcola lastDay per il nuovo blocco logistics
             const lastDay = getLastDay(state.tripData.filledBlocks);
 
@@ -252,31 +279,30 @@ const useTripEditorChatStore = create(
                 filledBlocks: [...state.tripData.filledBlocks, logisticsBlock]
               }
             };
-          } else {
-            // Prima zona: nessun blocco logistics
-            console.log(`🎯 Prima zona selezionata: ${zone.name} - Nessun blocco logistics creato`);
-
-            return {
-              tripData: {
-                ...state.tripData,
-                selectedZones: [...state.tripData.selectedZones, {
-                  ...zone,
-                  order: state.tripData.selectedZones.length + 1
-                }]
-              }
-            };
           }
         }),
 
-        removeZone: (zoneCode) => set((state) => ({
-          tripData: {
-            ...state.tripData,
-            selectedZones: state.tripData.selectedZones
-              .filter(z => z.code !== zoneCode)
-              // Ricalcola order
-              .map((z, idx) => ({ ...z, order: idx + 1 }))
-          }
-        })),
+        removeZone: (zoneCode) => set((state) => {
+          // Rimuovi zona da selectedZones
+          const newSelectedZones = state.tripData.selectedZones
+            .filter(z => z.code !== zoneCode)
+            .map((z, idx) => ({ ...z, order: idx + 1 }));
+
+          // Rimuovi tutti i blocchi associati a quella zona
+          const newFilledBlocks = state.tripData.filledBlocks.filter(
+            block => block.zoneCode !== zoneCode
+          );
+
+          console.log(`🗑️ Zona rimossa: ${zoneCode} - Rimossi ${state.tripData.filledBlocks.length - newFilledBlocks.length} blocchi`);
+
+          return {
+            tripData: {
+              ...state.tripData,
+              selectedZones: newSelectedZones,
+              filledBlocks: newFilledBlocks
+            }
+          };
+        }),
 
         addPackage: (zoneCode, packageData, experiences) => set((state) => {
           const zone = state.tripData.selectedZones.find(z => z.code === zoneCode);
