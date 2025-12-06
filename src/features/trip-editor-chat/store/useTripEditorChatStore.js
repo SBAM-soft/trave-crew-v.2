@@ -210,14 +210,20 @@ const useTripEditorChatStore = create(
           const exists = state.tripData.selectedZones.some(z => z.code === zone.code);
           if (exists) return state;
 
-          const isFirstZone = state.tripData.filledBlocks.length === 0;
+          // LOGICA CORRETTA: la prima zona NON crea blocco logistics
+          // Ogni zona successiva crea blocco logistics per trasferimento
+          const isFirstZone = state.tripData.selectedZones.length === 0;
 
-          // LOGICA AGGIORNATA: blocco logistics SOLO per zone successive (trasferimento)
-          // La prima zona NON crea blocco logistics (le esperienze partono da Day 1)
+          // Blocco logistics SOLO per zone successive (trasferimento)
           if (!isFirstZone) {
             // Calcola lastDay per il nuovo blocco logistics
             const lastDay = getLastDay(state.tripData.filledBlocks);
-            const previousZone = getPreviousZoneName(state.tripData.filledBlocks);
+
+            // Prendi nome zona precedente dai blocchi o dall'ultima selectedZone
+            let previousZone = getPreviousZoneName(state.tripData.filledBlocks);
+            if (!previousZone && state.tripData.selectedZones.length > 0) {
+              previousZone = state.tripData.selectedZones[state.tripData.selectedZones.length - 1].name;
+            }
 
             // Crea blocco logistics per trasferimento
             const logisticsBlock = {
@@ -227,12 +233,14 @@ const useTripEditorChatStore = create(
               zoneName: zone.name,
               experience: {
                 nome: `Trasferimento e sistemazione a ${zone.name}`,
-                descrizione: `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zone.name}`,
+                descrizione: previousZone
+                  ? `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zone.name}`
+                  : `Giorno dedicato al trasferimento e sistemazione a ${zone.name}`,
                 type: BLOCK_TYPE.LOGISTICS
               }
             };
 
-            console.log(`🚗 Cambio zona: ${previousZone} → ${zone.name} - Creato blocco logistics (Day ${lastDay + 1})`);
+            console.log(`🚗 Cambio zona: ${previousZone || 'zona precedente'} → ${zone.name} - Creato blocco logistics (Day ${lastDay + 1})`);
 
             return {
               tripData: {
