@@ -1,40 +1,33 @@
 import { useState } from 'react';
+import { BLOCK_TYPE, BLOCK_CONFIG } from '../../core/constants';
 import styles from './DayTimeline.module.css';
 
-function DayTimeline({ day, isFirst, isLast, onAddNote }) {
-  const [isExpanded, setIsExpanded] = useState(day.type === 'experience' || day.type === 'arrival');
+function DayTimeline({ day, isFirst, isLast, onAddNote, totalDays }) {
+  const [isExpanded, setIsExpanded] = useState(
+    day.type === BLOCK_TYPE.EXPERIENCE ||
+    day.type === BLOCK_TYPE.ARRIVAL ||
+    day.type === BLOCK_TYPE.DEPARTURE
+  );
   const [noteText, setNoteText] = useState(day.notes || '');
   const [showNoteInput, setShowNoteInput] = useState(false);
 
-  // Determina icona e colore per tipo giorno
-  const getDayTypeIcon = () => {
-    switch (day.type) {
-      case 'arrival':
-        return '✈️';
-      case 'experience':
-        return '⭐';
-      case 'free':
-        return '🌅';
-      case 'empty':
-        return '📅';
-      default:
-        return '📍';
-    }
-  };
+  // Determina configurazione per tipo giorno usando BLOCK_CONFIG
+  const blockConfig = BLOCK_CONFIG[day.type] || BLOCK_CONFIG[BLOCK_TYPE.EMPTY];
 
-  const getDayTypeColor = () => {
-    switch (day.type) {
-      case 'arrival':
-        return '#fbbf24'; // giallo
-      case 'experience':
-        return '#667eea'; // viola
-      case 'free':
-        return '#10b981'; // verde
-      case 'empty':
-        return '#9ca3af'; // grigio
-      default:
-        return '#6b7280';
-    }
+  const getDayTypeIcon = () => blockConfig.icon;
+  const getDayTypeColor = () => blockConfig.color;
+  const getDayTypeLabel = () => blockConfig.label;
+  const isTechnicalBlock = () => blockConfig.isTechnical;
+
+  // Calcola quale notte corrisponde a questo giorno
+  // Esempio: 7 notti = 8 giorni
+  // Giorno 1 = Arrivo (notte 1)
+  // Giorno 2 = Notte 1 completa
+  // Giorno 8 = Partenza (dopo notte 7)
+  const getNightInfo = () => {
+    if (day.dayNumber === 1) return 'Arrivo';
+    if (day.dayNumber === totalDays) return 'Partenza';
+    return `Notte ${day.dayNumber - 1}`;
   };
 
   // Handler salva nota
@@ -64,10 +57,23 @@ function DayTimeline({ day, isFirst, isLast, onAddNote }) {
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className={styles.dayHeaderLeft}>
-            <h3 className={styles.dayTitle}>{day.title}</h3>
-            {day.packageName && (
-              <span className={styles.packageBadge}>📦 {day.packageName}</span>
-            )}
+            <div className={styles.dayTitleRow}>
+              <h3 className={styles.dayTitle}>{day.title}</h3>
+              {isTechnicalBlock() && (
+                <span className={styles.technicalBadge} title="Giorno tecnico necessario per logistica">
+                  🔧 BLOCCO TECNICO
+                </span>
+              )}
+            </div>
+            <div className={styles.dayMetaInfo}>
+              <span className={styles.nightInfo}>{getNightInfo()}</span>
+              {day.zoneName && (
+                <span className={styles.zoneInfo}>📍 {day.zoneName}</span>
+              )}
+              {day.packageName && (
+                <span className={styles.packageBadge}>📦 {day.packageName}</span>
+              )}
+            </div>
           </div>
           <button className={styles.expandBtn}>
             {isExpanded ? '▼' : '▶'}

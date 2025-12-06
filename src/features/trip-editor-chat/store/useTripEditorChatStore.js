@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { getLastDay, prepareExperienceBlocks, isZoneChange, getPreviousZoneName } from '../../../core/services/tripBuilderService';
-import { ANIMATION, HOTEL_TIER_PRICES } from '../../../core/constants';
+import { ANIMATION, HOTEL_TIER_PRICES, BLOCK_TYPE } from '../../../core/constants';
 
 /**
  * CONSTANTS
@@ -222,13 +222,13 @@ const useTripEditorChatStore = create(
             // Crea blocco logistics per trasferimento
             const logisticsBlock = {
               day: lastDay + 1,
-              type: 'logistics',
+              type: BLOCK_TYPE.LOGISTICS,
               zoneCode: zone.code,
               zoneName: zone.name,
               experience: {
                 nome: `Trasferimento e sistemazione a ${zone.name}`,
                 descrizione: `Giorno dedicato al trasferimento da ${previousZone} e sistemazione a ${zone.name}`,
-                type: 'logistics'
+                type: BLOCK_TYPE.LOGISTICS
               }
             };
 
@@ -312,8 +312,8 @@ const useTripEditorChatStore = create(
           const lastDay = getLastDay(state.tripData.filledBlocks);
 
           // Crea il blocco per l'esperienza o giorno libero
-          const blockType = experience.isFreeDay ? 'free' : 'experience';
-          const emoji = blockType === 'free' ? '🏖️' : '🎯';
+          const blockType = experience.isFreeDay ? BLOCK_TYPE.FREE : BLOCK_TYPE.EXPERIENCE;
+          const emoji = blockType === BLOCK_TYPE.FREE ? '🏖️' : '🎯';
           console.log(`${emoji} Creazione blocco ${blockType.toUpperCase()}: ${experience.nome} (Day ${lastDay + 1})`);
 
           const experienceBlock = {

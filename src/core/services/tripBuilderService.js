@@ -3,6 +3,8 @@
  * Pura, testabile, senza dipendenze da store
  */
 
+import { BLOCK_TYPE } from '../constants';
+
 /**
  * Calcola giorni necessari per un set di esperienze
  * @param {Array} experiences - Array di esperienze
@@ -93,14 +95,14 @@ export function prepareExperienceBlocks(
   if (isZoneChange && previousZoneName) {
     blocks.push({
       day: currentDay,
-      type: 'transfer',
+      type: BLOCK_TYPE.LOGISTICS,
       zona: zoneName,
       codiceZona: zoneCode,
       packageName: null,
       experience: {
         nome: `Spostamento verso ${zoneName}`,
         descrizione: `Giorno dedicato al trasferimento da ${previousZoneName} a ${zoneName}`,
-        type: 'transfer'
+        type: BLOCK_TYPE.LOGISTICS
       }
     });
     currentDay++;
@@ -109,14 +111,14 @@ export function prepareExperienceBlocks(
   // Aggiungi giorno logistico arrivo
   blocks.push({
     day: currentDay,
-    type: 'logistics',
+    type: BLOCK_TYPE.LOGISTICS,
     zona: zoneName,
     codiceZona: zoneCode,
     packageName: packageData.NOME_PACCHETTO || packageData.NOME || packageData.nome,
     experience: {
       nome: `Arrivo e sistemazione a ${zoneName}`,
       descrizione: `Giorno logistico per check-in hotel e orientamento`,
-      type: 'logistics'
+      type: BLOCK_TYPE.LOGISTICS
     }
   });
   currentDay++;
@@ -125,7 +127,7 @@ export function prepareExperienceBlocks(
   experiences.forEach(exp => {
     blocks.push({
       day: currentDay,
-      type: 'experience',
+      type: BLOCK_TYPE.EXPERIENCE,
       experience: exp,
       packageName: packageData.NOME_PACCHETTO || packageData.NOME || packageData.nome,
       zona: zoneName,
@@ -230,7 +232,7 @@ export function extractValidExperiences(packageData, allExperiences) {
  */
 export function isBlockEditable(block) {
   // I blocchi di tipo transfer e logistics non sono modificabili
-  return block.type === 'experience';
+  return block.type === BLOCK_TYPE.EXPERIENCE;
 }
 
 /**
