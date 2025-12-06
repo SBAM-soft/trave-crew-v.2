@@ -2,6 +2,7 @@ import { toast } from 'sonner';
 import { loadEntityData } from '../../../core/utils/dataLoader';
 import { calculateNightsForZone, formatPrice } from '../utils/validators';
 import { DELAY_SHORT, DELAY_MEDIUM, DELAY_NORMAL, DELAY_LONG } from '../store/useTripEditorChatStore';
+import { BLOCK_TYPE, BLOCK_CONFIG } from '../../../core/constants';
 
 /**
  * Configurazione completa del flow conversazionale
@@ -299,9 +300,14 @@ export const CHAT_FLOW_CONFIG = {
       addUserMessage(`${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni)`);
       setTotalDays(days);
 
-      // Messaggio di conferma
+      // Messaggio di conferma con spiegazione logica
       addBotMessage(
-        `Perfetto! Con ${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni totali) potrai esplorare diverse zone senza fretta.\n\nAvrai ${days - 1} giorni pieni per le esperienze (l'ultimo giorno è dedicato alla partenza)! 🎉`
+        `Perfetto! Con ${nights} ${nights === 1 ? 'notte' : 'notti'} (${days} giorni totali) avrai:\n\n` +
+        `📅 Giorno 1: Arrivo e sistemazione (blocco tecnico)\n` +
+        `⭐ Giorni 2-${days - 1}: Esperienze e zone da esplorare\n` +
+        `✈️ Giorno ${days}: Partenza (blocco tecnico)\n\n` +
+        `💡 Quando cambi zona, dedicherò 1 giorno al trasferimento e sistemazione.\n\n` +
+        `Hai ${days - 1} giorni disponibili per esperienze! 🎉`
       );
 
       // Vai al prossimo step
@@ -1060,51 +1066,109 @@ export const CHAT_FLOW_CONFIG = {
 
       addBotMessage(getMessage());
 
-      // Prepara dati timeline
+      // Prepara dati timeline con BLOCK_TYPE
       const days = Array.from({ length: tripData.totalDays }, (_, i) => {
         const dayNumber = i + 1;
 
+        // Giorno 1 - BLOCCO TECNICO ARRIVO
         if (dayNumber === 1) {
+          const firstZone = tripData.filledBlocks[0]?.zoneName || tripData.selectedZones[0]?.name || 'destinazione';
           return {
             day: 1,
-            type: 'arrival',
-            title: '✈️ Arrivo',
-            description: 'Check-in hotel e orientamento'
-          };
-        } else if (dayNumber === tripData.totalDays) {
-          return {
-            day: dayNumber,
-            type: 'departure',
-            title: '🏡 Ritorno',
-            description: 'Check-out e viaggio di ritorno'
-          };
-        } else {
-          const block = tripData.filledBlocks.find(b => b.day === dayNumber);
-          return block ? {
-            day: dayNumber,
-            type: 'experience',
-            zone: block.zone,
-            experience: block.experience,
-            package: block.package
-          } : {
-            day: dayNumber,
-            type: 'free',
-            title: '☀️ Giorno libero',
-            description: 'Relax o esplorazione autonoma'
+            type: BLOCK_TYPE.ARRIVAL,
+            title: `${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].icon} ${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].label}`,
+            description: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].description(firstZone),
+            isTechnical: true
           };
         }
+
+        // Ultimo giorno - BLOCCO TECNICO PARTENZA
+        if (dayNumber === tripData.totalDays) {
+          const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
+          const lastZone = lastBlock?.zoneName || lastBlock?.zona || 'destinazione';
+          return {
+            day: dayNumber,
+            type: BLOCK_TYPE.DEPARTURE,
+            title: `${BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].icon} ${BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].label}`,
+            description: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].description(lastZone),
+            isTechnical: true
+          };
+        }
+
+        // Giorni intermedi - cerca blocco corrispondente
+        const block = tripData.filledBlocks.find(b => b.day === dayNumber);
+
+        if (block) {
+          const blockConfig = BLOCK_CONFIG[block.type] || BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE];
+
+          // BLOCCO TECNICO LOGISTICS (trasferimento)
+          if (block.type === BLOCK_TYPE.LOGISTICS) {
+            return {
+              day: dayNumber,
+              type: BLOCK_TYPE.LOGISTICS,
+              title: `${BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].icon} ${block.experience.nome || BLOCK_CONFIG[BLOCK_TYPE.LOGISTICS].label}`,
+              description: block.experience.descrizione || 'Trasferimento tra zone',
+              zone: block.zoneName || block.zona,
+              isTechnical: true
+            };
+          }
+
+          // GIORNO LIBERO
+          if (block.type === BLOCK_TYPE.FREE) {
+            return {
+              day: dayNumber,
+              type: BLOCK_TYPE.FREE,
+              title: `${BLOCK_CONFIG[BLOCK_TYPE.FREE].icon} ${BLOCK_CONFIG[BLOCK_TYPE.FREE].label}`,
+              description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description(),
+              zone: block.zoneName || block.zona
+            };
+          }
+
+          // ESPERIENZA
+          return {
+            day: dayNumber,
+            type: BLOCK_TYPE.EXPERIENCE,
+            title: `${BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE].icon} ${block.experience.nome}`,
+            zone: block.zoneName || block.zona,
+            experience: block.experience,
+            package: block.packageName
+          };
+        }
+
+        // Giorno senza blocco - giorno libero di default
+        return {
+          day: dayNumber,
+          type: BLOCK_TYPE.FREE,
+          title: `${BLOCK_CONFIG[BLOCK_TYPE.FREE].icon} ${BLOCK_CONFIG[BLOCK_TYPE.FREE].label}`,
+          description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description()
+        };
       });
 
       setTimeout(() => {
-        // Per ora mostriamo testo semplice, poi implementeremo timeline visuale
+        // Riepilogo testuale con indicazione blocchi tecnici
         const summary = days.map(d => {
-          if (d.type === 'arrival') return `Giorno ${d.day}: ${d.title}`;
-          if (d.type === 'departure') return `Giorno ${d.day}: ${d.title}`;
-          if (d.type === 'experience') return `Giorno ${d.day}: ${d.experience.nome} (${d.zone})`;
+          const technicalBadge = d.isTechnical ? ' 🔧' : '';
+          if (d.type === BLOCK_TYPE.ARRIVAL || d.type === BLOCK_TYPE.DEPARTURE) {
+            return `Giorno ${d.day}: ${d.title}${technicalBadge}`;
+          }
+          if (d.type === BLOCK_TYPE.LOGISTICS) {
+            return `Giorno ${d.day}: ${d.title}${technicalBadge} → ${d.zone}`;
+          }
+          if (d.type === BLOCK_TYPE.EXPERIENCE) {
+            return `Giorno ${d.day}: ${d.experience.nome} (${d.zone})`;
+          }
           return `Giorno ${d.day}: ${d.title}`;
         }).join('\n');
 
-        addBotMessage(`${summary}\n\n💰 Costo stimato esperienze: €${tripData.costs.experiences}`);
+        const experiencesCount = days.filter(d => d.type === BLOCK_TYPE.EXPERIENCE).length;
+        const technicalCount = days.filter(d => d.isTechnical).length;
+
+        addBotMessage(
+          `${summary}\n\n📊 Riepilogo:\n` +
+          `⭐ ${experiencesCount} esperienze\n` +
+          `🔧 ${technicalCount} giorni tecnici (arrivo/trasferimenti/partenza)\n` +
+          `💰 Costo esperienze: €${tripData.costs.experiences}`
+        );
 
         setTimeout(() => {
           addBotMessage(
