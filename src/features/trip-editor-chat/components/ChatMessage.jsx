@@ -6,6 +6,7 @@ import ChatHotelSelector from './ChatHotelSelector';
 import ChatExperienceCard from './ChatExperienceCard';
 import ChatExperienceCardRow from './ChatExperienceCardRow';
 import FreeDaySelector from './FreeDaySelector';
+import MarkdownText from './MarkdownText';
 import styles from './ChatMessage.module.css';
 
 /**
@@ -13,16 +14,31 @@ import styles from './ChatMessage.module.css';
  * Gestisce diversi tipi di messaggio: bot, user, options, cards, map, etc.
  */
 function ChatMessage({ message, isDisabled, onOptionSelect, onCardSelect, onCardDetails }) {
-  const { type, content, data, sender } = message;
+  const { type, content, data, sender, timestamp } = message;
 
   console.log('🎨 Rendering message:', { type, content, hasData: !!data, data, isDisabled });
+
+  // Formatta timestamp in modo leggibile
+  const formatTimestamp = (date) => {
+    if (!date) return '';
+    const now = new Date();
+    const msgDate = new Date(date);
+    const isToday = now.toDateString() === msgDate.toDateString();
+    const time = msgDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    return isToday ? time : `${msgDate.toLocaleDateString('it-IT')} ${time}`;
+  };
 
   // Messaggio utente
   if (type === 'user' || sender === 'user') {
     return (
       <div className={`${styles.message} ${styles.user}`}>
-        <div className={styles.bubbleUser}>
-          {content}
+        <div className={styles.bubbleWrapper}>
+          <div className={styles.bubbleUser}>
+            <MarkdownText>{content}</MarkdownText>
+          </div>
+          {timestamp && (
+            <div className={styles.timestamp}>{formatTimestamp(timestamp)}</div>
+          )}
         </div>
       </div>
     );
@@ -32,14 +48,21 @@ function ChatMessage({ message, isDisabled, onOptionSelect, onCardSelect, onCard
   if (type === 'bot_options') {
     return (
       <div className={`${styles.message} ${styles.bot}`}>
-        <div className={styles.bubble}>
-          <p className={styles.text}>{content}</p>
-          {data?.options && (
-            <ChatOptions
-              options={data.options}
-              onSelect={onOptionSelect}
-              disabled={isDisabled}
-            />
+        <div className={styles.bubbleWrapper}>
+          <div className={styles.bubble}>
+            <div className={styles.text}>
+              <MarkdownText>{content}</MarkdownText>
+            </div>
+            {data?.options && (
+              <ChatOptions
+                options={data.options}
+                onSelect={onOptionSelect}
+                disabled={isDisabled}
+              />
+            )}
+          </div>
+          {timestamp && (
+            <div className={styles.timestamp}>{formatTimestamp(timestamp)}</div>
           )}
         </div>
       </div>
@@ -223,12 +246,17 @@ function ChatMessage({ message, isDisabled, onOptionSelect, onCardSelect, onCard
   // Fallback: messaggio bot standard (DEVE essere DOPO tutti i controlli specifici)
   return (
     <div className={`${styles.message} ${styles.bot}`}>
-      <div className={styles.bubble}>
-        {content}
-        {data && (
-          <pre className={styles.debug}>
-            {JSON.stringify(data, null, 2)}
-          </pre>
+      <div className={styles.bubbleWrapper}>
+        <div className={styles.bubble}>
+          <MarkdownText>{content}</MarkdownText>
+          {data && (
+            <pre className={styles.debug}>
+              {JSON.stringify(data, null, 2)}
+            </pre>
+          )}
+        </div>
+        {timestamp && (
+          <div className={styles.timestamp}>{formatTimestamp(timestamp)}</div>
         )}
       </div>
     </div>

@@ -11,15 +11,47 @@ import styles from './ChatContainer.module.css';
 function ChatContainer({ messages, isTyping, isProcessing, onOptionSelect, onCardSelect, onCardDetails }) {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
+  const lastMessageRef = useRef(null);
 
   // Disabilita azioni se il bot sta scrivendo o processando
   const isDisabled = isTyping || isProcessing;
 
-  // Auto-scroll quando arriva un nuovo messaggio
+  // Auto-scroll migliorato: più lento e parte dall'inizio per messaggi lunghi
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
+    if (!containerRef.current) return;
+
+    const scrollToMessage = () => {
+      if (!lastMessageRef.current && !messagesEndRef.current) return;
+
+      // Se c'è un ultimo messaggio, calcola se è lungo
+      if (lastMessageRef.current) {
+        const messageHeight = lastMessageRef.current.offsetHeight;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        // Se il messaggio è più alto del 60% del container, scrolla all'inizio
+        if (messageHeight > containerHeight * 0.6) {
+          lastMessageRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+          });
+          return;
+        }
+      }
+
+      // Altrimenti scrolla normalmente alla fine
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'nearest'
+        });
+      }
+    };
+
+    // Ritardo di 100ms per permettere il rendering e rallentare lo scroll
+    const timeoutId = setTimeout(scrollToMessage, 100);
+    return () => clearTimeout(timeoutId);
   }, [messages, isTyping]);
 
   return (
@@ -33,15 +65,19 @@ function ChatContainer({ messages, isTyping, isProcessing, onOptionSelect, onCar
           </div>
         )}
 
-        {messages.map((msg) => (
-          <ChatMessage
+        {messages.map((msg, index) => (
+          <div
             key={msg.id}
-            message={msg}
-            isDisabled={isDisabled}
-            onOptionSelect={onOptionSelect}
-            onCardSelect={onCardSelect}
-            onCardDetails={onCardDetails}
-          />
+            ref={index === messages.length - 1 ? lastMessageRef : null}
+          >
+            <ChatMessage
+              message={msg}
+              isDisabled={isDisabled}
+              onOptionSelect={onOptionSelect}
+              onCardSelect={onCardSelect}
+              onCardDetails={onCardDetails}
+            />
+          </div>
         ))}
 
         {isTyping && <TypingIndicator />}
