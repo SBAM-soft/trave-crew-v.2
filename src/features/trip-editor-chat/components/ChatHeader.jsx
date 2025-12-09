@@ -44,14 +44,17 @@ function ChatHeader({ wizardData, currentStep, tripData }) {
       {/* Timeline giorni - mostra solo dopo aver selezionato i giorni */}
       {tripData?.totalDays && (
         <div className={styles.stepsBar}>
-          {Array.from({ length: tripData.totalDays - 1 }, (_, index) => {
-            // Calcola quanti blocchi sono stati riempiti usando filledBlocks
+          {Array.from({ length: tripData.totalDays }, (_, index) => {
+            // ✅ FIX: Mostra TUTTI i giorni incluso DEPARTURE (totalDays blocchi, non totalDays-1)
+            // filledBlocks contiene ARRIVAL + LOGISTICS + EXPERIENCE + FREE (ma NON DEPARTURE)
+            // DEPARTURE è sempre l'ultimo giorno (fisso, sempre pieno)
             const filledBlocks = tripData.filledBlocks?.length || 0;
-            const totalBlocks = tripData.totalDays - 1; // Notti = giorni - 1
+            const totalBlocks = tripData.totalDays; // Tutti i giorni incluso DEPARTURE
 
             const blockNumber = index + 1;
-            const isFilled = blockNumber <= filledBlocks;
-            const isActive = blockNumber === filledBlocks + 1;
+            const isDeparture = blockNumber === tripData.totalDays; // Ultimo giorno = DEPARTURE
+            const isFilled = blockNumber <= filledBlocks || isDeparture; // DEPARTURE è sempre "pieno"
+            const isActive = !isDeparture && blockNumber === filledBlocks + 1;
 
             return (
               <div
@@ -61,9 +64,9 @@ function ChatHeader({ wizardData, currentStep, tripData }) {
                   isActive ? styles.active :
                   styles.pending
                 }`}
-                title={`Blocco ${blockNumber}/${totalBlocks} - ${isFilled ? 'Completato' : isActive ? 'In corso' : 'Da pianificare'}`}
+                title={`${isDeparture ? '✈️ Partenza (Day ' + blockNumber + ')' : 'Blocco ' + blockNumber + '/' + (totalBlocks - 1)} - ${isFilled ? 'Completato' : isActive ? 'In corso' : 'Da pianificare'}`}
               >
-                {isFilled ? '✓' : blockNumber}
+                {isDeparture ? '✈️' : isFilled ? '✓' : blockNumber}
               </div>
             );
           })}
