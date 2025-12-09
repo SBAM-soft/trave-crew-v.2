@@ -454,6 +454,18 @@ export const CHAT_FLOW_CONFIG = {
 
         if (availableCounter === 1 || hasExistingBlocks) {
           // Primo giro o cambio zona durante selezione esperienze → vai subito a packages
+
+          // ✅ FIX: Se stiamo aggiungendo una nuova zona (hasExistingBlocks === true),
+          // aggiorna currentZoneIndex per puntare all'ULTIMA zona aggiunta
+          if (hasExistingBlocks) {
+            // Trova l'indice della zona appena aggiunta
+            const zoneIndex = tripData.selectedZones.findIndex(z => z.code === zone.code);
+            if (zoneIndex >= 0) {
+              CHAT_FLOW_CONFIG.packages.currentZoneIndex = zoneIndex;
+              console.log(`✅ Updated currentZoneIndex to ${zoneIndex} for new zone: ${zone.name}`);
+            }
+          }
+
           setTimeout(() => {
             addBotMessage('Ora selezioniamo le esperienze per questa zona! ✨');
             goToStep('packages');
@@ -979,21 +991,25 @@ export const CHAT_FLOW_CONFIG = {
         }, 500);
       } else if (value === 'change_zone') {
         addUserMessage('🗺️ Cambia zona');
-        // Rimuovi la zona corrente da selectedZones
-        const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
-        if (currentZone) {
-          store.removeZone(currentZone.code);
-        }
-        // Reset per nuova zona
+
+        // ✅ FIX: NON rimuovere la zona corrente!
+        // L'utente vuole AGGIUNGERE una nuova zona, non sostituire quella esistente
+        // La zona corrente e i suoi blocchi devono essere preservati
+
+        // Reset solo le esperienze selezionate per la nuova zona
         CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
-        CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
+
+        // NON resettare currentZoneIndex - mantieni il progresso
+        // L'indice verrà gestito automaticamente quando si aggiunge la nuova zona
+
         // Incrementa counter per sbloccare tutte le zone se necessario
         if (store.availableCounter === 1) {
           incrementCounter();
         }
-        // Torna allo step zones
+
+        // Torna allo step zones per selezionare una NUOVA zona da AGGIUNGERE
         setTimeout(() => {
-          addBotMessage('Perfetto! Scegli una nuova zona da esplorare.');
+          addBotMessage('Perfetto! Scegli una nuova zona da aggiungere al tuo viaggio.');
           setTimeout(() => goToStep('zones'), DELAY_MEDIUM);
         }, 500);
       } else if (value === 'finish_trip') {
@@ -1032,16 +1048,20 @@ export const CHAT_FLOW_CONFIG = {
         goToStep('packages');
       } else if (value === 'change_zone') {
         addUserMessage('🔄 Cambia zona');
-        // Rimuovi la zona corrente da selectedZones
-        const currentZone = tripData.selectedZones[CHAT_FLOW_CONFIG.packages.currentZoneIndex];
-        if (currentZone) {
-          store.removeZone(currentZone.code);
-        }
-        CHAT_FLOW_CONFIG.packages.currentZoneIndex = 0;
+
+        // ✅ FIX: NON rimuovere la zona corrente!
+        // L'utente vuole AGGIUNGERE una nuova zona, non sostituire quella esistente
+        // La zona corrente e i suoi blocchi devono essere preservati
+
+        // Reset solo le esperienze selezionate per la nuova zona
+        CHAT_FLOW_CONFIG.packages.selectedExperiences = [];
+
         // Incrementa counter per sbloccare tutte le zone se necessario
         if (store.availableCounter === 1) {
           incrementCounter();
         }
+
+        // Vai allo step zones per selezionare una NUOVA zona da AGGIUNGERE
         goToStep('zones');
       }
     },
