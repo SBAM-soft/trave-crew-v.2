@@ -1077,6 +1077,8 @@ export const CHAT_FLOW_CONFIG = {
 
       addBotMessage(getMessage());
 
+      console.log(`🗓️ Building timeline: totalDays=${tripData.totalDays}, filledBlocks=${tripData.filledBlocks.length}`);
+
       // Prepara dati timeline con BLOCK_TYPE
       // LOGICA: filledBlocks contiene TUTTI i blocchi incluso ARRIVAL (giorno 1)
       // Solo DEPARTURE (ultimo giorno) viene generato dinamicamente
@@ -1157,6 +1159,9 @@ export const CHAT_FLOW_CONFIG = {
           description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description()
         };
       });
+
+      console.log(`✅ Timeline created with ${days.length} days`);
+      console.log('Days breakdown:', days.map(d => `Day ${d.day}: ${d.type}`).join(', '));
 
       setTimeout(() => {
         // Riepilogo testuale con indicazione blocchi tecnici
