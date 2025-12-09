@@ -14,6 +14,9 @@
   display: flex;
   flex-direction: column;
   scroll-behavior: smooth;
+  /* Scroll più fluido e graduale */
+  scroll-padding-top: 20px;
+  scroll-padding-bottom: 20px;
 }
 
 /* Scrollbar styling */
