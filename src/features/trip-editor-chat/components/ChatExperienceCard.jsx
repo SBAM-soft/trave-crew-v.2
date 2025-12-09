@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import ExperienceDetailFullscreen from './ExperienceDetailFullscreen';
+import MarkdownText from './MarkdownText';
 import styles from './ChatExperienceCard.module.css';
 
 /**
@@ -9,6 +10,37 @@ import styles from './ChatExperienceCard.module.css';
  */
 function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, disabled = false }) {
   const [showFullscreen, setShowFullscreen] = useState(false);
+
+  // Renderizza rating con stelle
+  const renderRating = (rating) => {
+    if (!rating) return null;
+    const stars = Math.round(rating * 2) / 2; // Arrotonda a .0 o .5
+    const fullStars = Math.floor(stars);
+    const hasHalfStar = stars % 1 !== 0;
+
+    return (
+      <div className={styles.rating}>
+        <div className={styles.stars}>
+          {[...Array(fullStars)].map((_, i) => (
+            <span key={`full-${i}`} className={styles.star}>⭐</span>
+          ))}
+          {hasHalfStar && <span className={styles.starHalf}>⭐</span>}
+          {[...Array(5 - Math.ceil(stars))].map((_, i) => (
+            <span key={`empty-${i}`} className={styles.starEmpty}>☆</span>
+          ))}
+        </div>
+        <span className={styles.ratingText}>{rating.toFixed(1)}</span>
+      </div>
+    );
+  };
+
+  // Determina se mostrare badge "Popular" o "Best Seller"
+  const getBadge = () => {
+    if (!experience.rating) return null;
+    if (experience.rating >= 4.7) return { text: '🏆 Best Seller', className: styles.badgeBest };
+    if (experience.rating >= 4.3) return { text: '⭐ Popular', className: styles.badgePopular };
+    return null;
+  };
 
   const handleLike = () => {
     if (disabled) return;
@@ -55,6 +87,8 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, dis
     ? `€${experience.prezzo.toFixed(2)} / persona`
     : 'Prezzo da definire';
 
+  const badge = getBadge();
+
   return (
     <>
       <div className={styles.card}>
@@ -73,10 +107,22 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, dis
             <div className={styles.imagePlaceholder} style={{ display: 'none' }}>
               <span className={styles.placeholderEmoji}>{experience.emoji || '🎯'}</span>
             </div>
+            {/* Badge Best Seller / Popular */}
+            {badge && (
+              <div className={`${styles.badge} ${badge.className}`}>
+                {badge.text}
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.imagePlaceholder}>
             <span className={styles.placeholderEmoji}>{experience.emoji || '🎯'}</span>
+            {/* Badge Best Seller / Popular */}
+            {badge && (
+              <div className={`${styles.badge} ${badge.className}`}>
+                {badge.text}
+              </div>
+            )}
           </div>
         )}
 
@@ -87,6 +133,9 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, dis
             {experience.emoji && <span className={styles.emoji}>{experience.emoji}</span>}
             {experience.nome}
           </h3>
+
+          {/* Rating con stelle */}
+          {experience.rating && renderRating(experience.rating)}
 
           {/* Info rapide */}
           <div className={styles.quickInfo}>
@@ -108,10 +157,31 @@ function ChatExperienceCard({ experience, zone, progress, onLike, onDislike, dis
             <span className={styles.priceValue}>{priceText}</span>
           </div>
 
-          {/* Descrizione */}
-          <p className={styles.description}>
-            {experience.descrizione || experience.descrizioneEstesa}
-          </p>
+          {/* Descrizione con markdown */}
+          <div className={styles.description}>
+            <MarkdownText>
+              {experience.descrizione || experience.descrizioneEstesa || 'Esperienza da scoprire'}
+            </MarkdownText>
+          </div>
+
+          {/* Preview "Incluso nel prezzo" */}
+          {experience.incluso && experience.incluso.length > 0 && (
+            <div className={styles.included}>
+              <h4 className={styles.includedTitle}>✓ Incluso nel prezzo</h4>
+              <ul className={styles.includedList}>
+                {experience.incluso.slice(0, 3).map((item, idx) => (
+                  <li key={idx} className={styles.includedItem}>
+                    {item}
+                  </li>
+                ))}
+                {experience.incluso.length > 3 && (
+                  <li className={styles.includedMore}>
+                    +{experience.incluso.length - 3} altri inclusi
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
 
           {/* Tags / Interessi */}
           {experience.tags && experience.tags.length > 0 && (
