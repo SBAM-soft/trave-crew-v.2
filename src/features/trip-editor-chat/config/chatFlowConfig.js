@@ -770,27 +770,20 @@ export const CHAT_FLOW_CONFIG = {
 
         addBotMessage(`Perfetto! "${experience.nome}" è stata aggiunta al tuo viaggio! ✨`);
 
-        // Calcola giorni totali selezionati (ogni blocco experience o free = 1 giorno)
-        // NON contare i blocchi logistics (trasferimento/sistemazione) come nel primo giorno di arrivo
-        const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
-        const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
-        const isZoneChange = lastBlock && lastBlock.zoneCode !== currentZone.code;
-        let blocksToAdd = 1; // di default solo l'esperienza o free day
-        if (isZoneChange) {
-          blocksToAdd = 1; // solo experience/free (il logistics non conta)
-        }
-        const totalDaysUsed = experienceBlocks.length + blocksToAdd;
-        const daysAvailable = store.getDaysRemaining(); // -2 per arrivo/partenza
+        // ✅ FIX: Usa getDaysRemaining() che già calcola correttamente i giorni disponibili
+        // Formula: totalDays - 1 (departure) - filledBlocks.length
+        // filledBlocks include ARRIVAL, LOGISTICS, EXPERIENCE, FREE (ma NON DEPARTURE)
+        const daysRemaining = store.getDaysRemaining();
 
-        console.log(`📊 Giorni usati: ${totalDaysUsed}/${daysAvailable}`);
+        console.log(`📊 Giorni rimanenti: ${daysRemaining} (filledBlocks: ${tripData.filledBlocks.length}/${tripData.totalDays - 1})`);
 
         // Chiedi cosa fare dopo
         setTimeout(() => {
-          if (totalDaysUsed >= daysAvailable) {
+          if (daysRemaining <= 0) {
             // Giorni completati → vai al summary
             const { totalDays } = tripData;
             addBotMessage(
-              `🎉 Perfetto! Hai riempito tutti i ${daysAvailable} giorni disponibili!\n\n(Il giorno ${totalDays} è riservato alla partenza)`,
+              `🎉 Perfetto! Hai riempito tutti i giorni disponibili!\n\n(Il giorno ${totalDays} è riservato alla partenza)`,
               'bot_options',
               {
                 options: [
@@ -801,7 +794,7 @@ export const CHAT_FLOW_CONFIG = {
           } else {
             // Chiedi se vuole un'altra esperienza, cambiare zona o giorno libero
             addBotMessage(
-              `Cosa vuoi fare ora? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
+              `Cosa vuoi fare ora? (${daysRemaining} ${daysRemaining === 1 ? 'giorno disponibile' : 'giorni disponibili'})`,
               'bot_options',
               {
                 options: [
@@ -930,19 +923,18 @@ export const CHAT_FLOW_CONFIG = {
 
         addBotMessage(`Perfetto! Ho aggiunto ${numDays} ${numDays === 1 ? 'giorno libero' : 'giorni liberi'} al tuo itinerario! 🎉`);
 
-        // Calcola giorni totali (solo blocchi experience + free, NON logistics)
-        // +numDays perché addExperience è asincrono e lo stato potrebbe non essere ancora aggiornato
-        const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
-        const totalDaysUsed = experienceBlocks.length + numDays;
-        const daysAvailable = store.getDaysRemaining(); // -2 per arrivo/partenza
+        // ✅ FIX: Usa getDaysRemaining() che già calcola correttamente i giorni disponibili
+        const daysRemaining = store.getDaysRemaining();
+
+        console.log(`📊 Giorni rimanenti dopo free days: ${daysRemaining}`);
 
         // Chiedi cosa fare dopo
         setTimeout(() => {
-          if (totalDaysUsed >= daysAvailable) {
+          if (daysRemaining <= 0) {
             // Giorni completati → vai al summary
             const { totalDays } = tripData;
             addBotMessage(
-              `🎉 Perfetto! Hai riempito tutti i ${daysAvailable} giorni disponibili!\n\n(Il giorno ${totalDays} è riservato alla partenza)`,
+              `🎉 Perfetto! Hai riempito tutti i giorni disponibili!\n\n(Il giorno ${totalDays} è riservato alla partenza)`,
               'bot_options',
               {
                 options: [
@@ -953,7 +945,7 @@ export const CHAT_FLOW_CONFIG = {
           } else {
             // Chiedi se vuole continuare
             addBotMessage(
-              `Cosa vuoi fare ora? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
+              `Cosa vuoi fare ora? (${daysRemaining} ${daysRemaining === 1 ? 'giorno disponibile' : 'giorni disponibili'})`,
               'bot_options',
               {
                 options: [
@@ -972,12 +964,11 @@ export const CHAT_FLOW_CONFIG = {
 
         // Torna alle opzioni precedenti
         setTimeout(() => {
-          const experienceBlocks = tripData.filledBlocks.filter(b => b.type === 'experience' || b.type === 'free');
-          const totalDaysUsed = experienceBlocks.length;
-          const daysAvailable = store.getDaysRemaining();
+          // ✅ FIX: Usa getDaysRemaining() che già calcola correttamente i giorni disponibili
+          const daysRemaining = store.getDaysRemaining();
 
           addBotMessage(
-            `Nessun problema! Cosa vuoi fare? (${totalDaysUsed}/${daysAvailable} giorni usati)`,
+            `Nessun problema! Cosa vuoi fare? (${daysRemaining} ${daysRemaining === 1 ? 'giorno disponibile' : 'giorni disponibili'})`,
             'bot_options',
             {
               options: [
