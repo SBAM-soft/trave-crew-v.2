@@ -83,7 +83,8 @@ function TripSummaryUnified() {
 
       // Giorno di partenza (ultimo giorno) - BLOCCO TECNICO
       if (day === totalDays) {
-        const lastZone = filledBlocks[filledBlocks.length - 1]?.zona || wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione';
+        const lastBlock = filledBlocks[filledBlocks.length - 1];
+        const lastZone = lastBlock?.zoneName || lastBlock?.zona || wizardData.destinazioneNome || wizardData.destinazione || 'Destinazione';
         return {
           day: totalDays,
           type: BLOCK_TYPE.DEPARTURE,
@@ -129,7 +130,7 @@ function TripSummaryUnified() {
 
         // Giorno libero
         if (block.type === BLOCK_TYPE.FREE) {
-          const zona = block.zona || block.experience.zona || '';
+          const zona = block.zoneName || block.zona || block.experience?.zona || '';
           return {
             day,
             type: BLOCK_TYPE.FREE,
@@ -143,12 +144,13 @@ function TripSummaryUnified() {
         }
 
         // Esperienza normale
+        const expZona = block.zoneName || block.zona || block.experience.zona || '';
         return {
           day,
           type: BLOCK_TYPE.EXPERIENCE,
           title: block.experience.nome || block.experience.ESPERIENZE,
-          subtitle: `${block.zona || block.experience.zona || ''}${block.experience.durata ? ' • ' + block.experience.durata : ''}`,
-          description: block.experience.descrizione || block.experience.DESCRIZIONE || `Esperienza programmata${block.zona ? ' nella zona di ' + block.zona : ''}. Un'attività selezionata appositamente per rendere il tuo viaggio indimenticabile.`,
+          subtitle: `${expZona}${block.experience.durata ? ' • ' + block.experience.durata : ''}`,
+          description: block.experience.descrizione || block.experience.DESCRIZIONE || `Esperienza programmata${expZona ? ' nella zona di ' + expZona : ''}. Un'attività selezionata appositamente per rendere il tuo viaggio indimenticabile.`,
           duration: block.experience.durata || `${block.experience.SLOT || 1} slot`,
           price: block.experience.prezzo || block.experience.PRX_PAX,
           difficulty: block.experience.difficolta || block.experience.DIFFICOLTA,
@@ -164,9 +166,12 @@ function TripSummaryUnified() {
       let currentZone = '';
       for (let prevDay = day - 1; prevDay >= 1; prevDay--) {
         const prevBlock = filledBlocks.find(b => b.day === prevDay);
-        if (prevBlock && prevBlock.zona) {
-          currentZone = prevBlock.zona;
-          break;
+        if (prevBlock) {
+          const zona = prevBlock.zoneName || prevBlock.zona;
+          if (zona) {
+            currentZone = zona;
+            break;
+          }
         }
       }
 
