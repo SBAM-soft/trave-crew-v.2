@@ -210,12 +210,39 @@ const useTripEditorChatStore = create(
           const exists = state.tripData.selectedZones.some(z => z.code === zone.code);
           if (exists) return state;
 
-          // LOGICA CORRETTA: la prima zona NON crea blocco logistics
-          // Ogni zona successiva crea blocco logistics per trasferimento
+          // LOGICA DEFINITIVA:
+          // - Prima zona: crea blocco ARRIVAL (giorno 1)
+          // - Zone successive: crea blocco LOGISTICS (trasferimento)
           const isFirstZone = state.tripData.selectedZones.length === 0;
 
-          // Blocco logistics SOLO per zone successive (trasferimento)
-          if (!isFirstZone) {
+          if (isFirstZone) {
+            // PRIMA ZONA: crea blocco ARRIVAL (giorno 1)
+            const arrivalBlock = {
+              day: 1,
+              type: BLOCK_TYPE.ARRIVAL,
+              zoneCode: zone.code,
+              zoneName: zone.name,
+              experience: {
+                nome: `Arrivo a ${zone.name}`,
+                descrizione: `Arrivo e sistemazione a ${zone.name}`,
+                type: BLOCK_TYPE.ARRIVAL
+              }
+            };
+
+            console.log(`✈️ Prima zona selezionata: ${zone.name} - Creato blocco ARRIVAL (Day 1)`);
+
+            return {
+              tripData: {
+                ...state.tripData,
+                selectedZones: [...state.tripData.selectedZones, {
+                  ...zone,
+                  order: 1
+                }],
+                filledBlocks: [arrivalBlock]
+              }
+            };
+          } else {
+            // ZONE SUCCESSIVE: crea blocco LOGISTICS
             // Calcola lastDay per il nuovo blocco logistics
             const lastDay = getLastDay(state.tripData.filledBlocks);
 
@@ -252,31 +279,61 @@ const useTripEditorChatStore = create(
                 filledBlocks: [...state.tripData.filledBlocks, logisticsBlock]
               }
             };
-          } else {
-            // Prima zona: nessun blocco logistics
-            console.log(`🎯 Prima zona selezionata: ${zone.name} - Nessun blocco logistics creato`);
-
-            return {
-              tripData: {
-                ...state.tripData,
-                selectedZones: [...state.tripData.selectedZones, {
-                  ...zone,
-                  order: state.tripData.selectedZones.length + 1
-                }]
-              }
-            };
           }
         }),
 
-        removeZone: (zoneCode) => set((state) => ({
-          tripData: {
-            ...state.tripData,
-            selectedZones: state.tripData.selectedZones
-              .filter(z => z.code !== zoneCode)
-              // Ricalcola order
-              .map((z, idx) => ({ ...z, order: idx + 1 }))
+        removeZone: (zoneCode) => set((state) => {
+          // Trova la zona da rimuovere
+          const zoneToRemove = state.tripData.selectedZones.find(z => z.code === zoneCode);
+          const isFirstZone = zoneToRemove?.order === 1;
+
+          // Rimuovi zona da selectedZones
+          const newSelectedZones = state.tripData.selectedZones
+            .filter(z => z.code !== zoneCode)
+            .map((z, idx) => ({ ...z, order: idx + 1 }));
+
+          // Rimuovi tutti i blocchi associati a quella zona
+          let newFilledBlocks = state.tripData.filledBlocks.filter(
+            block => block.zoneCode !== zoneCode
+          );
+
+          // CASO CRITICO: Se rimuovo la prima zona e ci sono altre zone
+          // Il primo blocco LOGISTICS deve diventare ARRIVAL
+          if (isFirstZone && newFilledBlocks.length > 0 && newSelectedZones.length > 0) {
+            const firstBlock = newFilledBlocks[0];
+            if (firstBlock.type === BLOCK_TYPE.LOGISTICS) {
+              // Converti LOGISTICS in ARRIVAL
+              newFilledBlocks[0] = {
+                ...firstBlock,
+                day: 1,
+                type: BLOCK_TYPE.ARRIVAL,
+                experience: {
+                  ...firstBlock.experience,
+                  nome: `Arrivo a ${firstBlock.zoneName}`,
+                  descrizione: `Arrivo e sistemazione a ${firstBlock.zoneName}`,
+                  type: BLOCK_TYPE.ARRIVAL
+                }
+              };
+              console.log(`✈️ Convertito LOGISTICS in ARRIVAL per nuova prima zona: ${firstBlock.zoneName}`);
+            }
+
+            // Ricompatta tutti i giorni dopo il primo
+            newFilledBlocks = newFilledBlocks.map((block, idx) => {
+              if (idx === 0) return block; // Primo blocco (ARRIVAL) già al giorno 1
+              return { ...block, day: idx + 1 };
+            });
           }
-        })),
+
+          console.log(`🗑️ Zona rimossa: ${zoneCode} - Rimossi ${state.tripData.filledBlocks.length - newFilledBlocks.length} blocchi`);
+
+          return {
+            tripData: {
+              ...state.tripData,
+              selectedZones: newSelectedZones,
+              filledBlocks: newFilledBlocks
+            }
+          };
+        }),
 
         addPackage: (zoneCode, packageData, experiences) => set((state) => {
           const zone = state.tripData.selectedZones.find(z => z.code === zoneCode);
@@ -441,12 +498,18 @@ const useTripEditorChatStore = create(
           const state = get();
           const { totalDays, filledBlocks } = state.tripData;
           if (!totalDays) return 0;
-          // LOGICA CORRETTA:
-          // - filledBlocks contiene tutti i giorni programmati (esperienze + trasferimenti zone)
-          // - Prima zona NON crea blocco logistics, le esperienze partono da Day 1
-          // - Zone successive creano blocco logistics per trasferimento
-          // - Ultimo giorno (partenza) NON è in filledBlocks
-          // Esempio 10 giorni: Day 1-9 disponibili per blocchi, Day 10 partenza
+
+          // LOGICA DEFINITIVA CON ARRIVAL IN filledBlocks:
+          // - filledBlocks[0] = ARRIVAL (giorno 1) - creato quando si seleziona prima zona
+          // - filledBlocks[1..N] = LOGISTICS + EXPERIENCE + FREE
+          // - DEPARTURE (giorno totalDays) NON è in filledBlocks (generato dinamicamente)
+          //
+          // Formula: totalDays - 1 (departure) - filledBlocks.length
+          //
+          // Esempio 8 giorni (7 notti):
+          // - Dopo prima zona: filledBlocks = [ARRIVAL] → 8 - 1 - 1 = 6 disponibili ✅
+          // - Dopo 2 esperienze: filledBlocks = [ARRIVAL, EXP, EXP] → 8 - 1 - 3 = 4 disponibili ✅
+          // - Tutti pieni: filledBlocks = 7 blocchi → 8 - 1 - 7 = 0 disponibili ✅
           return totalDays - 1 - filledBlocks.length;
         },
 

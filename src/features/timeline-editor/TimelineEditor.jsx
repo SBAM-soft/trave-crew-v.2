@@ -35,49 +35,37 @@ function TimelineEditor() {
 
   const buildTimeline = () => {
     const days = [];
-    const firstZone = filledBlocks[0]?.zoneName || wizardData.destinazione;
     const lastBlock = filledBlocks[filledBlocks.length - 1];
-    const lastZone = lastBlock?.zoneName || firstZone;
+    const lastZone = lastBlock?.zoneName || lastBlock?.zona || wizardData.destinazione;
 
-    // Giorno 1 - Arrivo (BLOCCO TECNICO)
-    days.push({
-      dayNumber: 1,
-      type: BLOCK_TYPE.ARRIVAL,
-      title: `${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].icon} ${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].label}`,
-      description: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].description(firstZone),
-      zoneName: firstZone,
-      experiences: [],
-      notes: 'Check-in hotel, orientamento nella zona'
-    });
+    // Costruisci timeline da filledBlocks + DEPARTURE finale
+    // LOGICA: filledBlocks contiene TUTTI i blocchi incluso ARRIVAL (giorno 1)
+    for (let i = 1; i < totalDays; i++) {
+      const block = filledBlocks.find(b => b.day === i);
 
-    // Giorni intermedi (2 a totalDays-1)
-    for (let i = 2; i < totalDays; i++) {
-      const block = filledBlocks.find(b =>
-        typeof b === 'object' ? b.day === i : b === i
-      );
-
-      if (block && typeof block === 'object' && block.experience) {
+      if (block && block.experience) {
         const blockConfig = BLOCK_CONFIG[block.type] || BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE];
+
+        // Formatta titolo in base al tipo
+        let title;
+        if (block.type === BLOCK_TYPE.ARRIVAL || block.type === BLOCK_TYPE.DEPARTURE || block.type === BLOCK_TYPE.LOGISTICS) {
+          title = `${blockConfig.icon} ${blockConfig.label}`;
+        } else {
+          title = `${blockConfig.icon} Giorno ${i}`;
+        }
+
         days.push({
           dayNumber: i,
           type: block.type,
-          title: `${blockConfig.icon} Giorno ${i}`,
+          title,
+          description: block.experience.descrizione,
           zoneName: block.zoneName || block.zona,
-          experiences: [block.experience],
+          experiences: block.type === BLOCK_TYPE.EXPERIENCE ? [block.experience] : [],
           packageName: block.packageName || '',
           notes: ''
         });
-      } else if (block) {
-        days.push({
-          dayNumber: i,
-          type: BLOCK_TYPE.FREE,
-          title: `${BLOCK_CONFIG[BLOCK_TYPE.FREE].icon} Giorno ${i} - Giorno libero`,
-          zoneName: block.zoneName,
-          description: BLOCK_CONFIG[BLOCK_TYPE.FREE].description(),
-          experiences: [],
-          notes: ''
-        });
       } else {
+        // Giorno senza blocco
         days.push({
           dayNumber: i,
           type: BLOCK_TYPE.EMPTY,
@@ -89,7 +77,7 @@ function TimelineEditor() {
       }
     }
 
-    // Ultimo giorno - Partenza (BLOCCO TECNICO)
+    // Ultimo giorno - DEPARTURE (generato dinamicamente)
     days.push({
       dayNumber: totalDays,
       type: BLOCK_TYPE.DEPARTURE,

@@ -1067,22 +1067,12 @@ export const CHAT_FLOW_CONFIG = {
       addBotMessage(getMessage());
 
       // Prepara dati timeline con BLOCK_TYPE
+      // LOGICA: filledBlocks contiene TUTTI i blocchi incluso ARRIVAL (giorno 1)
+      // Solo DEPARTURE (ultimo giorno) viene generato dinamicamente
       const days = Array.from({ length: tripData.totalDays }, (_, i) => {
         const dayNumber = i + 1;
 
-        // Giorno 1 - BLOCCO TECNICO ARRIVO
-        if (dayNumber === 1) {
-          const firstZone = tripData.filledBlocks[0]?.zoneName || tripData.selectedZones[0]?.name || 'destinazione';
-          return {
-            day: 1,
-            type: BLOCK_TYPE.ARRIVAL,
-            title: `${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].icon} ${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].label}`,
-            description: BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].description(firstZone),
-            isTechnical: true
-          };
-        }
-
-        // Ultimo giorno - BLOCCO TECNICO PARTENZA
+        // Ultimo giorno - BLOCCO TECNICO PARTENZA (generato dinamicamente)
         if (dayNumber === tripData.totalDays) {
           const lastBlock = tripData.filledBlocks[tripData.filledBlocks.length - 1];
           const lastZone = lastBlock?.zoneName || lastBlock?.zona || 'destinazione';
@@ -1091,15 +1081,28 @@ export const CHAT_FLOW_CONFIG = {
             type: BLOCK_TYPE.DEPARTURE,
             title: `${BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].icon} ${BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].label}`,
             description: BLOCK_CONFIG[BLOCK_TYPE.DEPARTURE].description(lastZone),
-            isTechnical: true
+            isTechnical: true,
+            zone: lastZone
           };
         }
 
-        // Giorni intermedi - cerca blocco corrispondente
+        // Cerca blocco in filledBlocks per questo giorno
         const block = tripData.filledBlocks.find(b => b.day === dayNumber);
 
         if (block) {
           const blockConfig = BLOCK_CONFIG[block.type] || BLOCK_CONFIG[BLOCK_TYPE.EXPERIENCE];
+
+          // BLOCCO TECNICO ARRIVAL (giorno 1)
+          if (block.type === BLOCK_TYPE.ARRIVAL) {
+            return {
+              day: dayNumber,
+              type: BLOCK_TYPE.ARRIVAL,
+              title: `${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].icon} ${BLOCK_CONFIG[BLOCK_TYPE.ARRIVAL].label}`,
+              description: block.experience.descrizione,
+              zone: block.zoneName || block.zona,
+              isTechnical: true
+            };
+          }
 
           // BLOCCO TECNICO LOGISTICS (trasferimento)
           if (block.type === BLOCK_TYPE.LOGISTICS) {
