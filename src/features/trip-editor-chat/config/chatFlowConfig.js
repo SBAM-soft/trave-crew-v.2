@@ -444,7 +444,6 @@ export const CHAT_FLOW_CONFIG = {
       } else if (value.action === 'stay') {
         const zone = value.zone;
         addUserMessage(`✨ Scegli un'esperienza in ${zone.name}`);
-        addBotMessage(`Perfetto! Ora seleziona un'esperienza da fare in ${zone.name}.`);
 
         const totalDaysSelected = tripData.selectedZones.reduce((sum, z) => sum + z.daysRecommended, 0);
         const daysAvailable = store.getDaysRemaining();
@@ -467,9 +466,8 @@ export const CHAT_FLOW_CONFIG = {
           }
 
           setTimeout(() => {
-            addBotMessage('Ora selezioniamo le esperienze per questa zona! ✨');
             goToStep('packages');
-          }, 1000);
+          }, 800);
         } else {
           // Contatori successivi durante setup iniziale - chiedi se proseguire o aggiungere zone
           if (totalDaysSelected >= daysAvailable) {
