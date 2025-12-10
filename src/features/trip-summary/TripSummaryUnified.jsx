@@ -592,6 +592,19 @@ function TripSummaryUnified() {
                   <span className={styles.dayIcon}>{item.icon}</span>
                 </div>
                 <div className={styles.timelineContent}>
+                  {/* Immagine per esperienze */}
+                  {item.type === 'experience' && item.image && (
+                    <div className={styles.timelineImageWrapper}>
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className={styles.timelineImage}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className={styles.timelineDay}>Giorno {item.day}</div>
                   <h3 className={styles.timelineTitle}>{item.title}</h3>
                   <p className={styles.timelineSubtitle}>📍 {item.subtitle}</p>
@@ -660,6 +673,81 @@ function TripSummaryUnified() {
           </div>
         </motion.div>
 
+        {/* Nuova Card Zone Visitate */}
+        {zoneVisitate && zoneVisitate.length > 0 && (
+          <motion.div
+            className={styles.card}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>🗺️ Zone Visitate</h2>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.zonesGrid}>
+                {zoneVisitate.map((zona, idx) => {
+                  // Calcola notti per questa zona
+                  const nottiZona = filledBlocks.filter(b =>
+                    (b.zoneName === zona.nome || b.zona === zona.nome) &&
+                    b.type !== BLOCK_TYPE.DEPARTURE
+                  ).length;
+
+                  // Calcola esperienze per questa zona
+                  const esperienze = filledBlocks.filter(b =>
+                    (b.zoneName === zona.nome || b.zona === zona.nome) &&
+                    b.type === BLOCK_TYPE.EXPERIENCE
+                  );
+
+                  return (
+                    <motion.div
+                      key={idx}
+                      className={styles.zoneCard}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.7 + idx * 0.1, duration: 0.4 }}
+                    >
+                      <div className={styles.zoneHeader}>
+                        <h3 className={styles.zoneName}>
+                          📍 {zona.nome}
+                        </h3>
+                        <div className={styles.zoneBadges}>
+                          <span className={styles.zoneBadge}>
+                            🌙 {nottiZona} {nottiZona === 1 ? 'notte' : 'notti'}
+                          </span>
+                          <span className={styles.zoneBadge}>
+                            🎯 {esperienze.length} {esperienze.length === 1 ? 'esperienza' : 'esperienze'}
+                          </span>
+                        </div>
+                      </div>
+                      {zona.descrizione && (
+                        <p className={styles.zoneDescription}>{zona.descrizione}</p>
+                      )}
+                      {esperienze.length > 0 && (
+                        <div className={styles.zoneExperiences}>
+                          <h4 className={styles.zoneExperiencesTitle}>Highlights</h4>
+                          <ul className={styles.zoneExperiencesList}>
+                            {esperienze.slice(0, 3).map((exp, i) => (
+                              <li key={i} className={styles.zoneExperienceItem}>
+                                {exp.experience.emoji || '✨'} {exp.experience.nome || exp.experience.ESPERIENZE}
+                              </li>
+                            ))}
+                            {esperienze.length > 3 && (
+                              <li className={styles.zoneExperienceMore}>
+                                +{esperienze.length - 3} altre esperienze
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Card Riepilogo Costi */}
         <motion.div
           className={`${styles.card} ${styles.costCard}`}
@@ -672,26 +760,95 @@ function TripSummaryUnified() {
           </div>
           <div className={styles.cardBody}>
             <div className={styles.costBreakdown}>
+              {/* Esperienze con barra visuale */}
               <div className={styles.costRow}>
-                <span>Esperienze</span>
-                <span className={styles.costValue}>€{costs.experiences.toFixed(2)}</span>
+                <div className={styles.costLabel}>
+                  <span>🎯 Esperienze</span>
+                  <span className={styles.costValue}>€{costs.experiences.toFixed(2)}</span>
+                </div>
+                <div className={styles.costBarWrapper}>
+                  <div
+                    className={styles.costBar}
+                    style={{
+                      width: `${costs.total > 0 ? (costs.experiences / costs.total * 100) : 0}%`,
+                      background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
+                    }}
+                  >
+                    <span className={styles.costPercentage}>
+                      {costs.total > 0 ? `${((costs.experiences / costs.total) * 100).toFixed(0)}%` : '0%'}
+                    </span>
+                  </div>
+                </div>
               </div>
+
+              {/* Hotel con barra visuale */}
               <div className={styles.costRow}>
-                <span>Hotel</span>
-                <span className={styles.costValue}>
-                  {selectedHotels.length === 0 ? 'Da selezionare' : `€${costs.hotels.toFixed(2)}`}
-                </span>
+                <div className={styles.costLabel}>
+                  <span>🏨 Hotel</span>
+                  <span className={styles.costValue}>
+                    {selectedHotels.length === 0 ? 'Da selezionare' : `€${costs.hotels.toFixed(2)}`}
+                  </span>
+                </div>
+                {selectedHotels.length > 0 && (
+                  <div className={styles.costBarWrapper}>
+                    <div
+                      className={styles.costBar}
+                      style={{
+                        width: `${costs.total > 0 ? (costs.hotels / costs.total * 100) : 0}%`,
+                        background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
+                      }}
+                    >
+                      <span className={styles.costPercentage}>
+                        {costs.total > 0 ? `${((costs.hotels / costs.total) * 100).toFixed(0)}%` : '0%'}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Extra con barra visuale */}
               {costs.extras > 0 && (
                 <div className={styles.costRow}>
-                  <span>Extra</span>
-                  <span className={styles.costValue}>€{costs.extras.toFixed(2)}</span>
+                  <div className={styles.costLabel}>
+                    <span>✨ Extra</span>
+                    <span className={styles.costValue}>€{costs.extras.toFixed(2)}</span>
+                  </div>
+                  <div className={styles.costBarWrapper}>
+                    <div
+                      className={styles.costBar}
+                      style={{
+                        width: `${costs.total > 0 ? (costs.extras / costs.total * 100) : 0}%`,
+                        background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)'
+                      }}
+                    >
+                      <span className={styles.costPercentage}>
+                        {costs.total > 0 ? `${((costs.extras / costs.total) * 100).toFixed(0)}%` : '0%'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
+
+              {/* Costi Accessori con barra visuale */}
               {costs.accessories > 0 && (
                 <div className={styles.costRow}>
-                  <span>Costi Accessori</span>
-                  <span className={styles.costValue}>€{costs.accessories.toFixed(2)}</span>
+                  <div className={styles.costLabel}>
+                    <span>📋 Costi Accessori</span>
+                    <span className={styles.costValue}>€{costs.accessories.toFixed(2)}</span>
+                  </div>
+                  <div className={styles.costBarWrapper}>
+                    <div
+                      className={styles.costBar}
+                      style={{
+                        width: `${costs.total > 0 ? (costs.accessories / costs.total * 100) : 0}%`,
+                        background: 'linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%)'
+                      }}
+                    >
+                      <span className={styles.costPercentage}>
+                        {costs.total > 0 ? `${((costs.accessories / costs.total) * 100).toFixed(0)}%` : '0%'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
               {costs.accessoriesItems && costs.accessoriesItems.length > 0 && (
